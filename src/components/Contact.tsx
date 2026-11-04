@@ -101,7 +101,7 @@ export const Contact: React.FC = () => {
                   style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) contrast(80%)' }} 
                   loading="lazy" 
                   referrerPolicy="no-referrer-when-downgrade"
-                  src="https://www.google.com/maps/@51.077776,17.0220223,18.76z?entry=ttu&g_ep=EgoyMDI2MTEwMS4wIKXMDSoASAFQAw%3D%3D=&output=embed"
+                  src="https://maps.google.com/maps?q=51.1578351,17.1517725&t=&z=15&ie=UTF8&iwloc=&output=embed"
                 />
               </Reveal>
             </div>
