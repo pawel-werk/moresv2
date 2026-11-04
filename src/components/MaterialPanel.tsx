@@ -1,6 +1,5 @@
 import React from 'react';
 
-// Dodano wariant 'azure' dla błękitnego koloru
 export type MaterialVariant = 'bazalt' | 'magma' | 'lithos' | 'tundra' | 'lumina' | 'azure';
 export type ProfileType = 'flat' | 'frame' | 'slatted' | 'grooved' | 'integrated-handle' | 'half-round' | 'integrated-handle-full' | 'integrated-handle-centered' | 'integrated-handle-hidden' | 'raised-panel' | 'micro-frame' | 'shaker' | 'complex-raised-panel' | 'double-stepped-panel' | 'vertical-stiles-raised' | 'flat-grooves' | 'concave-grooves' | 'mullion-frame' | 'glass-frame' | 'lattice-frame';
 
@@ -30,11 +29,11 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
   const getVariantStyle = () => {
     switch (variant) {
       case 'bazalt': return 'bg-graphite'; 
-      case 'magma': return 'bg-brand'; 
+      case 'magma': return 'bg-[#5D4037]'; // ZMIANA: bezposredni kolor zamiast bg-brand
       case 'lithos': return 'bg-ash'; 
       case 'tundra': return 'bg-oak bg-grain'; 
       case 'lumina': return 'bg-paper';
-      case 'azure': return 'bg-[#5c7a8c]'; // Błękitny/Stalowy wariant
+      case 'azure': return 'bg-[#5c7a8c]'; 
       default: return 'bg-graphite';
     }
   };

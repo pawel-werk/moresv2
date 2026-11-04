@@ -12,7 +12,6 @@ type CatalogItem = {
   longDesc: string;
 };
 
-// Zmieniony odcień brązu (magma) na bardziej naturalny, zgaszony (orzech/czekolada)
 const colorOptions: { id: MaterialVariant; name: string; bgClass: string }[] = [
   { id: 'lithos', name: 'Jasny', bgClass: 'bg-[#D3CCC3]' },
   { id: 'azure', name: 'Błękitny', bgClass: 'bg-[#5c7a8c]' },
@@ -144,8 +143,8 @@ export const CatalogPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* SEKCJA Z WARIANTAMI KOLORYSTYCZNYMI (POD FRONTEM) */}
-              <div className="relative z-10 mt-12 md:mt-16 flex gap-4 md:gap-6 items-center justify-center w-full">
+              {/* SEKCJA Z WARIANTAMI KOLORYSTYCZNYMI */}
+              <div className="relative z-10 mt-12 md:mt-16 flex gap-5 md:gap-7 items-center justify-center w-full">
                 {colorOptions.map((opt) => (
                   <button
                     key={opt.id}
@@ -154,14 +153,14 @@ export const CatalogPage: React.FC = () => {
                     title={opt.name}
                     aria-label={`Wybierz kolor ${opt.name}`}
                   >
+                    {/* ZMIANA: Mocniejsze skalowanie (scale-125) i wyrazniejsza poświata (shadow) dla aktywnego */}
                     <span 
                       className={`w-10 h-10 md:w-14 md:h-14 rounded-sm border-[2px] transition-all duration-300 flex items-center justify-center ${opt.bgClass} ${
                         activeVariant === opt.id 
-                          ? 'border-copper scale-110 shadow-[0_0_15px_rgba(184,107,62,0.3)]' 
+                          ? 'border-copper scale-125 shadow-[0_0_25px_rgba(184,107,62,0.6)] z-10' 
                           : 'border-line-dark/50 hover:border-gold/50'
                       }`}
                     >
-                      {/* Wewnętrzny cień urealniający próbkę koloru */}
                       <span className="w-full h-full block rounded-[2px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)]" />
                     </span>
                   </button>
