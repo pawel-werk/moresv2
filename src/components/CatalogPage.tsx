@@ -1,16 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { ExternalLinkIcon, XIcon } from './Icons';
 import { Reveal } from './Reveal';
-import { MaterialPanel } from './MaterialPanel';
+import { MaterialPanel, MaterialVariant } from './MaterialPanel';
 import { scrollToSection } from '../utils/scrollToSection';
 
 type CatalogItem = {
   title: string;
   desc: string;
-  variant: 'bazalt' | 'magma' | 'lithos' | 'tundra' | 'lumina';
+  variant: MaterialVariant;
   profile: 'flat' | 'frame' | 'slatted' | 'grooved' | 'integrated-handle' | 'half-round' | 'integrated-handle-full' | 'integrated-handle-centered' | 'integrated-handle-hidden' | 'raised-panel' | 'micro-frame' | 'shaker' | 'complex-raised-panel' | 'double-stepped-panel' | 'vertical-stiles-raised' | 'flat-grooves' | 'concave-grooves' | 'mullion-frame' | 'glass-frame' | 'lattice-frame';
   longDesc: string;
 };
+
+// Definicja dostępnych kolorów w podglądzie
+const colorOptions: { id: MaterialVariant; name: string; bgClass: string }[] = [
+  { id: 'lithos', name: 'Jasny', bgClass: 'bg-[#D3CCC3]' },
+  { id: 'azure', name: 'Błękitny', bgClass: 'bg-[#5c7a8c]' },
+  { id: 'magma', name: 'Brązowy', bgClass: 'bg-[#824626]' },
+  { id: 'bazalt', name: 'Grafitowy', bgClass: 'bg-[#212121]' }
+];
 
 const catalogFronts: CatalogItem[] = [
   { title: "F-1", desc: "Płaski / Uchwyt pełny", variant: "lithos", profile: "integrated-handle-full", longDesc: "Czysty, płaski front ze zintegrowanym uchwytem frezowanym na całej szerokości krawędzi. Kwintesencja minimalizmu i funkcjonalności." },
@@ -38,10 +46,8 @@ const FrontBacking: React.FC<{ profile: string; className?: string; children: Re
   const isLattice = profile === 'lattice-frame';
   
   if (isLattice) {
-    // Specjalne tło dla kratki F-18 symulujące głębię i ciemną przestrzeń za ażurem
     return (
       <div className={`w-full h-full rounded-sm overflow-hidden relative bg-[#2A2522] ${className}`}>
-        {/* Wewnętrzny cień imitujący grubość otworu i padające światło */}
         <div className="absolute inset-0 shadow-[inset_0_2px_8px_rgba(0,0,0,0.8)] pointer-events-none z-0" />
         <div className="relative z-10 w-full h-full">
           {children}
@@ -61,6 +67,7 @@ const FrontBacking: React.FC<{ profile: string; className?: string; children: Re
 
 export const CatalogPage: React.FC = () => {
   const [selectedFront, setSelectedFront] = useState<CatalogItem | null>(null);
+  const [activeVariant, setActiveVariant] = useState<MaterialVariant>('lithos');
   const pdfUrl = "/katalog/mores-katalog.pdf";
 
   useEffect(() => {
@@ -69,17 +76,19 @@ export const CatalogPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && selectedFront) setSelectedFront(null);
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    
     if (selectedFront) {
+      setActiveVariant(selectedFront.variant);
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
-    
+  }, [selectedFront]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && selectedFront) setSelectedFront(null);
+    };
+    document.addEventListener('keydown', handleKeyDown);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = '';
@@ -111,32 +120,54 @@ export const CatalogPage: React.FC = () => {
               <XIcon className="w-6 h-6 md:w-8 md:h-8" aria-hidden="true" />
             </button>
 
-            {/* LEWA STRONA: Grafika */}
-            <div className="w-full md:w-1/2 bg-night p-6 pt-12 pb-8 md:p-20 lg:p-24 relative flex items-center justify-center min-h-[340px] md:min-h-0 md:h-full shrink-0 border-b md:border-b-0 md:border-r border-line-dark">
-              {/* Radialne ciepłe światło z tyłu zapewniające kontrast dla paneli bazalt/magma */}
+            {/* LEWA STRONA: Grafika i Swatche */}
+            <div className="w-full md:w-1/2 bg-night p-6 pt-12 pb-8 md:p-20 lg:p-24 relative flex flex-col items-center justify-center min-h-[340px] md:min-h-0 md:h-full shrink-0 border-b md:border-b-0 md:border-r border-line-dark overflow-y-auto">
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(184,107,62,0.12),transparent_70%)] pointer-events-none scale-150" />
               
               <div className="relative w-full max-w-[160px] sm:max-w-[200px] md:max-w-[280px] lg:max-w-[340px] aspect-[3/4] rounded-sm mt-4 md:mt-0 shadow-[0_20px_40px_rgba(0,0,0,0.8)]">
                 <FrontBacking profile={selectedFront.profile}>
-                  <MaterialPanel variant={selectedFront.variant} profile={selectedFront.profile} className="w-full h-full rounded-sm" />
+                  <MaterialPanel variant={activeVariant} profile={selectedFront.profile} className="w-full h-full rounded-sm transition-all duration-300" />
                 </FrontBacking>
                 
-                {/* Lupa powiększająca - PRAWDZIWE SKALOWANIE CSS */}
                 <div className="absolute -top-8 -right-10 sm:-top-10 sm:-right-12 md:-top-24 md:-right-28 lg:-top-[130px] lg:-right-[150px] w-40 h-40 sm:w-48 sm:h-48 md:w-72 md:h-72 lg:w-[340px] lg:h-[340px] rounded-full border-[4px] md:border-[8px] border-line-dark shadow-2xl overflow-hidden z-20 pointer-events-none bg-surface flex items-start justify-end">
                   <div className="origin-top-right transform scale-[1.6] sm:scale-[1.8] md:scale-[2.2] lg:scale-[2.5] mt-4 mr-4 md:mt-10 md:mr-10">
                     <div className="w-[120px] sm:w-[140px] md:w-[180px] lg:w-[220px] aspect-[3/4] rounded-sm flex-shrink-0">
                       <FrontBacking profile={selectedFront.profile}>
                         <MaterialPanel 
-                          variant={selectedFront.variant} 
+                          variant={activeVariant} 
                           profile={selectedFront.profile} 
-                          className="w-full h-full" 
+                          className="w-full h-full transition-all duration-300" 
                         />
                       </FrontBacking>
                     </div>
                   </div>
                 </div>
-
               </div>
+
+              {/* SEKCJA Z WARIANTAMI KOLORYSTYCZNYMI (POD FRONTEM) */}
+              <div className="relative z-10 mt-12 md:mt-16 flex gap-4 md:gap-6 items-center justify-center w-full">
+                {colorOptions.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setActiveVariant(opt.id)}
+                    className="group relative flex flex-col items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-2 focus-visible:ring-offset-night rounded-sm"
+                    title={opt.name}
+                    aria-label={`Wybierz kolor ${opt.name}`}
+                  >
+                    <span 
+                      className={`w-10 h-10 md:w-14 md:h-14 rounded-sm border-[2px] transition-all duration-300 flex items-center justify-center ${opt.bgClass} ${
+                        activeVariant === opt.id 
+                          ? 'border-copper scale-110 shadow-[0_0_15px_rgba(184,107,62,0.3)]' 
+                          : 'border-line-dark/50 hover:border-gold/50'
+                      }`}
+                    >
+                      {/* Wewnętrzny cień urealniający próbkę koloru */}
+                      <span className="w-full h-full block rounded-[2px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)]" />
+                    </span>
+                  </button>
+                ))}
+              </div>
+
             </div>
 
             {/* PRAWA STRONA: Teksty */}
@@ -144,14 +175,14 @@ export const CatalogPage: React.FC = () => {
               <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-ivory mb-1 md:mb-4">{selectedFront.title}</h2>
               <p className="text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-widest font-semibold text-gold mb-3 md:mb-10">{selectedFront.desc}</p>
               
-              <p className="text-ivory/70 font-light leading-snug md:leading-relaxed mb-4 md:mb-16 text-[14px] sm:text-[15px] md:text-xl lg:text-2xl text-left">
+              <p className="text-ivory/70 font-light leading-snug md:leading-relaxed mb-6 md:mb-12 text-[14px] sm:text-[15px] md:text-xl lg:text-2xl text-left">
                 {selectedFront.longDesc}
               </p>
 
               <a 
                 href="#kontakt" 
                 onClick={handleContactClick}
-                className="bg-[linear-gradient(135deg,var(--color-copper),var(--color-gold))] text-night px-6 py-3 md:px-12 md:py-5 text-[14px] md:text-lg font-medium hover:brightness-110 transition-all rounded-sm inline-block text-center w-max mx-auto mt-1 md:mt-4 shadow-[0_0_20px_rgba(184,107,62,0.15)] hover:shadow-[0_0_30px_rgba(184,107,62,0.25)] outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+                className="bg-[linear-gradient(135deg,var(--color-copper),var(--color-gold))] text-night px-6 py-3 md:px-12 md:py-5 text-[14px] md:text-lg font-medium hover:brightness-110 transition-all rounded-sm inline-block w-max mx-auto md:mx-0 mt-1 shadow-[0_0_20px_rgba(184,107,62,0.15)] hover:shadow-[0_0_30px_rgba(184,107,62,0.25)] outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
               >
                 Zapytaj o ten front
               </a>
@@ -161,6 +192,7 @@ export const CatalogPage: React.FC = () => {
         </div>
       )}
 
+      {/* --- GŁÓWNY WIDOK KATALOGU --- */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <header className="mb-16 md:mb-20 flex flex-col lg:flex-row lg:justify-between lg:items-end gap-10">
@@ -207,7 +239,6 @@ export const CatalogPage: React.FC = () => {
                   onClick={() => setSelectedFront(item)}
                 >
                   <div className="w-full aspect-[3/4] rounded-sm transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-2 relative flex items-center justify-center bg-surface-2/30 shadow-[0_10px_20px_rgba(0,0,0,0.4)] group-hover:shadow-[0_15px_30px_rgba(0,0,0,0.6)]">
-                    {/* Delikatne podświetlenie bazy dla ciemnych frontów */}
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(184,107,62,0.08),transparent_70%)] pointer-events-none scale-150" />
                     
                     <FrontBacking profile={item.profile} className="relative z-10">

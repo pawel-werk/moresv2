@@ -1,6 +1,7 @@
 import React from 'react';
 
-export type MaterialVariant = 'bazalt' | 'magma' | 'lithos' | 'tundra' | 'lumina';
+// Dodano wariant 'azure' dla błękitnego koloru
+export type MaterialVariant = 'bazalt' | 'magma' | 'lithos' | 'tundra' | 'lumina' | 'azure';
 export type ProfileType = 'flat' | 'frame' | 'slatted' | 'grooved' | 'integrated-handle' | 'half-round' | 'integrated-handle-full' | 'integrated-handle-centered' | 'integrated-handle-hidden' | 'raised-panel' | 'micro-frame' | 'shaker' | 'complex-raised-panel' | 'double-stepped-panel' | 'vertical-stiles-raised' | 'flat-grooves' | 'concave-grooves' | 'mullion-frame' | 'glass-frame' | 'lattice-frame';
 
 interface MaterialPanelProps {
@@ -32,12 +33,13 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
       case 'magma': return 'bg-brand'; 
       case 'lithos': return 'bg-ash'; 
       case 'tundra': return 'bg-oak bg-grain'; 
-      case 'lumina': return 'bg-paper'; 
+      case 'lumina': return 'bg-paper';
+      case 'azure': return 'bg-[#5c7a8c]'; // Błękitny/Stalowy wariant
       default: return 'bg-graphite';
     }
   };
 
-  const isDark = variant === 'bazalt' || variant === 'magma';
+  const isDark = variant === 'bazalt' || variant === 'magma' || variant === 'azure';
   const shadowOp = isDark ? '0.7' : '0.15'; 
   const highlightOp = isDark ? '0.1' : '0.7'; 
 
@@ -47,7 +49,6 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
     </div>
   );
 
-  // Ustalenie, czy front wymaga przezroczystego środka (witryny, ażury)
   let seeThroughBevel = '0px';
   if (profile === 'glass-frame' || profile === 'mullion-frame') seeThroughBevel = '6px';
   if (profile === 'lattice-frame') seeThroughBevel = '10px';
@@ -56,7 +57,6 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
   return (
     <div className={`relative overflow-hidden rounded-sm shadow-xl ${isSeeThrough ? '' : getVariantStyle()} ${className}`}>
       
-      {/* Podbudowa ramy dla frontów "na wylot" */}
       {isSeeThrough && (
         <>
           <div className={`absolute top-0 left-0 right-0 ${getVariantStyle()}`} style={{ height: `calc(18% + ${seeThroughBevel})` }} />
@@ -66,7 +66,6 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </>
       )}
 
-      {/* Podbudowa dla szprosów witryny */}
       {profile === 'mullion-frame' && (
         <>
           <div className={`absolute top-[50%] -mt-[9px] h-[18px] left-[18%] right-[18%] ${getVariantStyle()}`} />
@@ -74,10 +73,8 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </>
       )}
 
-      {/* Główne oświetlenie frontu */}
       <div className={`absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/20 pointer-events-none ${isSeeThrough ? 'opacity-60 mix-blend-overlay' : ''}`} />
 
-      {/* Profil 5: Wypukłe półwałki (F-15) */}
       {profile === 'half-round' && (
         <div 
           className="absolute inset-0 pointer-events-none"
@@ -96,7 +93,6 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         />
       )}
 
-      {/* Profil 1: Klasyczna, szeroka rama (Shaker płaski) */}
       {profile === 'frame' && (
         <div 
           className="absolute inset-[18%] border-t border-l"
@@ -109,7 +105,6 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </div>
       )}
 
-      {/* Profil 2: Ostre listwowanie (Lamele) */}
       {profile === 'slatted' && (
         <div className="absolute inset-0 flex justify-evenly pointer-events-none">
           {Array.from({ length: 8 }).map((_, i) => (
@@ -125,7 +120,6 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </div>
       )}
 
-      {/* Profil 3: Wąski rowek obwiedniowy (F-13) */}
       {profile === 'grooved' && (
         <div className="absolute inset-[4%] pointer-events-none">
           <div 
@@ -151,7 +145,6 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </div>
       )}
 
-      {/* Profil 4: Zintegrowany uchwyt asymetryczny (F-2) - WERSJA Z ZAOKRĄGLONYMI SKOSAMI */}
       {profile === 'integrated-handle' && (
         <svg 
           className="absolute top-0 left-0 w-[85%] h-[7%] pointer-events-none" 
@@ -185,7 +178,6 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </svg>
       )}
 
-      {/* Profil 6: Zintegrowany uchwyt na całej szerokości (F-1) */}
       {profile === 'integrated-handle-full' && (
         <div className="absolute top-0 left-0 right-0 h-[7%] pointer-events-none">
           <div 
@@ -199,7 +191,6 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </div>
       )}
 
-      {/* Profil 7: Symetryczny uchwyt odsunięty od krawędzi (F-3) - WERSJA Z ZAOKRĄGLONYMI SKOSAMI */}
       {profile === 'integrated-handle-centered' && (
         <svg 
           className="absolute top-0 left-[15%] w-[70%] h-[7%] pointer-events-none" 
@@ -240,10 +231,8 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </svg>
       )}
 
-      {/* Profil 8: Ukryty uchwyt krawędziowy (F-4) */}
       {profile === 'integrated-handle-hidden' && null}
 
-      {/* Profil 9: Ramowy z wypukłą płyciną (F-6) */}
       {profile === 'raised-panel' && (
         <div className="absolute inset-[17%] pointer-events-none">
           <div className="absolute inset-0" style={{
@@ -270,7 +259,6 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </div>
       )}
 
-      {/* Profil 10: Mikroramka na skraju frontu z twardym skosem 45 stopni (F-7) */}
       {profile === 'micro-frame' && (
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute inset-0 rounded-[1px]" style={{
@@ -295,7 +283,6 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </div>
       )}
 
-      {/* Profil 11: Ramowy Shaker z obniżeniem pod kątem 45 stopni (F-8) */}
       {profile === 'shaker' && (
         <div className="absolute inset-[18%] pointer-events-none">
           <div className="absolute inset-0" style={{
@@ -311,7 +298,6 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </div>
       )}
 
-      {/* Profil 12: Rozbudowany front klasyczny (F-9) */}
       {profile === 'complex-raised-panel' && (
         <>
           <div className="absolute inset-[2%] pointer-events-none rounded-[1px]" style={{
@@ -362,7 +348,6 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </>
       )}
 
-      {/* Profil 13: Podwójnie stopniowany w dół (F-10) */}
       {profile === 'double-stepped-panel' && (
         <div className="absolute inset-[18%] pointer-events-none">
           <div className="absolute inset-0" style={{
@@ -393,7 +378,6 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </div>
       )}
 
-      {/* Profil 14: Pionowe ramiaki z obniżeniem i wypukłą płytą środkową (F-11) */}
       {profile === 'vertical-stiles-raised' && (
         <>
           <div className="absolute top-0 h-[18%] left-[18%] w-[4px] pointer-events-none z-10" style={{
@@ -443,7 +427,6 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </>
       )}
 
-      {/* Profil 15: Płaskie wycięcia / szeroki ryfel (F-12) */}
       {profile === 'flat-grooves' && (
         <div className="absolute inset-0 flex justify-evenly pointer-events-none">
           {Array.from({ length: 9 }).map((_, i) => (
@@ -461,7 +444,6 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </div>
       )}
 
-      {/* Profil 16: Wklęsłe frezy z płaskimi przerwami (F-14) */}
       {profile === 'concave-grooves' && (
         <div 
           className="absolute inset-0 pointer-events-none"
@@ -479,7 +461,6 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         />
       )}
 
-      {/* Profil 17: Klasyczna witryna ze szprosami i szkłem (F-16) */}
       {profile === 'mullion-frame' && (
         <div className="absolute inset-[18%] pointer-events-none">
           <div className="absolute top-0 left-0 right-[calc(50%+3px)] bottom-[calc(50%+3px)]" style={{
@@ -528,7 +509,6 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </div>
       )}
 
-      {/* Profil 18: Witryna z pojedynczą szybą (F-17) */}
       {profile === 'glass-frame' && (
         <div className="absolute inset-[18%] pointer-events-none">
           <div className="absolute inset-0" style={{
@@ -544,7 +524,6 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </div>
       )}
 
-      {/* Profil 19: Witryna z ażurową kratką wyciętą na wylot (F-18) */}
       {profile === 'lattice-frame' && (
         <div className="absolute inset-[18%] pointer-events-none">
           <div className="absolute inset-0 z-20 pointer-events-none" style={{
