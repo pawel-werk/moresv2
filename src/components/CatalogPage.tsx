@@ -12,11 +12,11 @@ type CatalogItem = {
   longDesc: string;
 };
 
-// Definicja dostępnych kolorów w podglądzie
+// Zmieniony odcień brązu (magma) na bardziej naturalny, zgaszony (orzech/czekolada)
 const colorOptions: { id: MaterialVariant; name: string; bgClass: string }[] = [
   { id: 'lithos', name: 'Jasny', bgClass: 'bg-[#D3CCC3]' },
   { id: 'azure', name: 'Błękitny', bgClass: 'bg-[#5c7a8c]' },
-  { id: 'magma', name: 'Brązowy', bgClass: 'bg-[#824626]' },
+  { id: 'magma', name: 'Brązowy', bgClass: 'bg-[#5D4037]' },
   { id: 'bazalt', name: 'Grafitowy', bgClass: 'bg-[#212121]' }
 ];
 
