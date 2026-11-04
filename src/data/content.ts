@@ -1,8 +1,8 @@
 export const companyData = {
   phone: "+48 531 187 187",
   email: "info@mores.pl",
-  addressLine1: "ul. Łąkowa 6",
-  addressLine2: "55-095 Mirków",
+  addressLine1: "ul. Rudolfa Weigla 12",
+  addressLine2: "53-114 Wrocław",
   workingHours: "Pn. - Pt.: 8:00 - 17:00"
 };
 
