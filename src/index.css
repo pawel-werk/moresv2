@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+@theme {
+  /* Istniejące tokeny (NIETYKALNE - warunkują poprawne renderowanie starych sekcji i MaterialPanel) */
+  --color-brand: #E85010;
+  --color-brand-dark: #C94208;
+  --color-brand-soft: #FFEAE0;
+  
+  --color-paper: #F7F4EF;
+  --color-stone: #E6E1D8;
+  --color-ink: #121212;
+  --color-muted: #5C4A3D;
+  
+  --color-graphite: #201A16;
+  --color-oak: #D5C5B3;
+  --color-ash: #E6E1D8;
+
+  --color-line: #E5E0D8;
+  
+  /* NOWE TOKENY (Ciemny motyw premium B2B) */
+  --color-night: #0E0B09;
+  --color-surface: #17120F;
+  --color-surface-2: #241D18;
+  --color-ivory: #F2EBE3;
+  --color-copper: #B86B3E;
+  --color-gold: #C5A059;
+  --color-line-dark: rgba(242, 235, 227, 0.08);
+  --color-muted-dark: #8C7D73;
+
+  /* Zaktualizowana Typografia */
+  --font-sans: "Inter Tight", sans-serif;
+  --font-serif: "Newsreader", serif;
+
+  --radius-sm: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.375rem;
+  --radius-xl: 0.375rem;
+
+  /* Animacje ujawniania i wejścia modali */
+  @keyframes clip-reveal {
+    0% { clip-path: inset(100% 0 0 0); }
+    100% { clip-path: inset(0 0 0 0); }
+  }
+  @keyframes line-reveal {
+    0% { transform: scaleX(0); transform-origin: left; }
+    100% { transform: scaleX(1); transform-origin: left; }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes zoom-in-95 {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  
+  --animate-clip-reveal: clip-reveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-line-reveal: line-reveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-fade-in: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-zoom-in-95: zoom-in-95 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@layer utilities {
+  /* Klasyczne ziarno */
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+  }
+
+  /* Anizotropowe ziarno imitujące szczotkowane drewno/fornir */
+  .bg-grain {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.01 0.55' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.06'/%3E%3C/svg%3E");
+  }
+
+  /* Konstrukcyjny przekrój drewna (słoje). Opiera się na currentColor */
+  .bg-rings {
+    background-image: url("data:image/svg+xml,%3Csvg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='currentColor' stroke-width='1.5' opacity='0.03'%3E%3Ccircle cx='400' cy='400' r='50'/%3E%3Ccircle cx='400' cy='400' r='90'/%3E%3Ccircle cx='400' cy='400' r='130'/%3E%3Ccircle cx='400' cy='400' r='180'/%3E%3Ccircle cx='400' cy='400' r='230'/%3E%3Ccircle cx='400' cy='400' r='280'/%3E%3Ccircle cx='400' cy='400' r='340'/%3E%3Ccircle cx='400' cy='400' r='400'/%3E%3Ccircle cx='400' cy='400' r='460'/%3E%3Ccircle cx='400' cy='400' r='520'/%3E%3C/g%3E%3C/svg%3E");
+    background-position: bottom right;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  /* Klasyczne (jasne) linie odcięcia dla starych sekcji */
+  .hairline-b {
+    @apply border-b border-ink/10;
+  }
+  .hairline-t {
+    @apply border-t border-ink/10;
+  }
+  .hairline-l {
+    @apply border-l border-ink/10;
+  }
+
+  /* Nowe, ciemne linie odcięcia dla sekcji premium (TopBar, Navbar, Footer itp.) */
+  .hairline-dark-b {
+    border-bottom: 1px solid var(--color-line-dark);
+  }
+  .hairline-dark-t {
+    border-top: 1px solid var(--color-line-dark);
+  }
+
+  /* Klasy do obsługi transformacji 3D */
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  .perspective-1200 {
+    perspective: 1200px;
+  }
+
+  /* Utility do animacji bez zewnętrznego pluginu */
+  .animate-in {
+    animation-duration: 0.3s;
+    animation-fill-mode: forwards;
+  }
+  .fade-in {
+    animation-name: fade-in;
+  }
+  .zoom-in-95 {
+    animation-name: zoom-in-95;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-night);
+  color: var(--color-ivory);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+}
+
+/* Fokus z akcentem miedzi dla ciemnego UI */
+*:focus-visible {
+  outline: 2px solid var(--color-copper);
+  outline-offset: 2px;
+}
