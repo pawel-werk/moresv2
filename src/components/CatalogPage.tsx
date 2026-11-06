@@ -80,8 +80,6 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   
   const innerTop = mix(base, '#000000', isDark ? 0.05 : 0.10);
   const innerBottom = mix(base, '#000000', isDark ? 0.20 : 0.25);
-  
-  const edgeHighlight = mix(base, '#ffffff', isDark ? 0.55 : 0.65);
 
   return (
     <svg
@@ -122,33 +120,22 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
           fill={ledge} 
         />
         
-        {/* Prawy parapet (dach) */}
+        {/* Prawy parapet (dach) w 100% połączony i spójny, żadnych przerw */}
         <path 
           d="M 268 166 Q 268 160 274 160 L 291 160 Q 297 160 297 166 L 323 146 Q 323 140 317 140 L 300 140 Q 294 140 294 146 Z" 
           fill={ledge} 
         />
 
-        {/* Wnętrze wgłębienia (jedna ciągła płaszczyzna 3D) */}
+        {/* Wnętrze wgłębienia (jedna ciągła płaszczyzna 3D zamykająca środek pod parapetami) */}
         <path 
           d="M 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 L 294 146 L 294 202 A 81 92 0 0 1 132 202 L 132 146 Z" 
           fill={`url(#hh-inner-${variant})`} 
         />
 
-        {/* Front główny */}
+        {/* Front główny z zaokrąglonymi 4 rogami, bez żadnych obrysów (highlight usunięty) */}
         <path
           d="M 77 420 L 77 166 Q 77 160 83 160 L 100 160 Q 106 160 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 Q 268 160 274 160 L 291 160 Q 297 160 297 166 L 297 420 Z"
           fill={`url(#hh-front-${variant})`}
-        />
-
-        {/* Błysk (highlight) na górnych krawędziach */}
-        <path
-          d="M 77 166 Q 77 160 83 160 L 100 160 Q 106 160 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 Q 268 160 274 160 L 291 160 Q 297 160 297 166"
-          fill="none"
-          stroke={edgeHighlight}
-          strokeWidth="1.6"
-          strokeLinejoin="round"
-          strokeLinecap="round"
-          opacity="0.85"
         />
 
       </g>
