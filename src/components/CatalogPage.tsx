@@ -78,7 +78,6 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   const ledge = mix(base, '#ffffff', isDark ? 0.24 : 0.3);
   const sideFace = mix(base, '#000000', isDark ? 0.15 : 0.28);
   
-  // Zgrane wnętrze uchwytu - miękki gradient bez ostrego odcięcia na ściance
   const innerTop = mix(base, '#000000', isDark ? 0.05 : 0.10);
   const innerBottom = mix(base, '#000000', isDark ? 0.20 : 0.25);
   
@@ -111,28 +110,36 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 
       <g transform="translate(0, 15)">
         
-        {/* Prawa ściana boczna płyty (zewnętrzna) */}
+        {/* Prawa ściana boczna płyty (ostre kąty zewnętrzne) */}
         <polygon points="297,160 323,140 323,400 297,420" fill={sideFace} />
 
-        {/* Górna krawędź płyty (grubość parapetów) - powrót do idealnie zgranych kątów prostych */}
-        <polygon points="77,160 106,160 132,140 103,140" fill={ledge} />
-        <polygon points="268,160 297,160 323,140 294,140" fill={ledge} />
-
-        {/* Czyste, zgrane wnętrze wycięcia - jedna płynna powierzchnia (lewa ściana + łukowate dno) */}
+        {/* Lewa krawędź grubości (lewy parapet) - zaokrąglona tylko od wewnętrznej strony frezu */}
         <path 
-          d="M 132 140 L 106 160 L 106 222 A 81 92 0 0 0 268 222 L 294 202 A 81 92 0 0 1 132 202 Z" 
+          d="M 77 160 L 94 160 Q 106 160, 106 172 L 132 152 Q 132 140, 120 140 L 103 140 Z" 
+          fill={ledge} 
+        />
+        
+        {/* Prawa krawędź grubości (prawy parapet) - zaokrąglona tylko od wewnętrznej strony frezu */}
+        <path 
+          d="M 268 172 Q 268 160, 280 160 L 297 160 L 323 140 L 306 140 Q 294 140, 294 152 Z" 
+          fill={ledge} 
+        />
+
+        {/* Czyste, zgrane wnętrze wycięcia - płynne połączone w jedno */}
+        <path 
+          d="M 106 172 L 106 222 A 81 92 0 0 0 268 222 L 294 202 A 81 92 0 0 1 132 202 L 132 152 Z" 
           fill={`url(#hh-inner-${variant})`} 
         />
 
-        {/* Czysty przód frontu zamykający szczelnie bryłę */}
+        {/* Czysty przód frontu zamykający szczelnie bryłę (zewnętrzne kąty ostre, wewnętrzne zaokrąglone) */}
         <path
-          d="M 77 160 L 106 160 L 106 222 A 81 92 0 0 0 268 222 L 268 160 L 297 160 L 297 420 L 77 420 Z"
+          d="M 77 160 L 94 160 Q 106 160, 106 172 L 106 222 A 81 92 0 0 0 268 222 L 268 172 Q 268 160, 280 160 L 297 160 L 297 420 L 77 420 Z"
           fill={`url(#hh-front-${variant})`}
         />
 
         {/* Jasne fazy nakładane precyzyjnie na krawędzie przodu */}
         <path
-          d="M 106 160 L 106 222 A 81 92 0 0 0 268 222 L 268 160"
+          d="M 106 222 A 81 92 0 0 0 268 222 L 268 172 Q 268 160, 280 160 L 297 160"
           fill="none"
           stroke={edgeHighlight}
           strokeWidth="1.6"
@@ -140,7 +147,7 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
           opacity="0.85"
         />
         <path
-          d="M 77 160 L 106 160 M 268 160 L 297 160"
+          d="M 77 160 L 94 160 Q 106 160, 106 172 L 106 222"
           fill="none"
           stroke={edgeHighlight}
           strokeWidth="1.6"
