@@ -78,13 +78,9 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   const ledge = mix(base, '#ffffff', isDark ? 0.24 : 0.3);
   const sideFace = mix(base, '#000000', isDark ? 0.15 : 0.28);
   
-  // Usunięty ciemny cień/brud z wewnętrznej ścianki – teraz jest czystym materiałem
-  const wall = mix(base, '#000000', isDark ? 0.03 : 0.06); 
-  
-  // Naturalny trójstopniowy cień dla zaokrąglonego wnętrza uchwytu - delikatniejszy
-  const shadowDeep = mix(base, '#000000', isDark ? 0.40 : 0.45);
-  const shadowMid = mix(base, '#000000', isDark ? 0.10 : 0.15);
-  const shadowLight = mix(base, '#ffffff', isDark ? 0.05 : 0.10);
+  // Zgrane wnętrze uchwytu - delikatny pionowy spadek jasności bez ostrego cienia w środku
+  const innerTop = mix(base, '#000000', isDark ? 0.05 : 0.10);
+  const innerBottom = mix(base, '#000000', isDark ? 0.20 : 0.25);
   
   const edgeHighlight = mix(base, '#ffffff', isDark ? 0.55 : 0.65);
 
@@ -105,10 +101,10 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
           <stop offset="0%" stopColor={frontTop} />
           <stop offset="100%" stopColor={frontBottom} />
         </linearGradient>
-        <linearGradient id={`hh-floor-${variant}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={shadowDeep} />
-          <stop offset="35%" stopColor={shadowMid} />
-          <stop offset="100%" stopColor={shadowLight} />
+        {/* Usunięty brudny trójstopniowy gradient, teraz jest czysty i płynny */}
+        <linearGradient id={`hh-inner-${variant}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={innerTop} />
+          <stop offset="100%" stopColor={innerBottom} />
         </linearGradient>
       </defs>
 
@@ -122,7 +118,7 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
           fill={sideFace} 
         />
 
-        {/* Lewa krawędź grubości płyty (parapet) - idealnie zgrany z krzywymi */}
+        {/* Lewa krawędź grubości płyty (parapet) */}
         <path 
           d="M 83 160 L 94 160 L 120 140 L 109 140 Q 103 140 103 146 L 77 166 Q 77 160 83 160 Z" 
           fill={ledge} 
@@ -134,16 +130,10 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
           fill={ledge} 
         />
 
-        {/* Lewa wewnętrzna ścianka wycięcia - zawiera zagięcie (grubość) w głąb frontu */}
+        {/* Zgrane wnętrze wycięcia - połączona lewa ściana i zaokrąglone dno w jeden płynny kształt */}
         <path 
-          d="M 94 160 Q 106 160 106 172 L 106 222 L 132 202 L 132 152 Q 132 140 120 140 Z" 
-          fill={wall} 
-        />
-
-        {/* Dno wycięcia */}
-        <path
-          d="M 106 222 A 81 92 0 0 0 268 222 L 294 202 A 81 92 0 0 1 132 202 Z"
-          fill={`url(#hh-floor-${variant})`}
+          d="M 94 160 Q 106 160 106 172 L 106 222 A 81 92 0 0 0 268 222 L 294 202 A 81 92 0 0 1 132 202 L 132 152 Q 132 140 120 140 Z" 
+          fill={`url(#hh-inner-${variant})`} 
         />
 
         {/* Przód frontu z wycięciem */}
