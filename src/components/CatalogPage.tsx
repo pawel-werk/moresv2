@@ -267,4 +267,168 @@ export const CatalogPage: React.FC = () => {
                     onClick={() => setActiveVariant(opt.id)}
                     className="group relative flex flex-col items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-2 focus-visible:ring-offset-night rounded-sm"
                     title={opt.name}
-                    aria
+                    aria-label={`Wybierz kolor ${opt.name}`}
+                  >
+                    <span 
+                      className={`w-10 h-10 md:w-14 md:h-14 rounded-sm border-[2px] transition-all duration-300 flex items-center justify-center ${opt.bgClass} ${
+                        activeVariant === opt.id 
+                          ? 'border-copper scale-125 shadow-[0_0_25px_rgba(184,107,62,0.6)] z-10' 
+                          : 'border-line-dark/50 hover:border-gold/50'
+                      }`}
+                    >
+                      <span className="w-full h-full block rounded-[2px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)]" />
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+            </div>
+
+            {/* PRAWA STRONA: Teksty */}
+            <div className="w-full md:w-1/2 p-5 sm:p-8 md:p-16 lg:p-24 flex flex-col justify-center text-center md:text-left overflow-y-auto">
+              <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-ivory mb-1 md:mb-4">{selectedFront.title}</h2>
+              <p className="text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-widest font-semibold text-gold mb-3 md:mb-10">{selectedFront.desc}</p>
+              
+              <p className="text-ivory/70 font-light leading-snug md:leading-relaxed mb-6 md:mb-12 text-[14px] sm:text-[15px] md:text-xl lg:text-2xl text-left">
+                {selectedFront.longDesc}
+              </p>
+
+              <a 
+                href="#kontakt" 
+                onClick={handleContactClick}
+                className="bg-[linear-gradient(135deg,var(--color-copper),var(--color-gold))] text-night px-6 py-3 md:px-12 md:py-5 text-[14px] md:text-lg font-medium hover:brightness-110 transition-all rounded-sm inline-block w-max mx-auto md:mx-0 mt-1 shadow-[0_0_20px_rgba(184,107,62,0.15)] hover:shadow-[0_0_30px_rgba(184,107,62,0.25)] outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+              >
+                Zapytaj o ten front
+              </a>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* --- GŁÓWNY WIDOK KATALOGU --- */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <header className="mb-16 md:mb-20 flex flex-col lg:flex-row lg:justify-between lg:items-end gap-10">
+          <Reveal className="lg:w-1/2">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-8 h-[1px] bg-copper" />
+              <span className="text-[11px] uppercase tracking-widest font-semibold text-gold">
+                Dokumentacja techniczna
+              </span>
+            </div>
+            <h1 className="font-serif text-4xl md:text-5xl text-ivory mb-6">Katalog frontów</h1>
+            <p className="text-ivory/70 text-lg font-light leading-relaxed">
+              Poznaj nasze propozycje frezowań i wykończeń dla Twoich projektów.
+            </p>
+          </Reveal>
+          <Reveal delay={100} className="flex flex-col sm:flex-row gap-6">
+             <a 
+              href={pdfUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-[15px] font-medium text-ivory hover:text-copper transition-colors relative group inline-flex items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-copper rounded-sm"
+            >
+              <ExternalLinkIcon className="w-4 h-4" aria-hidden="true" /> Otwórz PDF w nowej karcie
+              <span className="absolute left-0 -bottom-1.5 w-full h-[1px] bg-copper scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></span>
+            </a>
+          </Reveal>
+        </header>
+
+        <section className="mb-24">
+          <Reveal>
+            <div className="flex justify-between items-end mb-10 hairline-dark-b pb-6">
+              <div>
+                <h2 className="font-serif text-3xl md:text-4xl text-ivory">Baza wykończeń</h2>
+                <p className="text-ivory/60 font-light mt-4">Poglądowe zestawienie frezowań, fornirów i powłok lakierniczych.</p>
+              </div>
+            </div>
+          </Reveal>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-10 lg:gap-x-6 lg:gap-y-12">
+            {catalogFronts.map((item, idx) => (
+              <Reveal key={idx} delay={(idx % 6) * 50} variant="slide-up">
+                <button 
+                  className="group cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-4 focus-visible:ring-offset-night rounded-sm text-left w-full block" 
+                  onClick={() => setSelectedFront(item)}
+                >
+                  <div className="w-full aspect-[3/4] rounded-sm transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-2 relative flex items-center justify-center bg-surface-2/30 shadow-[0_10px_20px_rgba(0,0,0,0.4)] group-hover:shadow-[0_15px_30px_rgba(0,0,0,0.6)]">
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(184,107,62,0.08),transparent_70%)] pointer-events-none scale-150" />
+                    
+                    <FrontBacking profile={item.profile} className="relative z-10">
+                      <MaterialPanel 
+                        variant={item.variant} 
+                        profile={item.profile}
+                        className="w-full h-full rounded-sm"
+                      />
+                    </FrontBacking>
+                  </div>
+                  <div className="mt-4 hairline-dark-t pt-3 flex flex-col gap-1">
+                    <h3 className="font-serif text-lg text-ivory transition-colors duration-300 group-hover:text-copper">
+                      {item.title}
+                    </h3>
+                    <p className="text-[10px] uppercase tracking-widest font-bold text-muted-dark mt-1">
+                      {item.desc}
+                    </p>
+                  </div>
+                </button>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
+        <section className="grid lg:grid-cols-12 gap-16 items-center">
+          <div className="lg:col-span-6 hairline-dark-t">
+            <Reveal>
+              <h2 className="font-serif text-3xl text-ivory mb-10 pt-8">Jak złożyć zamówienie?</h2>
+            </Reveal>
+            <div className="space-y-0">
+              {[
+                { title: "Wybierz wzór", desc: "Zwróć uwagę na głębokość frezu oraz opcje uchwytów wpuszczanych." },
+                { title: "Wybierz wykończenie", desc: "Oferujemy mat, półmat oraz wysoki połysk. Każdy front może być przygotowany również w surowym MDF." },
+                { title: "Wyślij zapytanie", desc: "Podaj kod frontu i zestawienie formatek do szybkiej wyceny." }
+              ].map((step, idx) => (
+                <Reveal key={idx} delay={idx * 100}>
+                  <div className="group relative flex gap-8 py-8 hairline-dark-b hover:bg-surface-2 transition-colors duration-500 px-4 -mx-4">
+                    <div className="absolute top-[-1px] left-0 right-0 h-[1px] bg-copper scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)]" />
+                    <span className="flex-shrink-0 font-serif text-3xl text-ivory/10 transition-colors duration-500 group-hover:text-copper mt-[-4px]">
+                      0{idx + 1}
+                    </span>
+                    <div>
+                      <h3 className="font-serif text-xl text-ivory mb-2 transition-colors duration-500 group-hover:text-copper">{step.title}</h3>
+                      <p className="text-ivory/70 font-light leading-relaxed">{step.desc}</p>
+                    </div>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+          
+          <div className="lg:col-span-6">
+            <Reveal delay={200}>
+              <div className="bg-surface p-12 md:p-16 relative overflow-hidden flex flex-col justify-center rounded-sm border border-line-dark shadow-2xl">
+                <div className="absolute inset-0 bg-rings text-ivory opacity-5 pointer-events-none" aria-hidden="true" />
+                <div className="absolute inset-0 bg-grain mix-blend-overlay opacity-10 pointer-events-none" aria-hidden="true" />
+                
+                <div className="relative z-10">
+                  <h3 className="font-serif text-3xl text-ivory mb-6">Potrzebujesz wyceny konkretnych wzorów?</h3>
+                  <p className="mb-10 text-ivory/70 font-light leading-relaxed">
+                    Skopiuj numery wzorów z katalogu, dodaj wymiary i prześlij zapytanie do naszego zespołu za pomocą formularza.
+                  </p>
+                  <a 
+                    href="#kontakt" 
+                    onClick={handleContactClick}
+                    className="inline-block bg-[linear-gradient(135deg,var(--color-copper),var(--color-gold))] text-night px-8 py-4 text-[15px] font-medium hover:brightness-110 transition-all rounded-sm shadow-[0_0_20px_rgba(184,107,62,0.15)] hover:shadow-[0_0_30px_rgba(184,107,62,0.25)] outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+                  >
+                    Przejdź do formularza
+                  </a>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  );
+};
