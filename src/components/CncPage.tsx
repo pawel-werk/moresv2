@@ -11,7 +11,7 @@ const machines = [
 
 const productionFeatures = [
   {
-    title: "Nesting i rozkrój płyt",
+    title: "Nesting CNC",
     desc: "Optymalne wykorzystanie materiału i precyzyjne cięcie CNC."
   },
   {
