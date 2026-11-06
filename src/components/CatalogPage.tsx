@@ -108,33 +108,39 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 
       <g transform="translate(0, 15)">
         
-        {/* 1. Zewnętrzna prawa ściana (boczna) narysowana na samym dole */}
+        {/* 1. Zewnętrzna prawa ściana (boczna) rysowana z tyłu.
+            Głębokość wyciągnięcia to teraz mocne dx=55, dy=-45 */}
         <path 
-          d="M 370 168 L 370 420 L 396 400 L 396 148 Z" 
+          d="M 297 160 L 352 115 L 352 375 L 297 420 Z" 
           fill={sideFace} 
         />
 
-        {/* 2. Wnętrze wycięcia - schowane bezpiecznie pod dachami */}
+        {/* 2. Wnętrze wycięcia u-shape.
+            Zaczyna się i kończy IDEALNIE w punktach głębi dachów (161,127 oraz 323,127). */}
         <path 
-          d="M 100 168 L 100 200 A 90 70 0 0 0 280 200 L 280 168 L 306 148 L 306 180 A 90 70 0 0 1 126 180 L 126 148 Z" 
+          d="M 161 127 L 161 177 A 81 92 0 0 0 323 177 L 323 127 L 268 172 L 268 222 A 81 92 0 0 1 106 222 L 106 172 Z" 
           fill={`url(#hh-inner-${variant})`} 
         />
 
-        {/* 3. Lewy dach (parapet) - idealnie zgrany z krzywymi frontu, bez efektu naklejonego papieru */}
+        {/* 3. Lewy dach (parapet).
+            Łączy przód i zaokrąglenia frontowe z idealnymi odpowiednikami w głębi. */}
         <path 
-          d="M 10 168 Q 10 160 18 160 L 92 160 Q 100 160 100 168 L 126 148 Q 126 140 118 140 L 44 140 Q 36 140 36 148 Z" 
+          d="M 77 160 L 94 160 Q 106 160 106 172 L 161 127 Q 161 115 149 115 L 132 115 Z" 
           fill={ledge} 
         />
         
-        {/* 4. Prawy dach (parapet) - jw., w pełni kryjący, dopasowany do milimetra */}
+        {/* 4. Prawy dach (parapet). 
+            Kryje całkowicie szczyt prawej ścianki i współdzieli krawędzie. Zero przerw. */}
         <path 
-          d="M 280 168 Q 280 160 288 160 L 362 160 Q 370 160 370 168 L 396 148 Q 396 140 388 140 L 314 140 Q 306 140 306 148 Z" 
+          d="M 268 172 Q 268 160 280 160 L 297 160 L 352 115 L 335 115 Q 323 115 323 127 Z" 
           fill={ledge} 
         />
 
-        {/* 5. Front główny na wierzchu - rozszerzony do proporcji meblowych, dopasowany do krawędzi dachów */}
+        {/* 5. Front główny na wierzchu. 
+            Ma zaokrąglone górne krawędzie przy wycięciu. Proporcje to znowu 220px szerokości, 
+            ale głębia w tle potęguje masę. */}
         <path
-          d="M 10 420 L 10 168 Q 10 160 18 160 L 92 160 Q 100 160 100 168 L 100 200 A 90 70 0 0 0 280 200 L 280 168 Q 280 160 288 160 L 362 160 Q 370 160 370 168 L 370 420 Z"
+          d="M 77 420 L 77 160 L 94 160 Q 106 160 106 172 L 106 222 A 81 92 0 0 0 268 222 L 268 172 Q 268 160 280 160 L 297 160 L 297 420 Z"
           fill={`url(#hh-front-${variant})`}
         />
 
