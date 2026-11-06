@@ -10,6 +10,9 @@ type CatalogItem = {
   variant: MaterialVariant;
   profile: 'flat' | 'frame' | 'slatted' | 'grooved' | 'integrated-handle' | 'half-round' | 'integrated-handle-full' | 'integrated-handle-centered' | 'integrated-handle-hidden' | 'raised-panel' | 'micro-frame' | 'shaker' | 'complex-raised-panel' | 'double-stepped-panel' | 'vertical-stiles-raised' | 'flat-grooves' | 'concave-grooves' | 'mullion-frame' | 'glass-frame' | 'lattice-frame';
   longDesc: string;
+  detailImages?: Partial<Record<MaterialVariant, string>>;
+  detailLabel?: string;
+  detailImagePosition?: string;
 };
 
 const colorOptions: { id: MaterialVariant; name: string; bgClass: string }[] = [
@@ -23,7 +26,21 @@ const catalogFronts: CatalogItem[] = [
   { title: "F-1", desc: "Płaski / Uchwyt pełny", variant: "lithos", profile: "integrated-handle-full", longDesc: "Czysty, płaski front ze zintegrowanym uchwytem frezowanym na całej szerokości krawędzi. Kwintesencja minimalizmu i funkcjonalności." },
   { title: "F-2", desc: "Płaski / Uchwyt asymetryczny", variant: "lithos", profile: "integrated-handle", longDesc: "Minimalistyczny front z precyzyjnie wyfrezowanym, zintegrowanym uchwytem krawędziowym. Łączy w sobie czystość formy z najwyższą ergonomią bezuchwytowego otwierania." },
   { title: "F-3", desc: "Płaski / Uchwyt symetryczny", variant: "lithos", profile: "integrated-handle-centered", longDesc: "Nowoczesny front z wycentrowanym, symetrycznym frezem uchwytowym. Zakończony eleganckimi skosami z obu stron." },
-  { title: "F-4", desc: "Płaski / Uchwyt ukryty", variant: "lithos", profile: "integrated-handle-hidden", longDesc: "Front z wycięciem w górnej krawędzi. Front od przodu zachowuje jednolitą, gładką płaszczyznę, a frez uchwytowy pozostaje całkowicie niewidoczny." },
+  { 
+    title: "F-4", 
+    desc: "Płaski / Uchwyt ukryty", 
+    variant: "lithos", 
+    profile: "integrated-handle-hidden", 
+    longDesc: "Front z wycięciem w górnej krawędzi. Front od przodu zachowuje jednolitą, gładką płaszczyznę, a frez uchwytowy pozostaje całkowicie niewidoczny.",
+    detailImages: {
+      lithos: '/fronty/f-4-uchwyt-lithos.jpg',
+      azure: '/fronty/f-4-uchwyt-azure.jpg',
+      magma: '/fronty/f-4-uchwyt-magma.jpg',
+      bazalt: '/fronty/f-4-uchwyt-bazalt.jpg'
+    },
+    detailLabel: 'Detal: ukryty uchwyt',
+    detailImagePosition: 'center 30%'
+  },
   { title: "F-5", desc: "Płaski / Gładki", variant: "lithos", profile: "flat", longDesc: "Klasyczny, gładki front lakierowany bez żadnych dodatkowych frezowań i detali. Minimalistyczna, jednolita płaszczyzna, która stanowi doskonałą bazę dla nowoczesnych projektów." },
   { title: "F-6", desc: "Ramowy / Wypukła płycina", variant: "lithos", profile: "raised-panel", longDesc: "Klasyczny front ramowy z frezowaną, wypukłą płyciną wewnętrzną. Wprowadza tradycyjny, elegancki charakter do nowoczesnych projektów, nawiązując do najwyższej klasy stolarki angielskiej." },
   { title: "F-7", desc: "Płaski / Mikroramka", variant: "lithos", profile: "micro-frame", longDesc: "Nowoczesny front z niezwykle cienką, subtelną ramką na samych krawędziach. Idealny kompromis między gładkim minimalizmem a klasycznym, ramiakowym stylem." },
@@ -67,6 +84,7 @@ const FrontBacking: React.FC<{ profile: string; className?: string; children: Re
 export const CatalogPage: React.FC = () => {
   const [selectedFront, setSelectedFront] = useState<CatalogItem | null>(null);
   const [activeVariant, setActiveVariant] = useState<MaterialVariant>('lithos');
+  const [imageError, setImageError] = useState(false);
   const pdfUrl = "/katalog/mores-katalog.pdf";
 
   useEffect(() => {
@@ -78,10 +96,15 @@ export const CatalogPage: React.FC = () => {
     if (selectedFront) {
       setActiveVariant(selectedFront.variant);
       document.body.style.overflow = 'hidden';
+      setImageError(false);
     } else {
       document.body.style.overflow = '';
     }
   }, [selectedFront]);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [activeVariant]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -101,6 +124,9 @@ export const CatalogPage: React.FC = () => {
       scrollToSection('#kontakt');
     }, 150);
   };
+
+  const detailSrc = selectedFront?.detailImages?.[activeVariant] ?? selectedFront?.detailImages?.lithos;
+  const showDetailImage = detailSrc && !imageError;
 
   return (
     <div className="pt-16 md:pt-24 pb-24 md:pb-32 bg-night min-h-screen">
@@ -128,18 +154,40 @@ export const CatalogPage: React.FC = () => {
                   <MaterialPanel variant={activeVariant} profile={selectedFront.profile} className="w-full h-full rounded-sm transition-all duration-300" />
                 </FrontBacking>
                 
-                <div className="absolute -top-8 -right-10 sm:-top-10 sm:-right-12 md:-top-24 md:-right-28 lg:-top-[130px] lg:-right-[150px] w-40 h-40 sm:w-48 sm:h-48 md:w-72 md:h-72 lg:w-[340px] lg:h-[340px] rounded-full border-[4px] md:border-[8px] border-line-dark shadow-2xl overflow-hidden z-20 pointer-events-none bg-surface flex items-start justify-end">
-                  <div className="origin-top-right transform scale-[1.6] sm:scale-[1.8] md:scale-[2.2] lg:scale-[2.5] mt-4 mr-4 md:mt-10 md:mr-10">
-                    <div className="w-[120px] sm:w-[140px] md:w-[180px] lg:w-[220px] aspect-[3/4] rounded-sm flex-shrink-0">
-                      <FrontBacking profile={selectedFront.profile}>
-                        <MaterialPanel 
-                          variant={activeVariant} 
-                          profile={selectedFront.profile} 
-                          className="w-full h-full transition-all duration-300" 
-                        />
-                      </FrontBacking>
+                <div className="absolute -top-8 -right-10 sm:-top-10 sm:-right-12 md:-top-24 md:-right-28 lg:-top-[130px] lg:-right-[150px] w-40 h-40 sm:w-48 sm:h-48 md:w-72 md:h-72 lg:w-[340px] lg:h-[340px] rounded-full border-[4px] md:border-[8px] border-line-dark shadow-2xl overflow-hidden z-20 pointer-events-none bg-surface flex items-center justify-center">
+                  {showDetailImage ? (
+                    <>
+                      <img 
+                        key={detailSrc}
+                        src={detailSrc} 
+                        alt={`Ukryty uchwyt frontu ${selectedFront.title}, widok pod kątem`} 
+                        className="w-full h-full object-cover transition-opacity duration-300" 
+                        style={{ objectPosition: selectedFront.detailImagePosition ?? 'center' }} 
+                        loading="lazy" 
+                        draggable={false}
+                        onError={() => setImageError(true)}
+                      />
+                      {selectedFront.detailLabel && (
+                        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-night/70 backdrop-blur-sm rounded-full px-3 py-1">
+                          <span className="text-[9px] md:text-[10px] uppercase tracking-widest font-semibold text-ivory whitespace-nowrap">
+                            {selectedFront.detailLabel}
+                          </span>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="w-full h-full flex items-start justify-end origin-top-right transform scale-[1.6] sm:scale-[1.8] md:scale-[2.2] lg:scale-[2.5]">
+                      <div className="w-[120px] sm:w-[140px] md:w-[180px] lg:w-[220px] aspect-[3/4] rounded-sm flex-shrink-0 mt-4 mr-4 md:mt-10 md:mr-10">
+                        <FrontBacking profile={selectedFront.profile}>
+                          <MaterialPanel 
+                            variant={activeVariant} 
+                            profile={selectedFront.profile} 
+                            className="w-full h-full transition-all duration-300" 
+                          />
+                        </FrontBacking>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
 
@@ -153,7 +201,6 @@ export const CatalogPage: React.FC = () => {
                     title={opt.name}
                     aria-label={`Wybierz kolor ${opt.name}`}
                   >
-                    {/* ZMIANA: Mocniejsze skalowanie (scale-125) i wyrazniejsza poświata (shadow) dla aktywnego */}
                     <span 
                       className={`w-10 h-10 md:w-14 md:h-14 rounded-sm border-[2px] transition-all duration-300 flex items-center justify-center ${opt.bgClass} ${
                         activeVariant === opt.id 
