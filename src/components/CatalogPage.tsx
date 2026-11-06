@@ -80,8 +80,6 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   
   const innerTop = mix(base, '#000000', isDark ? 0.05 : 0.10);
   const innerBottom = mix(base, '#000000', isDark ? 0.20 : 0.25);
-  
-  const edgeHighlight = mix(base, '#ffffff', isDark ? 0.55 : 0.65);
 
   return (
     <svg
@@ -112,44 +110,34 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
         
         {/* Zewnętrzna prawa ściana grubości frontu */}
         <path 
-          d="M 297 166 L 297 420 L 323 400 L 323 146 Z" 
+          d="M 297 160 L 297 420 L 323 400 L 323 140 Z" 
           fill={sideFace} 
         />
 
-        {/* Lewy parapet (pełny, domknięty łukiem) */}
+        {/* Lewy parapet (dach) - idealnie zgrany z przodem i początkiem zaokrąglenia */}
         <path 
-          d="M 77 166 Q 77 160 83 160 L 100 160 Q 106 160 106 166 L 132 146 Q 132 140 126 140 L 109 140 Q 103 140 103 146 Z" 
+          d="M 77 160 L 94 160 L 120 140 L 103 140 Z" 
           fill={ledge} 
         />
         
-        {/* Prawy parapet (teraz w 100% pełny dach, bez dziury) */}
+        {/* Prawy parapet (dach) - idealnie zgrany z przodem i końcem zaokrąglenia */}
         <path 
-          d="M 268 166 Q 268 160 274 160 L 291 160 Q 297 160 297 166 L 323 146 Q 323 140 317 140 L 300 140 Q 294 140 294 146 Z" 
+          d="M 280 160 L 297 160 L 323 140 L 306 140 Z" 
           fill={ledge} 
         />
 
         {/* Wnętrze wgłębienia (lewa ściana + podłoga + prawa ściana) */}
         <path 
-          d="M 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 L 294 146 L 294 202 A 81 92 0 0 1 132 202 L 132 146 Z" 
+          d="M 94 160 Q 106 160 106 172 L 106 222 A 81 92 0 0 0 268 222 L 268 172 Q 268 160 280 160 L 306 140 Q 294 140 294 152 L 294 202 A 81 92 0 0 1 132 202 L 132 152 Q 132 140 120 140 Z" 
           fill={`url(#hh-inner-${variant})`} 
         />
 
-        {/* Front główny (zewnętrzne obrysy) */}
+        {/* Front główny (powierzchnia zewnętrzna frontu) - 100% krycia */}
         <path
-          d="M 77 420 L 77 166 Q 77 160 83 160 L 100 160 Q 106 160 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 Q 268 160 274 160 L 291 160 Q 297 160 297 166 L 297 420 Z"
+          d="M 77 420 L 77 160 L 94 160 Q 106 160 106 172 L 106 222 A 81 92 0 0 0 268 222 L 268 172 Q 268 160 280 160 L 297 160 L 297 420 Z"
           fill={`url(#hh-front-${variant})`}
         />
 
-        {/* Błysk (highlight) usunięty z zewnętrznych krawędzi - teraz akcentuje TYLKO wewnętrzny frez */}
-        <path
-          d="M 100 160 Q 106 160 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 Q 268 160 274 160"
-          fill="none"
-          stroke={edgeHighlight}
-          strokeWidth="1.6"
-          strokeLinejoin="round"
-          strokeLinecap="round"
-          opacity="0.85"
-        />
       </g>
     </svg>
   );
