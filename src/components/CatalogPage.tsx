@@ -110,31 +110,31 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
         
         {/* 1. Zewnętrzna prawa ściana (boczna) narysowana na samym dole */}
         <path 
-          d="M 297 160 L 323 140 L 323 400 L 297 420 Z" 
+          d="M 370 168 L 370 420 L 396 400 L 396 148 Z" 
           fill={sideFace} 
         />
 
-        {/* 2. Wnętrze wycięcia (U-shape) wpuszczone bezpiecznie pod dachy */}
+        {/* 2. Wnętrze wycięcia - schowane bezpiecznie pod dachami */}
         <path 
-          d="M 106 160 L 106 222 A 81 92 0 0 0 268 222 L 268 160 L 294 140 L 294 202 A 81 92 0 0 1 132 202 L 132 140 Z" 
+          d="M 100 168 L 100 200 A 90 70 0 0 0 280 200 L 280 168 L 306 148 L 306 180 A 90 70 0 0 1 126 180 L 126 148 Z" 
           fill={`url(#hh-inner-${variant})`} 
         />
 
-        {/* 3. Lewy dach (parapet) w pełnym kryciu, ostre rogi schowane pod frontem */}
+        {/* 3. Lewy dach (parapet) - idealnie zgrany z krzywymi frontu, bez efektu naklejonego papieru */}
         <path 
-          d="M 77 160 L 106 160 L 106 166 L 132 146 L 132 140 L 103 140 Z" 
+          d="M 10 168 Q 10 160 18 160 L 92 160 Q 100 160 100 168 L 126 148 Q 126 140 118 140 L 44 140 Q 36 140 36 148 Z" 
           fill={ledge} 
         />
         
-        {/* 4. Prawy dach (parapet) w pełnym kryciu, idealnie zgrany z wew. krawędzią */}
+        {/* 4. Prawy dach (parapet) - jw., w pełni kryjący, dopasowany do milimetra */}
         <path 
-          d="M 268 166 L 268 160 L 297 160 L 323 140 L 294 140 L 294 146 Z" 
+          d="M 280 168 Q 280 160 288 160 L 362 160 Q 370 160 370 168 L 396 148 Q 396 140 388 140 L 314 140 Q 306 140 306 148 Z" 
           fill={ledge} 
         />
 
-        {/* 5. Front narysowany na samej górze - przysłania zaokrągleniami ostre dachy, tworząc efekt fazowanego 3D */}
+        {/* 5. Front główny na wierzchu - rozszerzony do proporcji meblowych, dopasowany do krawędzi dachów */}
         <path
-          d="M 77 420 L 77 160 L 100 160 Q 106 160 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 Q 268 160 274 160 L 297 160 L 297 420 Z"
+          d="M 10 420 L 10 168 Q 10 160 18 160 L 92 160 Q 100 160 100 168 L 100 200 A 90 70 0 0 0 280 200 L 280 168 Q 280 160 288 160 L 362 160 Q 370 160 370 168 L 370 420 Z"
           fill={`url(#hh-front-${variant})`}
         />
 
