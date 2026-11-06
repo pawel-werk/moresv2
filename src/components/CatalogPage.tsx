@@ -108,31 +108,31 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 
       <g transform="translate(0, 15)">
         
-        {/* Zewnętrzna prawa ściana grubości frontu */}
+        {/* 1. Zewnętrzna prawa ściana grubości frontu (na samym spodzie z tyłu) */}
         <path 
           d="M 297 166 L 297 420 L 323 400 L 323 146 Z" 
           fill={sideFace} 
         />
 
-        {/* Lewy parapet (dach) */}
-        <path 
-          d="M 77 166 Q 77 160 83 160 L 100 160 Q 106 160 106 166 L 132 146 Q 132 140 126 140 L 109 140 Q 103 140 103 146 Z" 
-          fill={ledge} 
-        />
-        
-        {/* Prawy parapet (dach) w 100% połączony i spójny, żadnych przerw */}
-        <path 
-          d="M 268 166 Q 268 160 274 160 L 291 160 Q 297 160 297 166 L 323 146 Q 323 140 317 140 L 300 140 Q 294 140 294 146 Z" 
-          fill={ledge} 
-        />
-
-        {/* Wnętrze wgłębienia (jedna ciągła płaszczyzna 3D zamykająca środek pod parapetami) */}
+        {/* 2. Wnętrze wgłębienia (zmieniona kolejność - rysowane pod dachami, aby zapobiec prześwitywaniu przez dach) */}
         <path 
           d="M 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 L 294 146 L 294 202 A 81 92 0 0 1 132 202 L 132 146 Z" 
           fill={`url(#hh-inner-${variant})`} 
         />
 
-        {/* Front główny z zaokrąglonymi 4 rogami, bez żadnych obrysów (highlight usunięty) */}
+        {/* 3. Lewy parapet (dach) - rysowany NA WIERZCHU wnętrza */}
+        <path 
+          d="M 77 166 Q 77 160 83 160 L 100 160 Q 106 160 106 166 L 132 146 Q 132 140 126 140 L 109 140 Q 103 140 103 146 Z" 
+          fill={ledge} 
+        />
+        
+        {/* 4. Prawy parapet (dach) - rysowany NA WIERZCHU wnętrza, idealnie gładko z przodem, zero prześwitu wewnętrznej linii */}
+        <path 
+          d="M 268 166 Q 268 160 274 160 L 291 160 Q 297 160 297 166 L 323 146 Q 323 140 317 140 L 300 140 Q 294 140 294 146 Z" 
+          fill={ledge} 
+        />
+
+        {/* 5. Front główny na samym wierzchu */}
         <path
           d="M 77 420 L 77 166 Q 77 160 83 160 L 100 160 Q 106 160 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 Q 268 160 274 160 L 291 160 Q 297 160 297 166 L 297 420 Z"
           fill={`url(#hh-front-${variant})`}
