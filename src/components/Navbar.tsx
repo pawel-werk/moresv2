@@ -31,7 +31,7 @@ export const Navbar: React.FC = () => {
     { name: 'Produkcja', href: '#produkcja' },
     { name: 'Realizacje', href: '#realizacje' },
     { name: 'Katalog', href: '#/katalog' },
-    { name: 'CNC', href: '#/cnc' },
+    { name: 'Usługi CNC', href: '#/cnc' },
     { name: 'Kontakt', href: '#kontakt' },
   ];
 
