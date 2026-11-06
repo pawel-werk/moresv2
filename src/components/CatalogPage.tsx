@@ -265,7 +265,7 @@ export const CatalogPage: React.FC = () => {
         <section className="grid lg:grid-cols-12 gap-16 items-center">
           <div className="lg:col-span-6 hairline-dark-t">
             <Reveal>
-              <h2 className="font-serif text-3xl text-ivory mb-10 pt-8">Jak korzystać z katalogu?</h2>
+              <h2 className="font-serif text-3xl text-ivory mb-10 pt-8">Jak złożyć zamówienie?</h2>
             </Reveal>
             <div className="space-y-0">
               {[
