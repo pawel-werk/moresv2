@@ -80,6 +80,8 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   
   const innerTop = mix(base, '#000000', isDark ? 0.05 : 0.10);
   const innerBottom = mix(base, '#000000', isDark ? 0.20 : 0.25);
+  
+  const edgeHighlight = mix(base, '#ffffff', isDark ? 0.55 : 0.65);
 
   return (
     <svg
@@ -108,34 +110,45 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 
       <g transform="translate(0, 15)">
         
-        {/* Prawa sciana */}
+        {/* Zewnętrzna prawa ściana grubości frontu */}
         <path 
-          d="M 291 166 L 317 146 Q 323 140 323 146 L 323 400 Q 323 400 317 400 L 291 420 Q 291 420 291 414 Z" 
+          d="M 297 166 L 297 420 L 323 400 L 323 146 Z" 
           fill={sideFace} 
         />
 
-        {/* Lewy dach */}
+        {/* Lewy parapet (dach) */}
         <path 
-          d="M 83 160 L 100 160 Q 106 160 106 166 L 132 146 Q 132 140 126 140 L 109 140 Q 103 140 103 146 L 77 166 Q 77 160 83 160 Z" 
+          d="M 77 166 Q 77 160 83 160 L 100 160 Q 106 160 106 166 L 132 146 Q 132 140 126 140 L 109 140 Q 103 140 103 146 Z" 
           fill={ledge} 
         />
         
-        {/* Prawy dach */}
+        {/* Prawy parapet (dach) */}
         <path 
-          d="M 268 166 Q 268 160 274 160 L 291 160 Q 291 160 291 166 L 317 146 Q 317 146 317 140 L 300 140 Q 294 140 294 146 Z" 
+          d="M 268 166 Q 268 160 274 160 L 291 160 Q 297 160 297 166 L 323 146 Q 323 140 317 140 L 300 140 Q 294 140 294 146 Z" 
           fill={ledge} 
         />
 
-        {/* Wnetrze (lewa + dno + prawa) */}
+        {/* Wnętrze wgłębienia (jedna ciągła płaszczyzna 3D) */}
         <path 
           d="M 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 L 294 146 L 294 202 A 81 92 0 0 1 132 202 L 132 146 Z" 
           fill={`url(#hh-inner-${variant})`} 
         />
 
-        {/* Przod */}
+        {/* Front główny */}
         <path
-          d="M 83 160 L 100 160 Q 106 160 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 Q 268 160 274 160 L 291 160 Q 291 160 291 166 L 291 414 Q 291 420 285 420 L 77 420 Q 77 420 77 414 L 77 166 Q 77 160 83 160 Z"
+          d="M 77 420 L 77 166 Q 77 160 83 160 L 100 160 Q 106 160 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 Q 268 160 274 160 L 291 160 Q 297 160 297 166 L 297 420 Z"
           fill={`url(#hh-front-${variant})`}
+        />
+
+        {/* Błysk (highlight) na górnych krawędziach */}
+        <path
+          d="M 77 166 Q 77 160 83 160 L 100 160 Q 106 160 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 Q 268 160 274 160 L 291 160 Q 297 160 297 166"
+          fill="none"
+          stroke={edgeHighlight}
+          strokeWidth="1.6"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+          opacity="0.85"
         />
 
       </g>
