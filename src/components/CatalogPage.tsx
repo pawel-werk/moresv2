@@ -50,29 +50,15 @@ const catalogFronts: CatalogItem[] = [
   { title: "F-18", desc: "Ramowy / Kratka", variant: "lithos", profile: "lattice-frame", longDesc: "Front ramowy z klasycznym, ukośnym dziurkowaniem (kratką) w płaskiej płycinie. Ścięcie ramki pod kątem 45 stopni płynnie łączy się z dekoracyjnym, ażurowym środkiem, zapewniając wentylację i unikalny styl retro." }
 ];
 
-// Helper to adjust color brightness
-const shade = (hex: string, percent: number): string => {
-  let R = parseInt(hex.substring(1, 3), 16);
-  let G = parseInt(hex.substring(3, 5), 16);
-  let B = parseInt(hex.substring(5, 7), 16);
-
-  R = parseInt(String(R * (100 + percent) / 100));
-  G = parseInt(String(G * (100 + percent) / 100));
-  B = parseInt(String(B * (100 + percent) / 100));
-
-  R = (R < 255) ? R : 255;
-  G = (G < 255) ? G : 255;
-  B = (B < 255) ? B : 255;
-  
-  R = (R > 0) ? R : 0;
-  G = (G > 0) ? G : 0;
-  B = (B > 0) ? B : 0;
-
-  const RR = ((R.toString(16).length === 1) ? "0" + R.toString(16) : R.toString(16));
-  const GG = ((G.toString(16).length === 1) ? "0" + G.toString(16) : G.toString(16));
-  const BB = ((B.toString(16).length === 1) ? "0" + B.toString(16) : B.toString(16));
-
-  return "#" + RR + GG + BB;
+const mix = (hex: string, target: string, t: number): string => {
+  const parse = (h: string) => {
+    const c = h.replace('#', '');
+    return [0, 2, 4].map((i) => parseInt(c.slice(i, i + 2), 16));
+  };
+  const a = parse(hex);
+  const b = parse(target);
+  const out = a.map((v, i) => Math.round(v + (b[i] - v) * t));
+  return '#' + out.map((v) => v.toString(16).padStart(2, '0')).join('');
 };
 
 const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) => {
@@ -81,136 +67,80 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
     azure: '#5c7a8c',
     magma: '#5D4037',
     bazalt: '#212121',
-    tundra: '#8E918F', // Added missing variant to satisfy type, although not in colorOptions
-    lumina: '#EAE6E1'  // Added missing variant to satisfy type
+    tundra: '#8E918F',
+    lumina: '#EAE6E1'
   };
-
-  const base = baseColors[variant] || baseColors.lithos;
+  const base = baseColors[variant] ?? baseColors.lithos;
   const isDark = variant === 'bazalt' || variant === 'magma';
-  
-  // Adjusted shading logic for better visibility on dark variants
-  const frontColor = shade(base, isDark ? 10 : 0);
-  const topEdgeColor = shade(base, isDark ? 40 : 25);
-  const insideShadow = shade(base, isDark ? -50 : -40);
-  const deepShadow = shade(base, isDark ? -80 : -70);
-  const highlightColor = shade(base, isDark ? 70 : 50);
 
-  const gradFrontId = `grad-front-${variant}`;
-  const gradInsideId = `grad-inside-${variant}`;
+  const frontTop = mix(base, '#ffffff', isDark ? 0.1 : 0.12);
+  const frontBottom = mix(base, '#000000', isDark ? 0.1 : 0.12);
+  const ledge = mix(base, '#ffffff', isDark ? 0.24 : 0.3);
+  const sideFace = mix(base, '#000000', isDark ? 0.15 : 0.28);
+  const wall = mix(base, '#000000', isDark ? 0.1 : 0.22);
+  const floorFront = mix(base, '#000000', isDark ? 0.05 : 0.12);
+  const floorBack = mix(base, '#000000', isDark ? 0.45 : 0.55);
+  const edgeHighlight = mix(base, '#ffffff', isDark ? 0.55 : 0.65);
 
   return (
-    <svg 
-      viewBox="0 0 400 400" 
-      className="w-full h-full bg-night transition-colors duration-300" 
-      preserveAspectRatio="xMidYMid slice" 
-      role="img" 
-      aria-label="Ukryty uchwyt frontu F-4, widok pod kątem"
+    <svg
+      viewBox="0 0 400 400"
+      className="w-full h-full animate-in fade-in duration-300"
+      preserveAspectRatio="xMidYMid slice"
+      role="img"
+      aria-label="Ukryty uchwyt frontu F-4, widok pod kątem z góry"
     >
       <defs>
-        {/* Soft light behind the detail */}
-        <radialGradient id="bg-glow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#B86B3E" stopOpacity="0.15" />
-          <stop offset="100%" stopColor="var(--color-surface)" stopOpacity="0" />
+        <radialGradient id={`hh-bg-${variant}`} cx="50%" cy="45%" r="60%">
+          <stop offset="0%" stopColor="#3a332e" />
+          <stop offset="100%" stopColor="#141110" />
         </radialGradient>
-        
-        {/* Shadow under the board */}
-        <filter id="drop-shadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur in="SourceAlpha" stdDeviation="15" />
-          <feOffset dx="0" dy="20" result="offsetblur" />
-          <feComponentTransfer>
-            <feFuncA type="linear" slope="0.5" />
-          </feComponentTransfer>
-          <feMerge> 
-            <feMergeNode />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-
-        <linearGradient id={gradFrontId} x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor={frontColor} />
-          <stop offset="100%" stopColor={shade(frontColor, -15)} />
+        <linearGradient id={`hh-front-${variant}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={frontTop} />
+          <stop offset="100%" stopColor={frontBottom} />
         </linearGradient>
-
-        <linearGradient id={gradInsideId} x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor={insideShadow} />
-          <stop offset="100%" stopColor={deepShadow} />
+        <linearGradient id={`hh-floor-${variant}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={floorBack} />
+          <stop offset="100%" stopColor={floorFront} />
         </linearGradient>
       </defs>
 
-      <rect width="400" height="400" fill="var(--color-surface)" />
-      <rect width="400" height="400" fill="url(#bg-glow)" />
+      <rect width="400" height="400" fill={`url(#hh-bg-${variant})`} />
 
-      {/* Main Group with isometric-like transform */}
-      <g transform="translate(200, 220) scale(1.1)" filter="url(#drop-shadow)">
-        
-        {/* 1. Back/Inside wall of the cut-out */}
-        <path 
-          d="M -70 -60 
-             L -70 10
-             Q 0 50 70 10
-             L 70 -60
-             Z" 
-          fill={`url(#${gradInsideId})`} 
-          className="transition-colors duration-300"
+      {/* Rzut ukośny: front rysowany bez zniekształceń, grubość płyty wysunięta o wektor (+26, -20) w górę i w prawo */}
+      <g transform="translate(0, 15)">
+        {/* prawa ściana boczna płyty */}
+        <polygon points="297,160 323,140 323,400 297,420" fill={sideFace} />
+
+        {/* górna krawędź płyty (grubość) po lewej i po prawej od wycięcia */}
+        <polygon points="77,160 106,160 132,140 103,140" fill={ledge} />
+        <polygon points="268,160 297,160 323,140 294,140" fill={ledge} />
+
+        {/* lewa wewnętrzna ścianka wycięcia */}
+        <polygon points="106,160 106,222 132,202 132,140" fill={wall} />
+
+        {/* dno wycięcia (powierzchnia łuku wysunięta w głąb płyty) */}
+        <path
+          d="M106 222 A81 92 0 0 0 268 222 L294 202 A81 92 0 0 1 132 202 Z"
+          fill={`url(#hh-floor-${variant})`}
         />
 
-        {/* 2. Top Edge (Thickness of the board) */}
-        <path 
-          d="M -160 -40
-             L -70 -70
-             L -70 -60
-             Q 0 -30 70 -60
-             L 70 -70
-             L 160 -40
-             L 160 -15
-             L 70 -45
-             Q 0 -15 -70 -45
-             L -70 -15
-             Z" 
-          fill={topEdgeColor}
-          className="transition-colors duration-300"
+        {/* przód frontu z wycięciem w kształcie litery U */}
+        <path
+          d="M77 160 L106 160 L106 222 A81 92 0 0 0 268 222 L268 160 L297 160 L297 420 L77 420 Z"
+          fill={`url(#hh-front-${variant})`}
         />
 
-        {/* Highlight phase on the top edge of the cutout */}
-        <path 
-          d="M -70 -15
-             Q 0 -15 70 -45"
+        {/* jasne fazy na krawędziach przodu */}
+        <path
+          d="M106 160 L106 222 A81 92 0 0 0 268 222 L268 160"
           fill="none"
-          stroke={highlightColor}
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          className="transition-colors duration-300"
+          stroke={edgeHighlight}
+          strokeWidth="1.6"
+          strokeLinejoin="round"
+          opacity="0.85"
         />
-        
-        {/* Highlight phase on the straight top edges */}
-        <path 
-          d="M -160 -15 L -70 -45"
-          fill="none"
-          stroke={highlightColor}
-          strokeWidth="1.5"
-          className="transition-colors duration-300"
-        />
-        <path 
-          d="M 70 -45 L 160 -15"
-          fill="none"
-          stroke={highlightColor}
-          strokeWidth="1.5"
-          className="transition-colors duration-300"
-        />
-
-        {/* 3. Front Face of the board */}
-        <path 
-          d="M -160 -15
-             L -70 -45
-             Q 0 -15 70 -45
-             L 160 -15
-             L 160 200
-             L -160 200
-             Z" 
-          fill={`url(#${gradFrontId})`}
-          className="transition-colors duration-300"
-        />
-
+        <path d="M77 160 L106 160 M268 160 L297 160" fill="none" stroke={edgeHighlight} strokeWidth="1.6" opacity="0.85" />
       </g>
     </svg>
   );
@@ -307,10 +237,10 @@ export const CatalogPage: React.FC = () => {
                 <div className="absolute -top-8 -right-10 sm:-top-10 sm:-right-12 md:-top-24 md:-right-28 lg:-top-[130px] lg:-right-[150px] w-40 h-40 sm:w-48 sm:h-48 md:w-72 md:h-72 lg:w-[340px] lg:h-[340px] rounded-full border-[4px] md:border-[8px] border-line-dark shadow-2xl overflow-hidden z-20 pointer-events-none bg-surface flex items-center justify-center">
                   {selectedFront.detailGraphic === 'hidden-handle' ? (
                     <>
-                      <HiddenHandleDetail variant={activeVariant} />
+                      <HiddenHandleDetail key={activeVariant} variant={activeVariant} />
                       {selectedFront.detailLabel && (
-                        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-night/70 backdrop-blur-sm rounded-full px-3 py-1">
-                          <span className="text-[9px] md:text-[10px] uppercase tracking-widest font-semibold text-ivory whitespace-nowrap">
+                        <div className="absolute left-1/2 -translate-x-1/2 top-[22%] sm:top-[20%] md:top-[18%] bg-night/70 backdrop-blur-sm rounded-full px-2.5 md:px-3 py-1 z-10">
+                          <span className="text-[8px] sm:text-[9px] md:text-[10px] uppercase tracking-widest font-semibold text-ivory whitespace-nowrap">
                             {selectedFront.detailLabel}
                           </span>
                         </div>
