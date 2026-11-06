@@ -110,39 +110,39 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 
       <g transform="translate(0, 15)">
         
-        {/* Zewnętrzna prawa ściana grubości frontu */}
+        {/* Zewnętrzna prawa ściana grubości frontu (o wektor +26, -20) */}
         <path 
           d="M 297 166 L 297 420 L 323 400 L 323 146 Z" 
           fill={sideFace} 
         />
 
-        {/* Lewy parapet (grubość płyty). Zgrane z zaokrąglonymi zewnętrznymi krawędziami */}
+        {/* Lewy parapet (grubość płyty z lewej) */}
         <path 
-          d="M 77 166 Q 77 160 83 160 L 100 160 Q 106 160 106 166 L 132 146 Q 132 140 126 140 L 109 140 Q 103 140 103 146 Z" 
+          d="M 77 166 Q 77 160 83 160 L 100 160 L 126 140 L 109 140 Q 103 140 103 146 Z" 
           fill={ledge} 
         />
         
-        {/* Prawy parapet (grubość płyty). Zgrane z zaokrąglonymi zewnętrznymi krawędziami */}
+        {/* Prawy parapet (grubość płyty z prawej) */}
         <path 
-          d="M 268 166 Q 268 160 274 160 L 291 160 Q 297 160 297 166 L 323 146 Q 323 140 317 140 L 300 140 Q 294 140 294 146 Z" 
+          d="M 274 160 L 291 160 Q 297 160 297 166 L 323 146 Q 323 140 317 140 L 300 140 Z" 
           fill={ledge} 
         />
 
-        {/* Pełne wnętrze wgłębienia (lewa ściana + podłoga + prawa ściana). 
-            Naprawia to "rozjechaną krawędź", domykając geometrię w pełni pod parapetami */}
+        {/* Wnętrze wgłębienia. 
+            Teraz zawiera w pełni zintegrowane ZAKRZYWIENIA (fillety) na wejściu (Q 106 160 i Q 268 160).
+            Domyka to 100% luki między parapetem a prawą ścianką. */}
         <path 
-          d="M 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 L 294 146 L 294 202 A 81 92 0 0 1 132 202 L 132 146 Z" 
+          d="M 100 160 Q 106 160 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 Q 268 160 274 160 L 300 140 Q 294 140 294 146 L 294 202 A 81 92 0 0 1 132 202 L 132 146 Q 132 140 126 140 Z" 
           fill={`url(#hh-inner-${variant})`} 
         />
 
-        {/* Front główny, zakrywający to co w 3D zostaje naturalnie z przodu. 
-            Ma wszystkie cztery górne kąty elegancko zaokrąglone (r=6) */}
+        {/* Główny front (płaszczyzna). Wszystkie 4 kąty góry są teraz idealnie zaokrąglone i zgrane z grubością. */}
         <path
           d="M 77 420 L 77 166 Q 77 160 83 160 L 100 160 Q 106 160 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 Q 268 160 274 160 L 291 160 Q 297 160 297 166 L 297 420 Z"
           fill={`url(#hh-front-${variant})`}
         />
 
-        {/* Precyzyjny highlight padający gładko na frontowe rogi */}
+        {/* Błysk precyzyjnie obrysowujący całą skomplikowaną krawędź frontową. */}
         <path
           d="M 77 166 Q 77 160 83 160 L 100 160 Q 106 160 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 Q 268 160 274 160 L 291 160 Q 297 160 297 166"
           fill="none"
