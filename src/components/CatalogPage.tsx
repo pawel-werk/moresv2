@@ -77,12 +77,14 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   const frontBottom = mix(base, '#000000', isDark ? 0.1 : 0.12);
   const ledge = mix(base, '#ffffff', isDark ? 0.24 : 0.3);
   const sideFace = mix(base, '#000000', isDark ? 0.15 : 0.28);
-  const wall = mix(base, '#000000', isDark ? 0.1 : 0.22);
   
-  // Naturalny trójstopniowy cień dla zaokrąglonego wnętrza uchwytu
-  const shadowDeep = mix(base, '#000000', isDark ? 0.55 : 0.65);
-  const shadowMid = mix(base, '#000000', isDark ? 0.15 : 0.22);
-  const shadowLight = mix(base, '#ffffff', isDark ? 0.05 : 0.15);
+  // Usunięty ciemny cień/brud z wewnętrznej ścianki – teraz jest czystym materiałem
+  const wall = mix(base, '#000000', isDark ? 0.03 : 0.06); 
+  
+  // Naturalny trójstopniowy cień dla zaokrąglonego wnętrza uchwytu - delikatniejszy
+  const shadowDeep = mix(base, '#000000', isDark ? 0.40 : 0.45);
+  const shadowMid = mix(base, '#000000', isDark ? 0.10 : 0.15);
+  const shadowLight = mix(base, '#ffffff', isDark ? 0.05 : 0.10);
   
   const edgeHighlight = mix(base, '#ffffff', isDark ? 0.55 : 0.65);
 
@@ -112,46 +114,45 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 
       <rect width="400" height="400" fill={`url(#hh-bg-${variant})`} />
 
-      {/* Rzut ukośny: front rysowany ze złagodzonymi krzywymi na krawędziach */}
       <g transform="translate(0, 15)">
         
-        {/* prawa ściana boczna płyty */}
+        {/* Prawa ściana boczna płyty (zewnętrzna) */}
         <path 
           d="M 297 166 Q 297 160 291 160 L 317 140 Q 323 140 323 146 L 323 394 Q 323 400 317 400 L 291 420 Q 297 420 297 414 Z" 
           fill={sideFace} 
         />
 
-        {/* lewa górna krawędź płyty (grubość) z uwzględnieniem łuków */}
+        {/* Lewa krawędź grubości płyty (parapet) - idealnie zgrany z krzywymi */}
         <path 
-          d="M 83 160 L 94 160 Q 106 160 106 172 L 132 152 Q 132 140 120 140 L 109 140 Q 103 140 103 146 L 77 166 Q 77 160 83 160 Z" 
+          d="M 83 160 L 94 160 L 120 140 L 109 140 Q 103 140 103 146 L 77 166 Q 77 160 83 160 Z" 
           fill={ledge} 
         />
         
-        {/* prawa górna krawędź płyty (grubość) */}
+        {/* Prawa krawędź grubości płyty */}
         <path 
-          d="M 268 172 Q 268 160 280 160 L 291 160 Q 297 160 297 166 L 323 146 Q 323 140 317 140 L 306 140 Q 294 140 294 152 Z" 
+          d="M 280 160 L 291 160 Q 297 160 297 166 L 323 146 Q 323 140 317 140 L 306 140 Z" 
           fill={ledge} 
         />
 
-        {/* lewa wewnętrzna ścianka wycięcia */}
+        {/* Lewa wewnętrzna ścianka wycięcia - zawiera zagięcie (grubość) w głąb frontu */}
         <path 
-          d="M 106 172 L 106 222 L 132 202 L 132 152 Z" 
+          d="M 94 160 Q 106 160 106 172 L 106 222 L 132 202 L 132 152 Q 132 140 120 140 Z" 
           fill={wall} 
         />
 
-        {/* dno wycięcia (powierzchnia łuku wysunięta w głąb płyty) */}
+        {/* Dno wycięcia */}
         <path
           d="M 106 222 A 81 92 0 0 0 268 222 L 294 202 A 81 92 0 0 1 132 202 Z"
           fill={`url(#hh-floor-${variant})`}
         />
 
-        {/* przód frontu z wycięciem (z gładko zaokrąglonymi rogami zewnętrznymi i wewnętrznymi) */}
+        {/* Przód frontu z wycięciem */}
         <path
           d="M 77 166 Q 77 160 83 160 L 94 160 Q 106 160 106 172 L 106 222 A 81 92 0 0 0 268 222 L 268 172 Q 268 160 280 160 L 291 160 Q 297 160 297 166 L 297 414 Q 297 420 291 420 L 83 420 Q 77 420 77 414 Z"
           fill={`url(#hh-front-${variant})`}
         />
 
-        {/* jasne fazy na krawędziach przodu (płynna, ciągła linia) */}
+        {/* Jasne fazy na krawędziach przodu (łapiące światło) */}
         <path
           d="M 77 166 Q 77 160 83 160 L 94 160 Q 106 160 106 172 L 106 222 A 81 92 0 0 0 268 222 L 268 172 Q 268 160 280 160 L 291 160 Q 297 160 297 166"
           fill="none"
