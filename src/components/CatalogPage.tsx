@@ -78,8 +78,12 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   const ledge = mix(base, '#ffffff', isDark ? 0.24 : 0.3);
   const sideFace = mix(base, '#000000', isDark ? 0.15 : 0.28);
   const wall = mix(base, '#000000', isDark ? 0.1 : 0.22);
-  const floorFront = mix(base, '#000000', isDark ? 0.05 : 0.12);
-  const floorBack = mix(base, '#000000', isDark ? 0.45 : 0.55);
+  
+  // Naturalny trójstopniowy cień dla zaokrąglonego wnętrza uchwytu
+  const shadowDeep = mix(base, '#000000', isDark ? 0.55 : 0.65);
+  const shadowMid = mix(base, '#000000', isDark ? 0.15 : 0.22);
+  const shadowLight = mix(base, '#ffffff', isDark ? 0.05 : 0.15);
+  
   const edgeHighlight = mix(base, '#ffffff', isDark ? 0.55 : 0.65);
 
   return (
@@ -100,47 +104,63 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
           <stop offset="100%" stopColor={frontBottom} />
         </linearGradient>
         <linearGradient id={`hh-floor-${variant}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={floorBack} />
-          <stop offset="100%" stopColor={floorFront} />
+          <stop offset="0%" stopColor={shadowDeep} />
+          <stop offset="35%" stopColor={shadowMid} />
+          <stop offset="100%" stopColor={shadowLight} />
         </linearGradient>
       </defs>
 
       <rect width="400" height="400" fill={`url(#hh-bg-${variant})`} />
 
-      {/* Rzut ukośny: front rysowany bez zniekształceń, grubość płyty wysunięta o wektor (+26, -20) w górę i w prawo */}
+      {/* Rzut ukośny: front rysowany ze złagodzonymi krzywymi na krawędziach */}
       <g transform="translate(0, 15)">
+        
         {/* prawa ściana boczna płyty */}
-        <polygon points="297,160 323,140 323,400 297,420" fill={sideFace} />
+        <path 
+          d="M 297 166 Q 297 160 291 160 L 317 140 Q 323 140 323 146 L 323 394 Q 323 400 317 400 L 291 420 Q 297 420 297 414 Z" 
+          fill={sideFace} 
+        />
 
-        {/* górna krawędź płyty (grubość) po lewej i po prawej od wycięcia */}
-        <polygon points="77,160 106,160 132,140 103,140" fill={ledge} />
-        <polygon points="268,160 297,160 323,140 294,140" fill={ledge} />
+        {/* lewa górna krawędź płyty (grubość) z uwzględnieniem łuków */}
+        <path 
+          d="M 83 160 L 94 160 Q 106 160 106 172 L 132 152 Q 132 140 120 140 L 109 140 Q 103 140 103 146 L 77 166 Q 77 160 83 160 Z" 
+          fill={ledge} 
+        />
+        
+        {/* prawa górna krawędź płyty (grubość) */}
+        <path 
+          d="M 268 172 Q 268 160 280 160 L 291 160 Q 297 160 297 166 L 323 146 Q 323 140 317 140 L 306 140 Q 294 140 294 152 Z" 
+          fill={ledge} 
+        />
 
         {/* lewa wewnętrzna ścianka wycięcia */}
-        <polygon points="106,160 106,222 132,202 132,140" fill={wall} />
+        <path 
+          d="M 106 172 L 106 222 L 132 202 L 132 152 Z" 
+          fill={wall} 
+        />
 
         {/* dno wycięcia (powierzchnia łuku wysunięta w głąb płyty) */}
         <path
-          d="M106 222 A81 92 0 0 0 268 222 L294 202 A81 92 0 0 1 132 202 Z"
+          d="M 106 222 A 81 92 0 0 0 268 222 L 294 202 A 81 92 0 0 1 132 202 Z"
           fill={`url(#hh-floor-${variant})`}
         />
 
-        {/* przód frontu z wycięciem w kształcie litery U */}
+        {/* przód frontu z wycięciem (z gładko zaokrąglonymi rogami zewnętrznymi i wewnętrznymi) */}
         <path
-          d="M77 160 L106 160 L106 222 A81 92 0 0 0 268 222 L268 160 L297 160 L297 420 L77 420 Z"
+          d="M 77 166 Q 77 160 83 160 L 94 160 Q 106 160 106 172 L 106 222 A 81 92 0 0 0 268 222 L 268 172 Q 268 160 280 160 L 291 160 Q 297 160 297 166 L 297 414 Q 297 420 291 420 L 83 420 Q 77 420 77 414 Z"
           fill={`url(#hh-front-${variant})`}
         />
 
-        {/* jasne fazy na krawędziach przodu */}
+        {/* jasne fazy na krawędziach przodu (płynna, ciągła linia) */}
         <path
-          d="M106 160 L106 222 A81 92 0 0 0 268 222 L268 160"
+          d="M 77 166 Q 77 160 83 160 L 94 160 Q 106 160 106 172 L 106 222 A 81 92 0 0 0 268 222 L 268 172 Q 268 160 280 160 L 291 160 Q 297 160 297 166"
           fill="none"
           stroke={edgeHighlight}
           strokeWidth="1.6"
           strokeLinejoin="round"
+          strokeLinecap="round"
           opacity="0.85"
         />
-        <path d="M77 160 L106 160 M268 160 L297 160" fill="none" stroke={edgeHighlight} strokeWidth="1.6" opacity="0.85" />
       </g>
     </svg>
   );
