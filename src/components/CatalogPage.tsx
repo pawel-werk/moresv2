@@ -61,6 +61,21 @@ const mix = (hex: string, target: string, t: number): string => {
   return '#' + out.map((v) => v.toString(16).padStart(2, '0')).join('');
 };
 
+/**
+ * Detal ukrytego uchwytu F-4.
+ *
+ * Front jest teraz JEDNĄ bryłą: profil czołowy (płyta z wycięciem U od góry)
+ * wyciągnięty wzdłuż wektora (DX, DY) w osi Z. Wszystkie ściany (parapety,
+ * ściana boczna, wnętrze wycięcia) są wyliczone z tego samego profilu, więc
+ * łączą się idealnie krawędź w krawędź - nic nie wygląda jak "doklejona kartka".
+ *
+ * Widoczne ściany (kamera z prawej-góry):
+ *   1. wnętrze wycięcia (lewa ścianka + widoczny fragment łuku dna)
+ *   2. prawa ściana zewnętrzna
+ *   3. górne parapety (lewy i prawy)
+ *   4. przód
+ * Kolejność rysowania = od najdalszej do najbliższej.
+ */
 const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) => {
   const baseColors: Record<MaterialVariant, string> = {
     lithos: '#D3CCC3',
@@ -73,82 +88,83 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   const base = baseColors[variant] ?? baseColors.lithos;
   const isDark = variant === 'bazalt' || variant === 'magma';
 
-  // --- Kolory (większy kontrast, bez highlightów) ---
-  // Przód: jasny, lekki gradient góra-dół
+  // --- Kolory ---
   const frontTop = isDark ? mix(base, '#ffffff', 0.12) : mix(base, '#ffffff', 0.10);
   const frontBottom = isDark ? mix(base, '#ffffff', 0.04) : mix(base, '#000000', 0.05);
-  // Górne krawędzie (parapety) - lekko jaśniejsze od frontu
+  // Górne powierzchnie (parapety) - najjaśniejsze, łapią światło z góry
   const ledge = isDark ? mix(base, '#ffffff', 0.26) : mix(base, '#ffffff', 0.30);
-  // Prawa ściana boczna - łagodnie ciemniejsza od frontu
-  const sideFace = isDark ? mix(base, '#ffffff', 0.02) : mix(base, '#000000', 0.26);
-  // Wnętrze wycięcia - miękki cień, ciemniejszy ku dołowi (bez obrysów i połysków)
-  const innerTop = isDark ? mix(base, '#000000', 0.18) : mix(base, '#000000', 0.16);
-  const innerBottom = isDark ? mix(base, '#000000', 0.42) : mix(base, '#000000', 0.36);
+  // Prawa ściana zewnętrzna - odwrócona od światła
+  const sideTop = isDark ? mix(base, '#ffffff', 0.04) : mix(base, '#000000', 0.22);
+  const sideBottom = isDark ? mix(base, '#000000', 0.15) : mix(base, '#000000', 0.34);
+  // Wnętrze wycięcia - ciemniej w głębi (góra ekranu), jaśniej przy froncie
+  const innerBack = isDark ? mix(base, '#000000', 0.35) : mix(base, '#000000', 0.50);
+  const innerFront = isDark ? mix(base, '#ffffff', 0.05) : mix(base, '#000000', 0.18);
   // Tło okręgu
   const bgCenter = isDark ? '#443c35' : '#3a332e';
   const bgEdge = isDark ? '#1f1b18' : '#171310';
 
-  // --- Geometria ---
-  // Płaszczyzna frontu (x: L..R), wycięcie U (x: CL..CR), głębia (DX, DY)
-  const L = 40;
-  const R = 260;
-  const CL = 69;
-  const CR = 231;
-  const TOP = 195;
-  const BOT = 560; // poza kadrem - dolną krawędź ucina okrąg
-  const r = 12;    // promień zaokrąglenia krawędzi przy wycięciu
-  const ro = 18;   // promień zaokrąglenia zewnętrznych rogów frontu
-  const S = 62;    // prosta część wycięcia, zanim zacznie się łuk
-  const RX = 81;   // promień poziomy łuku (połowa szerokości wycięcia)
-  const RY = 92;   // promień pionowy łuku
-  const DX = 100;  // głębia frontu w osi Z (wektor wyciągnięcia)
-  const DY = -80;
+  // --- Geometria (współrzędne "projektowe", potem skalowane grupą) ---
+  const L = 40;          // lewa krawędź frontu
+  const R = 260;         // prawa krawędź frontu
+  const CL = 69;         // lewa krawędź wycięcia
+  const CR = 231;        // prawa krawędź wycięcia
+  const TOP = 195;       // górna krawędź frontu
+  const BOT = 700;       // poza kadrem - dolną krawędź ucina okrąg
+  const S = 62;          // prosta część wycięcia, zanim zacznie się łuk
+  const RX = (CR - CL) / 2; // promień poziomy łuku (połowa szerokości wycięcia)
+  const RY = 92;         // promień pionowy łuku
+  const CX = (CL + CR) / 2;
+  const CY = TOP + S;    // środek łuku dna wycięcia
+  const DX = 200;        // głębia frontu w osi Z (wektor wyciągnięcia) - 2x głębiej
+  const DY = -160;
 
-  const sideWallPath = `M ${R} ${TOP + ro} L ${R + DX} ${TOP + ro + DY} L ${R + DX} ${BOT + DY} L ${R} ${BOT} Z`;
+  // Skala całego detalu (50%) i położenie w kadrze 400x400
+  const SCALE = 0.5;
+  const TOP_SCREEN = 148; // gdzie na ekranie ląduje tylna krawędź parapetów
+  const tx = 200 - ((L + R + DX) / 2) * SCALE;
+  const ty = TOP_SCREEN - (TOP + DY) * SCALE;
 
+  // Widoczny fragment łuku: powierzchnia widoczna, gdy normalna · (DX, DY) > 0
+  const a = -DX / RX;
+  const b = -DY / RY;
+  const phi0 = Math.max(0, Math.atan2(b, a) - Math.PI / 2); // koniec widocznego łuku
+  const p0x = CX + RX * Math.cos(phi0);
+  const p0y = CY + RY * Math.sin(phi0);
+
+  // 1. Wnętrze wycięcia: lewa ścianka + widoczna część dna (przemiatanie łuku wzdłuż Z)
   const innerPath =
-    `M ${CL + DX} ${TOP + r + DY} ` +
-    `L ${CL + DX} ${TOP + S + DY} ` +
-    `A ${RX} ${RY} 0 0 0 ${CR + DX} ${TOP + S + DY} ` +
-    `L ${CR + DX} ${TOP + r + DY} ` +
-    `L ${CR} ${TOP + r} ` +
-    `L ${CR} ${TOP + S} ` +
-    `A ${RX} ${RY} 0 0 1 ${CL} ${TOP + S} ` +
-    `L ${CL} ${TOP + r} Z`;
+    `M ${CL} ${TOP} ` +
+    `L ${CL} ${CY} ` +
+    `A ${RX} ${RY} 0 0 0 ${p0x} ${p0y} ` +
+    `L ${p0x + DX} ${p0y + DY} ` +
+    `A ${RX} ${RY} 0 0 1 ${CL + DX} ${CY + DY} ` +
+    `L ${CL + DX} ${TOP + DY} Z`;
 
-  const leftLedgePath =
-    `M ${L} ${TOP + ro} ` +
-    `Q ${L} ${TOP} ${L + ro} ${TOP} ` +
-    `L ${CL - r} ${TOP} ` +
-    `Q ${CL} ${TOP} ${CL} ${TOP + r} ` +
-    `L ${CL + DX} ${TOP + r + DY} ` +
-    `Q ${CL + DX} ${TOP + DY} ${CL - r + DX} ${TOP + DY} ` +
-    `L ${L + ro + DX} ${TOP + DY} ` +
-    `Q ${L + DX} ${TOP + DY} ${L + DX} ${TOP + ro + DY} Z`;
+  // 2. Prawa ściana zewnętrzna (grubość frontu)
+  const sideWallPath = `M ${R} ${TOP} L ${R + DX} ${TOP + DY} L ${R + DX} ${BOT + DY} L ${R} ${BOT} Z`;
 
-  const rightLedgePath =
-    `M ${CR} ${TOP + r} ` +
-    `Q ${CR} ${TOP} ${CR + r} ${TOP} ` +
-    `L ${R - ro} ${TOP} ` +
-    `Q ${R} ${TOP} ${R} ${TOP + ro} ` +
-    `L ${R + DX} ${TOP + ro + DY} ` +
-    `Q ${R + DX} ${TOP + DY} ${R + DX - ro} ${TOP + DY} ` +
-    `L ${CR + r + DX} ${TOP + DY} ` +
-    `Q ${CR + DX} ${TOP + DY} ${CR + DX} ${TOP + r + DY} Z`;
+  // 3. Górne parapety
+  const leftLedgePath = `M ${L} ${TOP} L ${CL} ${TOP} L ${CL + DX} ${TOP + DY} L ${L + DX} ${TOP + DY} Z`;
+  const rightLedgePath = `M ${CR} ${TOP} L ${R} ${TOP} L ${R + DX} ${TOP + DY} L ${CR + DX} ${TOP + DY} Z`;
 
+  // 4. Przód
   const frontPath =
     `M ${L} ${BOT} ` +
-    `L ${L} ${TOP + ro} ` +
-    `Q ${L} ${TOP} ${L + ro} ${TOP} ` +
-    `L ${CL - r} ${TOP} ` +
-    `Q ${CL} ${TOP} ${CL} ${TOP + r} ` +
-    `L ${CL} ${TOP + S} ` +
-    `A ${RX} ${RY} 0 0 0 ${CR} ${TOP + S} ` +
-    `L ${CR} ${TOP + r} ` +
-    `Q ${CR} ${TOP} ${CR + r} ${TOP} ` +
-    `L ${R - ro} ${TOP} ` +
-    `Q ${R} ${TOP} ${R} ${TOP + ro} ` +
+    `L ${L} ${TOP} ` +
+    `L ${CL} ${TOP} ` +
+    `L ${CL} ${CY} ` +
+    `A ${RX} ${RY} 0 0 0 ${CR} ${CY} ` +
+    `L ${CR} ${TOP} ` +
+    `L ${R} ${TOP} ` +
     `L ${R} ${BOT} Z`;
+
+  const idBg = `hh-bg-${variant}`;
+  const idFront = `hh-front-${variant}`;
+  const idInner = `hh-inner-${variant}`;
+  const idSide = `hh-side-${variant}`;
+
+  // Obrys w kolorze wypełnienia domyka mikroszczeliny antyaliasingu na styku ścian
+  const seam = { strokeWidth: 1, strokeLinejoin: 'round' as const };
 
   return (
     <svg
@@ -159,37 +175,40 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
       aria-label="Ukryty uchwyt frontu F-4, widok pod kątem z góry"
     >
       <defs>
-        <radialGradient id={`hh-bg-${variant}`} cx="50%" cy="45%" r="60%">
+        <radialGradient id={idBg} cx="50%" cy="45%" r="60%">
           <stop offset="0%" stopColor={bgCenter} />
           <stop offset="100%" stopColor={bgEdge} />
         </radialGradient>
-        <linearGradient id={`hh-front-${variant}`} x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={idFront} gradientUnits="userSpaceOnUse" x1="0" y1={TOP} x2="0" y2={CY + RY + 140}>
           <stop offset="0%" stopColor={frontTop} />
           <stop offset="100%" stopColor={frontBottom} />
         </linearGradient>
-        <linearGradient id={`hh-inner-${variant}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={innerTop} />
-          <stop offset="100%" stopColor={innerBottom} />
+        <linearGradient id={idInner} gradientUnits="userSpaceOnUse" x1="0" y1={TOP + DY} x2="0" y2={CY + RY}>
+          <stop offset="0%" stopColor={innerBack} />
+          <stop offset="100%" stopColor={innerFront} />
+        </linearGradient>
+        <linearGradient id={idSide} gradientUnits="userSpaceOnUse" x1="0" y1={TOP + DY} x2="0" y2={BOT - 100}>
+          <stop offset="0%" stopColor={sideTop} />
+          <stop offset="100%" stopColor={sideBottom} />
         </linearGradient>
       </defs>
 
-      <rect width="400" height="400" fill={`url(#hh-bg-${variant})`} />
+      <rect width="400" height="400" fill={`url(#${idBg})`} />
 
-      {/* 1. Wnętrze wycięcia (lewa ścianka + dno). Rysowane pierwsze, żeby prawa
-          ściana boczna zakryła jego tylną, niewidoczną część. */}
-      <path d={innerPath} fill={`url(#hh-inner-${variant})`} />
+      <g transform={`translate(${tx} ${ty}) scale(${SCALE})`}>
+        {/* 1. Wnętrze wycięcia - rysowane pierwsze, bo prawy parapet i prawa ściana są bliżej kamery */}
+        <path d={innerPath} fill={`url(#${idInner})`} stroke={`url(#${idInner})`} {...seam} />
 
-      {/* 2. Prawa ściana boczna (grubość frontu w osi Z) */}
-      <path d={sideWallPath} fill={sideFace} />
+        {/* 2. Prawa ściana zewnętrzna */}
+        <path d={sideWallPath} fill={`url(#${idSide})`} stroke={`url(#${idSide})`} {...seam} />
 
-      {/* 3. Lewy parapet (górna krawędź) */}
-      <path d={leftLedgePath} fill={ledge} />
+        {/* 3. Parapety (górne powierzchnie) */}
+        <path d={leftLedgePath} fill={ledge} stroke={ledge} {...seam} />
+        <path d={rightLedgePath} fill={ledge} stroke={ledge} {...seam} />
 
-      {/* 4. Prawy parapet (górna krawędź) */}
-      <path d={rightLedgePath} fill={ledge} />
-
-      {/* 5. Front główny na wierzchu */}
-      <path d={frontPath} fill={`url(#hh-front-${variant})`} />
+        {/* 4. Przód na wierzchu */}
+        <path d={frontPath} fill={`url(#${idFront})`} stroke={`url(#${idFront})`} {...seam} />
+      </g>
     </svg>
   );
 };
@@ -287,8 +306,8 @@ export const CatalogPage: React.FC = () => {
                     <>
                       <HiddenHandleDetail key={activeVariant} variant={activeVariant} />
                       {selectedFront.detailLabel && (
-                        <div className="absolute left-1/2 -translate-x-1/2 top-[22%] sm:top-[20%] md:top-[18%] bg-night/70 backdrop-blur-sm rounded-full px-2.5 md:px-3 py-1 z-10">
-                          <span className="text-[8px] sm:text-[9px] md:text-[10px] uppercase tracking-widest font-semibold text-ivory whitespace-nowrap">
+                        <div className="absolute left-1/2 -translate-x-1/2 top-[15%] sm:top-[19%] md:top-[12%] lg:top-[9%] bg-night/70 backdrop-blur-sm rounded-full px-2 md:px-3 py-1 z-10">
+                          <span className="text-[7px] sm:text-[9px] md:text-[10px] uppercase tracking-wider md:tracking-widest font-semibold text-ivory whitespace-nowrap">
                             {selectedFront.detailLabel}
                           </span>
                         </div>
