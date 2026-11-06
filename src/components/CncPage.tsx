@@ -45,12 +45,12 @@ const productionFeatures = [
 ];
 
 const targetAudiences = [
-  "Bary & Restauracje",
-  "Hotele & Pensjonaty",
-  "Sieci Handlowe & Retail",
-  "Producenci Mebli & Agencje POS/BTL",
-  "Architekci Wnętrz & Deweloperzy",
-  "Pracownie Stolarskie & Rzemieślnicy"
+  "Pracownie Stolarskie i Rzemieślnicy",
+  "Producenci Mebli i Agencje POS/BTL",
+  "Architekci Wnętrz i Deweloperzy",
+  "Sieci Handlowe i Retail",
+  "Hotele i Pensjonaty",
+  "Bary i Restauracje" 
 ];
 
 const workSteps = [
