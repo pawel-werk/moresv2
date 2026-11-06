@@ -322,7 +322,7 @@ export const CncPage: React.FC = () => {
                   <span className="text-xl font-light">{companyData.email}</span>
                 </a>
 
-                <a href="hhttps://maps.app.goo.gl/UULc6dMyhpCJt6qZA" target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-4 text-ivory/70 hover:text-copper transition-colors outline-none focus-visible:ring-2 focus-visible:ring-copper rounded-sm w-max">
+                <a href="https://maps.app.goo.gl/UULc6dMyhpCJt6qZA" target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-4 text-ivory/70 hover:text-copper transition-colors outline-none focus-visible:ring-2 focus-visible:ring-copper rounded-sm w-max">
                   <span className="w-10 h-10 rounded-full border border-line-dark flex items-center justify-center group-hover:border-copper/50 transition-colors shrink-0 shadow-sm bg-surface-2">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                   </span>
