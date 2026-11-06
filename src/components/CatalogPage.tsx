@@ -78,7 +78,7 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   const ledge = mix(base, '#ffffff', isDark ? 0.24 : 0.3);
   const sideFace = mix(base, '#000000', isDark ? 0.15 : 0.28);
   
-  // Zgrane wnętrze uchwytu - delikatny pionowy spadek jasności bez ostrego cienia w środku
+  // Zgrane wnętrze uchwytu
   const innerTop = mix(base, '#000000', isDark ? 0.05 : 0.10);
   const innerBottom = mix(base, '#000000', isDark ? 0.20 : 0.25);
   
@@ -101,7 +101,6 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
           <stop offset="0%" stopColor={frontTop} />
           <stop offset="100%" stopColor={frontBottom} />
         </linearGradient>
-        {/* Usunięty brudny trójstopniowy gradient, teraz jest czysty i płynny */}
         <linearGradient id={`hh-inner-${variant}`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={innerTop} />
           <stop offset="100%" stopColor={innerBottom} />
@@ -112,37 +111,37 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 
       <g transform="translate(0, 15)">
         
-        {/* Prawa ściana boczna płyty (zewnętrzna) */}
+        {/* Prawa ściana boczna płyty (zewnętrzna pionowa powłoka z zaokrąglonym dołem) */}
         <path 
-          d="M 297 166 Q 297 160 291 160 L 317 140 Q 323 140 323 146 L 323 394 Q 323 400 317 400 L 291 420 Q 297 420 297 414 Z" 
+          d="M 297 166 L 297 414 Q 297 420 291 420 L 317 400 Q 323 400 323 394 L 323 146 Z" 
           fill={sideFace} 
         />
 
-        {/* Lewa krawędź grubości płyty (parapet) */}
+        {/* Lewa krawędź grubości (lewy parapet) - w pełni zgrana z górnymi łukami */}
         <path 
-          d="M 83 160 L 94 160 L 120 140 L 109 140 Q 103 140 103 146 L 77 166 Q 77 160 83 160 Z" 
+          d="M 77 166 Q 77 160 83 160 L 94 160 Q 106 160 106 172 L 132 152 Q 132 140 120 140 L 109 140 Q 103 140 103 146 Z" 
           fill={ledge} 
         />
         
-        {/* Prawa krawędź grubości płyty */}
+        {/* Prawa krawędź grubości (prawy parapet) - dodane zgranie z wycięciem w głębi */}
         <path 
-          d="M 280 160 L 291 160 Q 297 160 297 166 L 323 146 Q 323 140 317 140 L 306 140 Z" 
+          d="M 268 172 Q 268 160 280 160 L 291 160 Q 297 160 297 166 L 323 146 Q 323 140 317 140 L 306 140 Q 294 140 294 152 Z" 
           fill={ledge} 
         />
 
-        {/* Zgrane wnętrze wycięcia - połączona lewa ściana i zaokrąglone dno w jeden płynny kształt */}
+        {/* Zgrane wnętrze wycięcia - gładko schodzi od krawędzi (F) po lewej aż po podłogę */}
         <path 
-          d="M 94 160 Q 106 160 106 172 L 106 222 A 81 92 0 0 0 268 222 L 294 202 A 81 92 0 0 1 132 202 L 132 152 Q 132 140 120 140 Z" 
+          d="M 106 172 L 106 222 A 81 92 0 0 0 268 222 L 294 202 A 81 92 0 0 1 132 202 L 132 152 Z" 
           fill={`url(#hh-inner-${variant})`} 
         />
 
-        {/* Przód frontu z wycięciem */}
+        {/* Czysty przód frontu domykający szczelnie całą geometrię */}
         <path
           d="M 77 166 Q 77 160 83 160 L 94 160 Q 106 160 106 172 L 106 222 A 81 92 0 0 0 268 222 L 268 172 Q 268 160 280 160 L 291 160 Q 297 160 297 166 L 297 414 Q 297 420 291 420 L 83 420 Q 77 420 77 414 Z"
           fill={`url(#hh-front-${variant})`}
         />
 
-        {/* Jasne fazy na krawędziach przodu (łapiące światło) */}
+        {/* Jasne fazy nakładane precyzyjnie na krawędzie przodu */}
         <path
           d="M 77 166 Q 77 160 83 160 L 94 160 Q 106 160 106 172 L 106 222 A 81 92 0 0 0 268 222 L 268 172 Q 268 160 280 160 L 291 160 Q 297 160 297 166"
           fill="none"
