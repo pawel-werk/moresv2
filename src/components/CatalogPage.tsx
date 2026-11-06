@@ -73,13 +73,75 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   const base = baseColors[variant] ?? baseColors.lithos;
   const isDark = variant === 'bazalt' || variant === 'magma';
 
-  const frontTop = mix(base, '#ffffff', isDark ? 0.1 : 0.12);
-  const frontBottom = mix(base, '#000000', isDark ? 0.1 : 0.12);
-  const ledge = mix(base, '#ffffff', isDark ? 0.24 : 0.3);
-  const sideFace = mix(base, '#000000', isDark ? 0.15 : 0.28);
-  
-  const innerTop = mix(base, '#000000', isDark ? 0.05 : 0.10);
-  const innerBottom = mix(base, '#000000', isDark ? 0.20 : 0.25);
+  // --- Kolory (większy kontrast, bez highlightów) ---
+  // Przód: jasny, lekki gradient góra-dół
+  const frontTop = isDark ? mix(base, '#ffffff', 0.20) : mix(base, '#ffffff', 0.22);
+  const frontBottom = isDark ? mix(base, '#ffffff', 0.06) : mix(base, '#000000', 0.10);
+  // Górne krawędzie (parapety) - najjaśniejsze w całej bryle
+  const ledge = isDark ? mix(base, '#ffffff', 0.42) : mix(base, '#ffffff', 0.55);
+  // Prawa ściana boczna - wyraźnie ciemniejsza od frontu
+  const sideFace = isDark ? mix(base, '#ffffff', 0.03) : mix(base, '#000000', 0.45);
+  // Wnętrze wycięcia - głęboki cień, ciemniejszy ku dołowi (bez obrysów i połysków)
+  const innerTop = isDark ? mix(base, '#000000', 0.30) : mix(base, '#000000', 0.38);
+  const innerBottom = isDark ? mix(base, '#000000', 0.65) : mix(base, '#000000', 0.68);
+  // Tło okręgu
+  const bgCenter = isDark ? '#4b423a' : '#3a332e';
+  const bgEdge = isDark ? '#1d1917' : '#120f0e';
+
+  // --- Geometria ---
+  // Płaszczyzna frontu (x: L..R), wycięcie U (x: CL..CR), głębia (DX, DY)
+  const L = 40;
+  const R = 260;
+  const CL = 69;
+  const CR = 231;
+  const TOP = 195;
+  const BOT = 560; // poza kadrem - dolną krawędź ucina okrąg
+  const r = 12;    // promień zaokrąglenia krawędzi przy wycięciu
+  const S = 62;    // prosta część wycięcia, zanim zacznie się łuk
+  const RX = 81;   // promień poziomy łuku (połowa szerokości wycięcia)
+  const RY = 92;   // promień pionowy łuku
+  const DX = 100;  // głębia frontu w osi Z (wektor wyciągnięcia)
+  const DY = -80;
+
+  const sideWallPath = `M ${R} ${TOP} L ${R + DX} ${TOP + DY} L ${R + DX} ${BOT + DY} L ${R} ${BOT} Z`;
+
+  const innerPath =
+    `M ${CL + DX} ${TOP + r + DY} ` +
+    `L ${CL + DX} ${TOP + S + DY} ` +
+    `A ${RX} ${RY} 0 0 0 ${CR + DX} ${TOP + S + DY} ` +
+    `L ${CR + DX} ${TOP + r + DY} ` +
+    `L ${CR} ${TOP + r} ` +
+    `L ${CR} ${TOP + S} ` +
+    `A ${RX} ${RY} 0 0 1 ${CL} ${TOP + S} ` +
+    `L ${CL} ${TOP + r} Z`;
+
+  const leftLedgePath =
+    `M ${L} ${TOP} ` +
+    `L ${CL - r} ${TOP} ` +
+    `Q ${CL} ${TOP} ${CL} ${TOP + r} ` +
+    `L ${CL + DX} ${TOP + r + DY} ` +
+    `Q ${CL + DX} ${TOP + DY} ${CL - r + DX} ${TOP + DY} ` +
+    `L ${L + DX} ${TOP + DY} Z`;
+
+  const rightLedgePath =
+    `M ${CR} ${TOP + r} ` +
+    `Q ${CR} ${TOP} ${CR + r} ${TOP} ` +
+    `L ${R} ${TOP} ` +
+    `L ${R + DX} ${TOP + DY} ` +
+    `L ${CR + r + DX} ${TOP + DY} ` +
+    `Q ${CR + DX} ${TOP + DY} ${CR + DX} ${TOP + r + DY} Z`;
+
+  const frontPath =
+    `M ${L} ${BOT} ` +
+    `L ${L} ${TOP} ` +
+    `L ${CL - r} ${TOP} ` +
+    `Q ${CL} ${TOP} ${CL} ${TOP + r} ` +
+    `L ${CL} ${TOP + S} ` +
+    `A ${RX} ${RY} 0 0 0 ${CR} ${TOP + S} ` +
+    `L ${CR} ${TOP + r} ` +
+    `Q ${CR} ${TOP} ${CR + r} ${TOP} ` +
+    `L ${R} ${TOP} ` +
+    `L ${R} ${BOT} Z`;
 
   return (
     <svg
@@ -91,8 +153,8 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
     >
       <defs>
         <radialGradient id={`hh-bg-${variant}`} cx="50%" cy="45%" r="60%">
-          <stop offset="0%" stopColor="#3a332e" />
-          <stop offset="100%" stopColor="#141110" />
+          <stop offset="0%" stopColor={bgCenter} />
+          <stop offset="100%" stopColor={bgEdge} />
         </radialGradient>
         <linearGradient id={`hh-front-${variant}`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={frontTop} />
@@ -106,45 +168,21 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 
       <rect width="400" height="400" fill={`url(#hh-bg-${variant})`} />
 
-      <g transform="translate(0, 15)">
-        
-        {/* 1. Zewnętrzna prawa ściana (boczna) rysowana z tyłu.
-            Głębokość wyciągnięcia to teraz mocne dx=55, dy=-45 */}
-        <path 
-          d="M 297 160 L 352 115 L 352 375 L 297 420 Z" 
-          fill={sideFace} 
-        />
+      {/* 1. Wnętrze wycięcia (lewa ścianka + dno). Rysowane pierwsze, żeby prawa
+          ściana boczna zakryła jego tylną, niewidoczną część. */}
+      <path d={innerPath} fill={`url(#hh-inner-${variant})`} />
 
-        {/* 2. Wnętrze wycięcia u-shape.
-            Zaczyna się i kończy IDEALNIE w punktach głębi dachów (161,127 oraz 323,127). */}
-        <path 
-          d="M 161 127 L 161 177 A 81 92 0 0 0 323 177 L 323 127 L 268 172 L 268 222 A 81 92 0 0 1 106 222 L 106 172 Z" 
-          fill={`url(#hh-inner-${variant})`} 
-        />
+      {/* 2. Prawa ściana boczna (grubość frontu w osi Z) */}
+      <path d={sideWallPath} fill={sideFace} />
 
-        {/* 3. Lewy dach (parapet).
-            Łączy przód i zaokrąglenia frontowe z idealnymi odpowiednikami w głębi. */}
-        <path 
-          d="M 77 160 L 94 160 Q 106 160 106 172 L 161 127 Q 161 115 149 115 L 132 115 Z" 
-          fill={ledge} 
-        />
-        
-        {/* 4. Prawy dach (parapet). 
-            Kryje całkowicie szczyt prawej ścianki i współdzieli krawędzie. Zero przerw. */}
-        <path 
-          d="M 268 172 Q 268 160 280 160 L 297 160 L 352 115 L 335 115 Q 323 115 323 127 Z" 
-          fill={ledge} 
-        />
+      {/* 3. Lewy parapet (górna krawędź) */}
+      <path d={leftLedgePath} fill={ledge} />
 
-        {/* 5. Front główny na wierzchu. 
-            Ma zaokrąglone górne krawędzie przy wycięciu. Proporcje to znowu 220px szerokości, 
-            ale głębia w tle potęguje masę. */}
-        <path
-          d="M 77 420 L 77 160 L 94 160 Q 106 160 106 172 L 106 222 A 81 92 0 0 0 268 222 L 268 172 Q 268 160 280 160 L 297 160 L 297 420 Z"
-          fill={`url(#hh-front-${variant})`}
-        />
+      {/* 4. Prawy parapet (górna krawędź) */}
+      <path d={rightLedgePath} fill={ledge} />
 
-      </g>
+      {/* 5. Front główny na wierzchu */}
+      <path d={frontPath} fill={`url(#hh-front-${variant})`} />
     </svg>
   );
 };
