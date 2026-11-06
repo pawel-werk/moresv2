@@ -75,18 +75,18 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 
   // --- Kolory (większy kontrast, bez highlightów) ---
   // Przód: jasny, lekki gradient góra-dół
-  const frontTop = isDark ? mix(base, '#ffffff', 0.20) : mix(base, '#ffffff', 0.22);
-  const frontBottom = isDark ? mix(base, '#ffffff', 0.06) : mix(base, '#000000', 0.10);
-  // Górne krawędzie (parapety) - najjaśniejsze w całej bryle
-  const ledge = isDark ? mix(base, '#ffffff', 0.42) : mix(base, '#ffffff', 0.55);
-  // Prawa ściana boczna - wyraźnie ciemniejsza od frontu
-  const sideFace = isDark ? mix(base, '#ffffff', 0.03) : mix(base, '#000000', 0.45);
-  // Wnętrze wycięcia - głęboki cień, ciemniejszy ku dołowi (bez obrysów i połysków)
-  const innerTop = isDark ? mix(base, '#000000', 0.30) : mix(base, '#000000', 0.38);
-  const innerBottom = isDark ? mix(base, '#000000', 0.65) : mix(base, '#000000', 0.68);
+  const frontTop = isDark ? mix(base, '#ffffff', 0.12) : mix(base, '#ffffff', 0.10);
+  const frontBottom = isDark ? mix(base, '#ffffff', 0.04) : mix(base, '#000000', 0.05);
+  // Górne krawędzie (parapety) - lekko jaśniejsze od frontu
+  const ledge = isDark ? mix(base, '#ffffff', 0.26) : mix(base, '#ffffff', 0.30);
+  // Prawa ściana boczna - łagodnie ciemniejsza od frontu
+  const sideFace = isDark ? mix(base, '#ffffff', 0.02) : mix(base, '#000000', 0.26);
+  // Wnętrze wycięcia - miękki cień, ciemniejszy ku dołowi (bez obrysów i połysków)
+  const innerTop = isDark ? mix(base, '#000000', 0.18) : mix(base, '#000000', 0.16);
+  const innerBottom = isDark ? mix(base, '#000000', 0.42) : mix(base, '#000000', 0.36);
   // Tło okręgu
-  const bgCenter = isDark ? '#4b423a' : '#3a332e';
-  const bgEdge = isDark ? '#1d1917' : '#120f0e';
+  const bgCenter = isDark ? '#443c35' : '#3a332e';
+  const bgEdge = isDark ? '#1f1b18' : '#171310';
 
   // --- Geometria ---
   // Płaszczyzna frontu (x: L..R), wycięcie U (x: CL..CR), głębia (DX, DY)
@@ -97,13 +97,14 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   const TOP = 195;
   const BOT = 560; // poza kadrem - dolną krawędź ucina okrąg
   const r = 12;    // promień zaokrąglenia krawędzi przy wycięciu
+  const ro = 18;   // promień zaokrąglenia zewnętrznych rogów frontu
   const S = 62;    // prosta część wycięcia, zanim zacznie się łuk
   const RX = 81;   // promień poziomy łuku (połowa szerokości wycięcia)
   const RY = 92;   // promień pionowy łuku
   const DX = 100;  // głębia frontu w osi Z (wektor wyciągnięcia)
   const DY = -80;
 
-  const sideWallPath = `M ${R} ${TOP} L ${R + DX} ${TOP + DY} L ${R + DX} ${BOT + DY} L ${R} ${BOT} Z`;
+  const sideWallPath = `M ${R} ${TOP + ro} L ${R + DX} ${TOP + ro + DY} L ${R + DX} ${BOT + DY} L ${R} ${BOT} Z`;
 
   const innerPath =
     `M ${CL + DX} ${TOP + r + DY} ` +
@@ -116,31 +117,37 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
     `L ${CL} ${TOP + r} Z`;
 
   const leftLedgePath =
-    `M ${L} ${TOP} ` +
+    `M ${L} ${TOP + ro} ` +
+    `Q ${L} ${TOP} ${L + ro} ${TOP} ` +
     `L ${CL - r} ${TOP} ` +
     `Q ${CL} ${TOP} ${CL} ${TOP + r} ` +
     `L ${CL + DX} ${TOP + r + DY} ` +
     `Q ${CL + DX} ${TOP + DY} ${CL - r + DX} ${TOP + DY} ` +
-    `L ${L + DX} ${TOP + DY} Z`;
+    `L ${L + ro + DX} ${TOP + DY} ` +
+    `Q ${L + DX} ${TOP + DY} ${L + DX} ${TOP + ro + DY} Z`;
 
   const rightLedgePath =
     `M ${CR} ${TOP + r} ` +
     `Q ${CR} ${TOP} ${CR + r} ${TOP} ` +
-    `L ${R} ${TOP} ` +
-    `L ${R + DX} ${TOP + DY} ` +
+    `L ${R - ro} ${TOP} ` +
+    `Q ${R} ${TOP} ${R} ${TOP + ro} ` +
+    `L ${R + DX} ${TOP + ro + DY} ` +
+    `Q ${R + DX} ${TOP + DY} ${R + DX - ro} ${TOP + DY} ` +
     `L ${CR + r + DX} ${TOP + DY} ` +
     `Q ${CR + DX} ${TOP + DY} ${CR + DX} ${TOP + r + DY} Z`;
 
   const frontPath =
     `M ${L} ${BOT} ` +
-    `L ${L} ${TOP} ` +
+    `L ${L} ${TOP + ro} ` +
+    `Q ${L} ${TOP} ${L + ro} ${TOP} ` +
     `L ${CL - r} ${TOP} ` +
     `Q ${CL} ${TOP} ${CL} ${TOP + r} ` +
     `L ${CL} ${TOP + S} ` +
     `A ${RX} ${RY} 0 0 0 ${CR} ${TOP + S} ` +
     `L ${CR} ${TOP + r} ` +
     `Q ${CR} ${TOP} ${CR + r} ${TOP} ` +
-    `L ${R} ${TOP} ` +
+    `L ${R - ro} ${TOP} ` +
+    `Q ${R} ${TOP} ${R} ${TOP + ro} ` +
     `L ${R} ${BOT} Z`;
 
   return (
