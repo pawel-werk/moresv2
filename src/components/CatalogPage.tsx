@@ -10,9 +10,8 @@ type CatalogItem = {
   variant: MaterialVariant;
   profile: 'flat' | 'frame' | 'slatted' | 'grooved' | 'integrated-handle' | 'half-round' | 'integrated-handle-full' | 'integrated-handle-centered' | 'integrated-handle-hidden' | 'raised-panel' | 'micro-frame' | 'shaker' | 'complex-raised-panel' | 'double-stepped-panel' | 'vertical-stiles-raised' | 'flat-grooves' | 'concave-grooves' | 'mullion-frame' | 'glass-frame' | 'lattice-frame';
   longDesc: string;
-  detailImages?: Partial<Record<MaterialVariant, string>>;
+  detailGraphic?: 'hidden-handle';
   detailLabel?: string;
-  detailImagePosition?: string;
 };
 
 const colorOptions: { id: MaterialVariant; name: string; bgClass: string }[] = [
@@ -32,14 +31,8 @@ const catalogFronts: CatalogItem[] = [
     variant: "lithos", 
     profile: "integrated-handle-hidden", 
     longDesc: "Front z wycięciem w górnej krawędzi. Front od przodu zachowuje jednolitą, gładką płaszczyznę, a frez uchwytowy pozostaje całkowicie niewidoczny.",
-    detailImages: {
-      lithos: '/fronty/f-4-uchwyt-lithos.jpg',
-      azure: '/fronty/f-4-uchwyt-azure.jpg',
-      magma: '/fronty/f-4-uchwyt-magma.jpg',
-      bazalt: '/fronty/f-4-uchwyt-bazalt.jpg'
-    },
-    detailLabel: 'Detal: ukryty uchwyt',
-    detailImagePosition: 'center 30%'
+    detailGraphic: 'hidden-handle',
+    detailLabel: 'Detal: ukryty uchwyt'
   },
   { title: "F-5", desc: "Płaski / Gładki", variant: "lithos", profile: "flat", longDesc: "Klasyczny, gładki front lakierowany bez żadnych dodatkowych frezowań i detali. Minimalistyczna, jednolita płaszczyzna, która stanowi doskonałą bazę dla nowoczesnych projektów." },
   { title: "F-6", desc: "Ramowy / Wypukła płycina", variant: "lithos", profile: "raised-panel", longDesc: "Klasyczny front ramowy z frezowaną, wypukłą płyciną wewnętrzną. Wprowadza tradycyjny, elegancki charakter do nowoczesnych projektów, nawiązując do najwyższej klasy stolarki angielskiej." },
@@ -56,6 +49,172 @@ const catalogFronts: CatalogItem[] = [
   { title: "F-17", desc: "Witryna / Szklana tafla", variant: "lithos", profile: "glass-frame", longDesc: "Klasyczna witryna z szeroką ramą, ściętą precyzyjnie pod kątem 45 stopni w kierunku pojedynczej, dużej tafli szkła. Minimalistyczna forma otwierająca przestrzeń wewnątrz szafki." },
   { title: "F-18", desc: "Ramowy / Kratka", variant: "lithos", profile: "lattice-frame", longDesc: "Front ramowy z klasycznym, ukośnym dziurkowaniem (kratką) w płaskiej płycinie. Ścięcie ramki pod kątem 45 stopni płynnie łączy się z dekoracyjnym, ażurowym środkiem, zapewniając wentylację i unikalny styl retro." }
 ];
+
+// Helper to adjust color brightness
+const shade = (hex: string, percent: number): string => {
+  let R = parseInt(hex.substring(1, 3), 16);
+  let G = parseInt(hex.substring(3, 5), 16);
+  let B = parseInt(hex.substring(5, 7), 16);
+
+  R = parseInt(String(R * (100 + percent) / 100));
+  G = parseInt(String(G * (100 + percent) / 100));
+  B = parseInt(String(B * (100 + percent) / 100));
+
+  R = (R < 255) ? R : 255;
+  G = (G < 255) ? G : 255;
+  B = (B < 255) ? B : 255;
+  
+  R = (R > 0) ? R : 0;
+  G = (G > 0) ? G : 0;
+  B = (B > 0) ? B : 0;
+
+  const RR = ((R.toString(16).length === 1) ? "0" + R.toString(16) : R.toString(16));
+  const GG = ((G.toString(16).length === 1) ? "0" + G.toString(16) : G.toString(16));
+  const BB = ((B.toString(16).length === 1) ? "0" + B.toString(16) : B.toString(16));
+
+  return "#" + RR + GG + BB;
+};
+
+const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) => {
+  const baseColors: Record<MaterialVariant, string> = {
+    lithos: '#D3CCC3',
+    azure: '#5c7a8c',
+    magma: '#5D4037',
+    bazalt: '#212121',
+    tundra: '#8E918F', // Added missing variant to satisfy type, although not in colorOptions
+    lumina: '#EAE6E1'  // Added missing variant to satisfy type
+  };
+
+  const base = baseColors[variant] || baseColors.lithos;
+  const isDark = variant === 'bazalt' || variant === 'magma';
+  
+  // Adjusted shading logic for better visibility on dark variants
+  const frontColor = shade(base, isDark ? 10 : 0);
+  const topEdgeColor = shade(base, isDark ? 40 : 25);
+  const insideShadow = shade(base, isDark ? -50 : -40);
+  const deepShadow = shade(base, isDark ? -80 : -70);
+  const highlightColor = shade(base, isDark ? 70 : 50);
+
+  const gradFrontId = `grad-front-${variant}`;
+  const gradInsideId = `grad-inside-${variant}`;
+
+  return (
+    <svg 
+      viewBox="0 0 400 400" 
+      className="w-full h-full bg-night transition-colors duration-300" 
+      preserveAspectRatio="xMidYMid slice" 
+      role="img" 
+      aria-label="Ukryty uchwyt frontu F-4, widok pod kątem"
+    >
+      <defs>
+        {/* Soft light behind the detail */}
+        <radialGradient id="bg-glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#B86B3E" stopOpacity="0.15" />
+          <stop offset="100%" stopColor="var(--color-surface)" stopOpacity="0" />
+        </radialGradient>
+        
+        {/* Shadow under the board */}
+        <filter id="drop-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="15" />
+          <feOffset dx="0" dy="20" result="offsetblur" />
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="0.5" />
+          </feComponentTransfer>
+          <feMerge> 
+            <feMergeNode />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+
+        <linearGradient id={gradFrontId} x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor={frontColor} />
+          <stop offset="100%" stopColor={shade(frontColor, -15)} />
+        </linearGradient>
+
+        <linearGradient id={gradInsideId} x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor={insideShadow} />
+          <stop offset="100%" stopColor={deepShadow} />
+        </linearGradient>
+      </defs>
+
+      <rect width="400" height="400" fill="var(--color-surface)" />
+      <rect width="400" height="400" fill="url(#bg-glow)" />
+
+      {/* Main Group with isometric-like transform */}
+      <g transform="translate(200, 220) scale(1.1)" filter="url(#drop-shadow)">
+        
+        {/* 1. Back/Inside wall of the cut-out */}
+        <path 
+          d="M -70 -60 
+             L -70 10
+             Q 0 50 70 10
+             L 70 -60
+             Z" 
+          fill={`url(#${gradInsideId})`} 
+          className="transition-colors duration-300"
+        />
+
+        {/* 2. Top Edge (Thickness of the board) */}
+        <path 
+          d="M -160 -40
+             L -70 -70
+             L -70 -60
+             Q 0 -30 70 -60
+             L 70 -70
+             L 160 -40
+             L 160 -15
+             L 70 -45
+             Q 0 -15 -70 -45
+             L -70 -15
+             Z" 
+          fill={topEdgeColor}
+          className="transition-colors duration-300"
+        />
+
+        {/* Highlight phase on the top edge of the cutout */}
+        <path 
+          d="M -70 -15
+             Q 0 -15 70 -45"
+          fill="none"
+          stroke={highlightColor}
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          className="transition-colors duration-300"
+        />
+        
+        {/* Highlight phase on the straight top edges */}
+        <path 
+          d="M -160 -15 L -70 -45"
+          fill="none"
+          stroke={highlightColor}
+          strokeWidth="1.5"
+          className="transition-colors duration-300"
+        />
+        <path 
+          d="M 70 -45 L 160 -15"
+          fill="none"
+          stroke={highlightColor}
+          strokeWidth="1.5"
+          className="transition-colors duration-300"
+        />
+
+        {/* 3. Front Face of the board */}
+        <path 
+          d="M -160 -15
+             L -70 -45
+             Q 0 -15 70 -45
+             L 160 -15
+             L 160 200
+             L -160 200
+             Z" 
+          fill={`url(#${gradFrontId})`}
+          className="transition-colors duration-300"
+        />
+
+      </g>
+    </svg>
+  );
+};
 
 const FrontBacking: React.FC<{ profile: string; className?: string; children: React.ReactNode }> = ({ profile, className = '', children }) => {
   const isGlass = profile === 'glass-frame' || profile === 'mullion-frame';
@@ -84,7 +243,6 @@ const FrontBacking: React.FC<{ profile: string; className?: string; children: Re
 export const CatalogPage: React.FC = () => {
   const [selectedFront, setSelectedFront] = useState<CatalogItem | null>(null);
   const [activeVariant, setActiveVariant] = useState<MaterialVariant>('lithos');
-  const [imageError, setImageError] = useState(false);
   const pdfUrl = "/katalog/mores-katalog.pdf";
 
   useEffect(() => {
@@ -96,15 +254,10 @@ export const CatalogPage: React.FC = () => {
     if (selectedFront) {
       setActiveVariant(selectedFront.variant);
       document.body.style.overflow = 'hidden';
-      setImageError(false);
     } else {
       document.body.style.overflow = '';
     }
   }, [selectedFront]);
-
-  useEffect(() => {
-    setImageError(false);
-  }, [activeVariant]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -124,9 +277,6 @@ export const CatalogPage: React.FC = () => {
       scrollToSection('#kontakt');
     }, 150);
   };
-
-  const detailSrc = selectedFront?.detailImages?.[activeVariant] ?? selectedFront?.detailImages?.lithos;
-  const showDetailImage = detailSrc && !imageError;
 
   return (
     <div className="pt-16 md:pt-24 pb-24 md:pb-32 bg-night min-h-screen">
@@ -155,18 +305,9 @@ export const CatalogPage: React.FC = () => {
                 </FrontBacking>
                 
                 <div className="absolute -top-8 -right-10 sm:-top-10 sm:-right-12 md:-top-24 md:-right-28 lg:-top-[130px] lg:-right-[150px] w-40 h-40 sm:w-48 sm:h-48 md:w-72 md:h-72 lg:w-[340px] lg:h-[340px] rounded-full border-[4px] md:border-[8px] border-line-dark shadow-2xl overflow-hidden z-20 pointer-events-none bg-surface flex items-center justify-center">
-                  {showDetailImage ? (
+                  {selectedFront.detailGraphic === 'hidden-handle' ? (
                     <>
-                      <img 
-                        key={detailSrc}
-                        src={detailSrc} 
-                        alt={`Ukryty uchwyt frontu ${selectedFront.title}, widok pod kątem`} 
-                        className="w-full h-full object-cover transition-opacity duration-300" 
-                        style={{ objectPosition: selectedFront.detailImagePosition ?? 'center' }} 
-                        loading="lazy" 
-                        draggable={false}
-                        onError={() => setImageError(true)}
-                      />
+                      <HiddenHandleDetail variant={activeVariant} />
                       {selectedFront.detailLabel && (
                         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-night/70 backdrop-blur-sm rounded-full px-3 py-1">
                           <span className="text-[9px] md:text-[10px] uppercase tracking-widest font-semibold text-ivory whitespace-nowrap">
