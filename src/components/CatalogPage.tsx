@@ -108,33 +108,33 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 
       <g transform="translate(0, 15)">
         
-        {/* 1. Zewnętrzna prawa ściana grubości frontu (na samym spodzie z tyłu) */}
+        {/* 1. Zewnętrzna prawa ściana (boczna) narysowana na samym dole */}
         <path 
-          d="M 297 166 L 297 420 L 323 400 L 323 146 Z" 
+          d="M 297 160 L 323 140 L 323 400 L 297 420 Z" 
           fill={sideFace} 
         />
 
-        {/* 2. Wnętrze wgłębienia (zmieniona kolejność - rysowane pod dachami, aby zapobiec prześwitywaniu przez dach) */}
+        {/* 2. Wnętrze wycięcia (U-shape) wpuszczone bezpiecznie pod dachy */}
         <path 
-          d="M 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 L 294 146 L 294 202 A 81 92 0 0 1 132 202 L 132 146 Z" 
+          d="M 106 160 L 106 222 A 81 92 0 0 0 268 222 L 268 160 L 294 140 L 294 202 A 81 92 0 0 1 132 202 L 132 140 Z" 
           fill={`url(#hh-inner-${variant})`} 
         />
 
-        {/* 3. Lewy parapet (dach) - rysowany NA WIERZCHU wnętrza */}
+        {/* 3. Lewy dach (parapet) w pełnym kryciu, ostre rogi schowane pod frontem */}
         <path 
-          d="M 77 166 Q 77 160 83 160 L 100 160 Q 106 160 106 166 L 132 146 Q 132 140 126 140 L 109 140 Q 103 140 103 146 Z" 
+          d="M 77 160 L 106 160 L 106 166 L 132 146 L 132 140 L 103 140 Z" 
           fill={ledge} 
         />
         
-        {/* 4. Prawy parapet (dach) - rysowany NA WIERZCHU wnętrza, idealnie gładko z przodem, zero prześwitu wewnętrznej linii */}
+        {/* 4. Prawy dach (parapet) w pełnym kryciu, idealnie zgrany z wew. krawędzią */}
         <path 
-          d="M 268 166 Q 268 160 274 160 L 291 160 Q 297 160 297 166 L 323 146 Q 323 140 317 140 L 300 140 Q 294 140 294 146 Z" 
+          d="M 268 166 L 268 160 L 297 160 L 323 140 L 294 140 L 294 146 Z" 
           fill={ledge} 
         />
 
-        {/* 5. Front główny na samym wierzchu */}
+        {/* 5. Front narysowany na samej górze - przysłania zaokrągleniami ostre dachy, tworząc efekt fazowanego 3D */}
         <path
-          d="M 77 420 L 77 166 Q 77 160 83 160 L 100 160 Q 106 160 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 Q 268 160 274 160 L 291 160 Q 297 160 297 166 L 297 420 Z"
+          d="M 77 420 L 77 160 L 100 160 Q 106 160 106 166 L 106 222 A 81 92 0 0 0 268 222 L 268 166 Q 268 160 274 160 L 297 160 L 297 420 Z"
           fill={`url(#hh-front-${variant})`}
         />
 
