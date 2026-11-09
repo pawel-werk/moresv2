@@ -166,6 +166,7 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   const idInner = `hh-inner-${variant}`;
   const idSide = `hh-side-${variant}`;
   const idRound = `hh-round-${variant}`;
+  const idArc = `hh-arc-${variant}`;
 
   // Obrys w kolorze wypełnienia domyka mikroszczeliny antyaliasingu na styku ścian
   const seam = { strokeWidth: 1, strokeLinejoin: 'round' as const };
@@ -210,9 +211,13 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
           <feColorMatrix
             in="blur"
             type="matrix"
-            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 8 -3.2"
+            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 8 -4"
           />
         </filter>
+        {/* Obszar, w którym łuk wycięcia na przodzie jest rysowany ostro (bez rozmycia) */}
+        <clipPath id={idArc} clipPathUnits="userSpaceOnUse">
+          <rect x={CL - 4} y={TOP} width={CR - CL + 8} height={S + RY + 40} />
+        </clipPath>
       </defs>
 
       <rect width="400" height="400" fill={`url(#${idBg})`} />
@@ -232,6 +237,12 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
         {/* 4. Przód na wierzchu */}
         <path d={frontPath} fill={`url(#${idFront})`} stroke={`url(#${idFront})`} {...seam} />
       </g>
+      </g>
+
+      {/* 5. Ostry łuk wycięcia: ten sam przód narysowany jeszcze raz, bez filtra,
+          przycięty tylko do okolicy łuku. Reszta krawędzi pozostaje zaokrąglona. */}
+      <g transform={`translate(${tx} ${ty}) scale(${SCALE})`}>
+        <path d={frontPath} fill={`url(#${idFront})`} clipPath={`url(#${idArc})`} />
       </g>
     </svg>
   );
