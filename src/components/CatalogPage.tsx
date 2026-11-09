@@ -109,18 +109,21 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   const CL = 69;         // lewa krawędź wycięcia
   const CR = 231;        // prawa krawędź wycięcia
   const TOP = 195;       // górna krawędź frontu
-  const BOT = 700;       // poza kadrem - dolną krawędź ucina okrąg
+  const BOT = 1250;      // poza kadrem - dolną krawędź ucina okrąg (musi sięgać poniżej okręgu także po stronie tylnej)
   const S = 62;          // prosta część wycięcia, zanim zacznie się łuk
   const RX = (CR - CL) / 2; // promień poziomy łuku (połowa szerokości wycięcia)
   const RY = 92;         // promień pionowy łuku
   const CX = (CL + CR) / 2;
   const CY = TOP + S;    // środek łuku dna wycięcia
-  const DX = 200;        // głębia frontu w osi Z (wektor wyciągnięcia) - 2x głębiej
-  const DY = -160;
+  const DX = 600;        // głębia frontu w osi Z (wektor wyciągnięcia) - 3x głębiej niż poprzednio
+  const DY = -480;
 
-  // Skala całego detalu (50%) i położenie w kadrze 400x400
-  const SCALE = 0.5;
-  const TOP_SCREEN = 148; // gdzie na ekranie ląduje tylna krawędź parapetów
+  // Skala całego detalu (25% = kolejne -50%) i położenie w kadrze 400x400
+  const SCALE = 0.25;
+  const TOP_SCREEN = 140; // gdzie na ekranie ląduje tylna krawędź parapetów
+  // Zaokrąglenie WSZYSTKICH krawędzi (przednich, tylnych, bocznych), w jednostkach kadru 400x400.
+  // Większa wartość = większy promień zaokrąglenia i miększe przejścia między ścianami.
+  const ROUND = 1.5;
   const tx = 200 - ((L + R + DX) / 2) * SCALE;
   const ty = TOP_SCREEN - (TOP + DY) * SCALE;
 
@@ -162,6 +165,7 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   const idFront = `hh-front-${variant}`;
   const idInner = `hh-inner-${variant}`;
   const idSide = `hh-side-${variant}`;
+  const idRound = `hh-round-${variant}`;
 
   // Obrys w kolorze wypełnienia domyka mikroszczeliny antyaliasingu na styku ścian
   const seam = { strokeWidth: 1, strokeLinejoin: 'round' as const };
@@ -191,10 +195,29 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
           <stop offset="0%" stopColor={sideTop} />
           <stop offset="100%" stopColor={sideBottom} />
         </linearGradient>
+        {/* Zaokrąglenie krawędzi: lekkie rozmycie + ponowne wyostrzenie kanału alfa.
+            Zaokrągla narożniki sylwetki (też tylne) i zmiękcza przejścia między ścianami. */}
+        <filter
+          id={idRound}
+          filterUnits="userSpaceOnUse"
+          x="-40"
+          y="-40"
+          width="480"
+          height="480"
+          colorInterpolationFilters="sRGB"
+        >
+          <feGaussianBlur in="SourceGraphic" stdDeviation={ROUND} result="blur" />
+          <feColorMatrix
+            in="blur"
+            type="matrix"
+            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 8 -3.2"
+          />
+        </filter>
       </defs>
 
       <rect width="400" height="400" fill={`url(#${idBg})`} />
 
+      <g filter={`url(#${idRound})`}>
       <g transform={`translate(${tx} ${ty}) scale(${SCALE})`}>
         {/* 1. Wnętrze wycięcia - rysowane pierwsze, bo prawy parapet i prawa ściana są bliżej kamery */}
         <path d={innerPath} fill={`url(#${idInner})`} stroke={`url(#${idInner})`} {...seam} />
@@ -208,6 +231,7 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 
         {/* 4. Przód na wierzchu */}
         <path d={frontPath} fill={`url(#${idFront})`} stroke={`url(#${idFront})`} {...seam} />
+      </g>
       </g>
     </svg>
   );
