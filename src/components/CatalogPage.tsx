@@ -118,7 +118,7 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   const TOP_SCREEN = 140;
 
   // Promień zaokrąglenia ZEWNĘTRZNYCH narożników (im mniej, tym ostrzej)
-  const ROUND = 1.2;
+  const ROUND = 1.4;
   const tx = 200 - ((L + R + DX) / 2) * SCALE;
   const ty = TOP_SCREEN - (TOP + DY) * SCALE;
 
