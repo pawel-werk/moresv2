@@ -99,7 +99,7 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   const THICK = 130;      // grubość frontu (dawniej 220)
   const LEN = 900;        // długość frontu w głąb kadru (dawniej ok. 768)
   const BOT = 1250;       // wysokość frontu (i tak ucinana przez kadr)
-  const WALL = 24;        // grubość ścianki po obu stronach wycięcia
+  const NOTCH_RATIO = 0.68; // szerokość wycięcia / grubość frontu (0.1 = wąskie, 0.9 = bardzo szerokie)
   const ANGLE_DEG = 38.7; // kąt perspektywy (większy = bardziej "z góry")
   const SCALE = 0.25;     // powiększenie całego detalu w kadrze
   const TOP_SCREEN = 140; // pozycja górnej krawędzi na ekranie (px z 400)
@@ -112,6 +112,7 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 
   // --- Geometria (wyliczana) ---
   const L = 40;
+  const WALL = (THICK * (1 - NOTCH_RATIO)) / 1; // ścianka po każdej stronie wycięcia
   const R = L + THICK;
   const CL = L + WALL;
   const CR = R - WALL;
