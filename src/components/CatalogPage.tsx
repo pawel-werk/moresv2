@@ -121,7 +121,7 @@ const TopHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
   const NOTCH_LIFT = 0.67;   // prosty odcinek przed łukiem
 
   // ===== RÓŻNICA WYSOKOŚCI ŚCIANEK ZGODNIE ZE ZDJĘCIEM =====
-  const TOP_L = 150; // Lewa ścianka WYŻSZA (mniejsza wartość Y)
+  const TOP_L = 120; // Lewa ścianka WYŻSZA (mniejsza wartość Y)
   const TOP_R = 240; // Prawa ścianka NIŻSZA (większa wartość Y)
   // =========================================================
 
