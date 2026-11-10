@@ -347,57 +347,36 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </>
       )}
 
-            {profile === 'double-stepped-panel' && (
-        <>
-          {/* 1. Poziome schodki: tylko góra i dół, kończą się dokładnie na osi fug (18% / 82%) */}
-          <div
-            className="absolute left-[18%] right-[18%] top-[18%] h-[6px] pointer-events-none"
-            style={{
-              borderTop: `2px solid rgba(0,0,0,${Number(shadowOp) * 0.7})`,
-              borderBottom: `2px solid rgba(255,255,255,${Number(highlightOp) * 0.8})`,
-              backgroundColor: 'rgba(0,0,0,0.04)'
-            }}
-          />
-          <div
-            className="absolute left-[18%] right-[18%] bottom-[18%] h-[6px] pointer-events-none"
-            style={{
-              borderTop: `2px solid rgba(0,0,0,${Number(shadowOp) * 0.7})`,
-              borderBottom: `2px solid rgba(255,255,255,${Number(highlightOp) * 0.8})`,
-              backgroundColor: 'rgba(0,0,0,0.04)'
-            }}
-          />
-
-          {/* 2. Wewnętrzna płycina (drugi schodek), schowana między fugami i schodkami */}
-          <div className="absolute inset-[18%] pointer-events-none">
-            <div
-              className="absolute inset-[14px] bg-black/[0.05]"
-              style={{
+      {profile === 'double-stepped-panel' && (
+        <div className="absolute inset-[18%] pointer-events-none">
+          <div className="absolute inset-0" style={{
+            borderStyle: 'solid',
+            borderWidth: '6px',
+            borderTopColor: `rgba(0,0,0,${Number(shadowOp) * 0.7})`,
+            borderLeftColor: `rgba(0,0,0,${Number(shadowOp) * 0.7})`,
+            borderBottomColor: `rgba(255,255,255,${Number(highlightOp) * 0.8})`,
+            borderRightColor: `rgba(255,255,255,${Number(highlightOp) * 0.8})`,
+          }}>
+            <div className="absolute inset-0 bg-black/[0.03]" style={{
+              borderStyle: 'solid',
+              borderWidth: '8px', 
+              borderColor: 'transparent'
+            }}>
+              <div className="absolute inset-0" style={{
                 borderStyle: 'solid',
                 borderWidth: '6px',
                 borderTopColor: `rgba(0,0,0,${Number(shadowOp) * 0.8})`,
                 borderLeftColor: `rgba(0,0,0,${Number(shadowOp) * 0.8})`,
                 borderBottomColor: `rgba(255,255,255,${Number(highlightOp) * 0.9})`,
-                borderRightColor: `rgba(255,255,255,${Number(highlightOp) * 0.9})`
-              }}
-            />
+                borderRightColor: `rgba(255,255,255,${Number(highlightOp) * 0.9})`,
+              }}>
+                <div className="absolute inset-0 bg-black/[0.06]" />
+              </div>
+            </div>
           </div>
-
-          {/* 3. Pionowe fugi: jeden ciągły element na całą wysokość, rysowany NA WIERZCHU */}
-          {[18, 82].map((pos) => (
-            <div
-              key={pos}
-              className="absolute top-0 bottom-0 w-[6px] pointer-events-none z-20"
-              style={{
-                left: `calc(${pos}% - 3px)`,
-                background: `linear-gradient(to right,
-                  rgba(0,0,0,${Number(shadowOp) * 0.8}) 0 2px,
-                  rgba(0,0,0,${Number(shadowOp) * 0.25}) 2px 4px,
-                  rgba(255,255,255,${Number(highlightOp) * 0.9}) 4px 6px)`
-              }}
-            />
-          ))}
-        </>
+        </div>
       )}
+
       {profile === 'vertical-stiles-raised' && (
         <>
           <div className="absolute top-0 h-[18%] left-[18%] w-[4px] pointer-events-none z-10" style={{
