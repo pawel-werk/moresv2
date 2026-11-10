@@ -12,6 +12,10 @@ type CatalogItem = {
   longDesc: string;
   detailGraphic?: 'hidden-handle' | 'half-round';
   detailLabel?: string;
+  // Parametry pozwalające łatwo sterować kółkiem (zoomem) dla standardowych frontów:
+  zoomScale?: number; // mnożnik powiększenia (domyślnie 1.8)
+  zoomX?: string;     // przesunięcie w osi X, np. '-30%' (przesuwa front w lewo, pokazując prawą krawędź)
+  zoomY?: string;     // przesunięcie w osi Y, np. '30%' (przesuwa front w dół, pokazując górną krawędź)
 };
 
 const colorOptions: { id: MaterialVariant; name: string; bgClass: string }[] = [
@@ -194,7 +198,6 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
           <stop offset="100%" stopColor={sideBottom} />
         </linearGradient>
 
-        {/* Zaokrąglenie narożników bez rozmywania kolorów (rozmywamy tylko kształt) */}
         <filter
           id={idRound}
           filterUnits="userSpaceOnUse"
@@ -295,11 +298,13 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
       aria-label="Detal frontu F-15: półwałki 10 mm ze szczeliną 1 mm"
     >
       <defs>
+        {/* Tło kółka */}
         <radialGradient id={idBg} cx="50%" cy="50%" r="60%">
           <stop offset="0%" stopColor={bgCenter} />
           <stop offset="100%" stopColor={bgEdge} />
         </radialGradient>
         
+        {/* Indywidualne gradienty dla walców (światło z lewej) */}
         {Array.from({ length: COUNT }).map((_, i) => {
           const x = cornerX + i * (FLUTE_DX + GAP_DX);
           const x1 = x + FLUTE_DX;
@@ -322,10 +327,12 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
       <rect width="400" height="400" fill={`url(#${idBg})`} />
 
       <g filter="drop-shadow(0px 20px 30px rgba(0,0,0,0.5))">
+        {/* Lewa ściana (grubość płyty) */}
         <path 
           d={`M ${START_X} ${START_Y} L ${cornerX} ${cornerY} L ${cornerX} ${BOT} L ${START_X} ${BOT} Z`} 
           fill={sideWall} 
         />
+        {/* Połysk na górnej krawędzi lewej ściany */}
         <path 
           d={`M ${START_X} ${START_Y} L ${cornerX} ${cornerY}`} 
           stroke={highlight} 
@@ -333,6 +340,7 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
           fill="none" 
         />
 
+        {/* Półwałki i szczeliny (wyciągnięte w dół) */}
         {Array.from({ length: COUNT }).map((_, i) => {
           const x = cornerX + i * (FLUTE_DX + GAP_DX);
           const y = cornerY + i * (FLUTE_DY + GAP_DY);
@@ -341,15 +349,18 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
           const x2 = x1 + GAP_DX;
           const y2 = y1 + GAP_DY;
 
+          // Asymetryczny punkt kontrolny Beziera - wybrzusza łuk idealnie w lewo i w górę
           const cpX = x + 12;
           const cpY = y - 28;
 
           return (
             <g key={`flute-group-${i}`}>
+              {/* Powierzchnia półwałka */}
               <path 
                 d={`M ${x} ${y} Q ${cpX} ${cpY} ${x1} ${y1} L ${x1} ${BOT} L ${x} ${BOT} Z`} 
                 fill={`url(#flute-grad-${variant}-${i})`} 
               />
+              {/* Połysk na górnym łuku półwałka */}
               <path 
                 d={`M ${x} ${y} Q ${cpX} ${cpY} ${x1} ${y1}`} 
                 stroke={highlight} 
@@ -357,6 +368,8 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
                 fill="none" 
                 strokeLinecap="round"
               />
+              
+              {/* Szczelina (wgłębienie) */}
               <path 
                 d={`M ${x1} ${y1} L ${x2} ${y2} L ${x2} ${BOT} L ${x1} ${BOT} Z`} 
                 fill={groove} 
@@ -458,8 +471,8 @@ export const CatalogPage: React.FC = () => {
                   <MaterialPanel variant={activeVariant} profile={selectedFront.profile} className="w-full h-full rounded-sm transition-all duration-300" />
                 </FrontBacking>
                 
-                {/* Lupa (kółko) przesunięta do góry i w prawo oraz znacznie pomniejszona na mobile */}
-                <div className="absolute -top-6 -right-8 sm:-top-10 sm:-right-12 md:-top-[110px] md:-right-[150px] lg:-top-[170px] lg:-right-[200px] w-28 h-28 sm:w-40 sm:h-40 md:w-72 md:h-72 lg:w-[340px] lg:h-[340px] rounded-full border-[3px] md:border-[8px] border-line-dark shadow-2xl overflow-hidden z-20 pointer-events-none bg-surface flex items-center justify-center">
+                {/* Lupa powiększająca: wróciła do dużego rozmiaru na mobile, ale uniesiona w górę i prawo aby nie zasłaniać frontu */}
+                <div className="absolute -top-16 -right-20 sm:-top-24 sm:-right-28 md:-top-[110px] md:-right-[150px] lg:-top-[170px] lg:-right-[200px] w-40 h-40 sm:w-48 sm:h-48 md:w-72 md:h-72 lg:w-[340px] lg:h-[340px] rounded-full border-[4px] md:border-[8px] border-line-dark shadow-2xl overflow-hidden z-20 pointer-events-none bg-surface flex items-center justify-center">
                   {selectedFront.detailGraphic ? (
                     <>
                       {selectedFront.detailGraphic === 'half-round' ? (
@@ -468,21 +481,28 @@ export const CatalogPage: React.FC = () => {
                         <HiddenHandleDetail key={activeVariant} variant={activeVariant} />
                       )}
                       {selectedFront.detailLabel && (
-                        <div className="absolute left-1/2 -translate-x-1/2 top-[12%] sm:top-[15%] md:top-[12%] lg:top-[9%] bg-night/70 backdrop-blur-sm rounded-full px-1.5 py-0.5 sm:px-2 sm:py-1 md:px-3 md:py-1 z-10">
-                          <span className="text-[6px] sm:text-[8px] md:text-[10px] uppercase tracking-wider md:tracking-widest font-semibold text-ivory whitespace-nowrap">
+                        <div className="absolute left-1/2 -translate-x-1/2 top-4 sm:top-6 md:top-8 bg-night/70 backdrop-blur-sm rounded-full px-2 md:px-3 py-1 z-10">
+                          <span className="text-[7px] sm:text-[9px] md:text-[10px] uppercase tracking-wider md:tracking-widest font-semibold text-ivory whitespace-nowrap">
                             {selectedFront.detailLabel}
                           </span>
                         </div>
                       )}
                     </>
                   ) : (
-                    <div className="w-full h-full flex items-start justify-end origin-top-right transform scale-[1.6] sm:scale-[1.8] md:scale-[2.2] lg:scale-[2.5]">
-                      <div className="w-[80px] sm:w-[110px] md:w-[180px] lg:w-[220px] aspect-[3/4] rounded-sm flex-shrink-0 mt-2 mr-2 sm:mt-4 sm:mr-4 md:mt-10 md:mr-10">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div 
+                        className="w-[160px] sm:w-[200px] md:w-[280px] lg:w-[340px] aspect-[3/4] rounded-sm flex-shrink-0 transition-transform duration-300"
+                        style={{
+                          transformOrigin: 'center',
+                          // Dynamiczne wyliczenie przesunięcia z parametrów konfiguracyjnych, jeśli są określone:
+                          transform: `translate(calc(-50% + ${selectedFront.zoomX || '-25%'}), calc(-50% + ${selectedFront.zoomY || '25%'})) scale(${selectedFront.zoomScale ?? 1.8})`
+                        }}
+                      >
                         <FrontBacking profile={selectedFront.profile}>
                           <MaterialPanel 
                             variant={activeVariant} 
                             profile={selectedFront.profile} 
-                            className="w-full h-full transition-all duration-300" 
+                            className="w-full h-full" 
                           />
                         </FrontBacking>
                       </div>
