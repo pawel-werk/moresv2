@@ -347,7 +347,7 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </>
       )}
 
-      {profile === 'double-stepped-panel' && (
+            {profile === 'double-stepped-panel' && (
         <div className="absolute inset-[18%] pointer-events-none">
           <div className="absolute inset-0" style={{
             borderStyle: 'solid',
@@ -356,6 +356,8 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
             borderLeftColor: `rgba(0,0,0,${Number(shadowOp) * 0.7})`,
             borderBottomColor: `rgba(255,255,255,${Number(highlightOp) * 0.8})`,
             borderRightColor: `rgba(255,255,255,${Number(highlightOp) * 0.8})`,
+            // skrócenie trójkącika w narożnikach (zmień 4px, żeby skrócić mniej lub bardziej)
+            clipPath: 'polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px))'
           }}>
             <div className="absolute inset-0 bg-black/[0.03]" style={{
               borderStyle: 'solid',
