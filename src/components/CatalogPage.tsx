@@ -256,7 +256,7 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
 
   // --- Parametry do strojenia ---
   const THICK = 15;    // grubość płyty (poprzednio 27, czyli ok. 37% mniej)
-  const COUNT = 17;    // liczba półwałków
+  const COUNT = 20;    // liczba półwałków
   const FLUTE = 13;    // szerokość półwałka (10 mm)
   const GAP = 1;       // szczelina (1 mm)
   const RAD = FLUTE / 2;
