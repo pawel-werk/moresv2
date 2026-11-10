@@ -71,18 +71,6 @@ const mix = (hex: string, target: string, t: number): string => {
 
 /**
  * Detal ukrytego uchwytu F-4.
- *
- * Front jest teraz JEDNĄ bryłą: profil czołowy (płyta z wycięciem U od góry)
- * wyciągnięty wzdłuż wektora (DX, DY) w osi Z. Wszystkie ściany (parapety,
- * ściana boczna, wnętrze wycięcia) są wyliczone z tego samego profilu, więc
- * łączą się idealnie krawędź w krawędź - nic nie wygląda jak "doklejona kartka".
- *
- * Widoczne ściany (kamera z prawej-góry):
- *   1. wnętrze wycięcia (lewa ścianka + widoczny fragment łuku dna)
- *   2. prawa ściana zewnętrzna
- *   3. górne parapety (lewy i prawy)
- *   4. przód
- * Kolejność rysowania = od najdalszej do najbliższej.
  */
 const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) => {
   const baseColors: Record<MaterialVariant, string> = {
@@ -99,50 +87,48 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   // --- Kolory ---
   const frontTop = isDark ? mix(base, '#ffffff', 0.12) : mix(base, '#ffffff', 0.10);
   const frontBottom = isDark ? mix(base, '#ffffff', 0.04) : mix(base, '#000000', 0.05);
-  // Górne powierzchnie (parapety) - najjaśniejsze, łapią światło z góry
+  // Górne powierzchnie (parapety)
   const ledge = isDark ? mix(base, '#ffffff', 0.26) : mix(base, '#ffffff', 0.30);
-  // Prawa ściana zewnętrzna - odwrócona od światła
+  // Prawa ściana zewnętrzna
   const sideTop = isDark ? mix(base, '#ffffff', 0.04) : mix(base, '#000000', 0.22);
   const sideBottom = isDark ? mix(base, '#000000', 0.15) : mix(base, '#000000', 0.34);
-  // Wnętrze wycięcia - ciemniej w głębi (góra ekranu), jaśniej przy froncie
-  const innerBack = isDark ? mix(base, '#000000', 0.35) : mix(base, '#000000', 0.50);
-  const innerFront = isDark ? mix(base, '#ffffff', 0.05) : mix(base, '#000000', 0.18);
+  // Wnętrze wycięcia - Cienie zostały zmienione, aby były łagodniejsze
+  const innerBack = isDark ? mix(base, '#000000', 0.25) : mix(base, '#000000', 0.40);
+  const innerFront = isDark ? mix(base, '#ffffff', 0.08) : mix(base, '#000000', 0.10);
   // Tło okręgu
   const bgCenter = isDark ? '#443c35' : '#3a332e';
   const bgEdge = isDark ? '#1f1b18' : '#171310';
 
-  // --- Geometria (współrzędne "projektowe", potem skalowane grupą) ---
-  const L = 40;          // lewa krawędź frontu
-  const R = 260;         // prawa krawędź frontu
-  const CL = 69;         // lewa krawędź wycięcia
-  const CR = 231;        // prawa krawędź wycięcia
-  const TOP = 195;       // górna krawędź frontu
-  const BOT = 1250;      // poza kadrem - dolną krawędź ucina okrąg (musi sięgać poniżej okręgu także po stronie tylnej)
-  const S = 62;          // prosta część wycięcia, zanim zacznie się łuk
-  const RX = (CR - CL) / 2; // promień poziomy łuku (połowa szerokości wycięcia)
-  const RY = 92;         // promień pionowy łuku
+  // --- Geometria ---
+  const L = 40;
+  const R = 260;
+  const CL = 69;
+  const CR = 231;
+  const TOP = 195;
+  const BOT = 1250;
+  const S = 62;
+  const RX = (CR - CL) / 2;
+  const RY = 92;
   const CX = (CL + CR) / 2;
-  const CY = TOP + S;    // środek łuku dna wycięcia
-  const DX = 600;        // głębia frontu w osi Z (wektor wyciągnięcia) - 3x głębiej niż poprzednio
+  const CY = TOP + S;
+  const DX = 600;
   const DY = -480;
 
-  // Skala całego detalu (25% = kolejne -50%) i położenie w kadrze 400x400
   const SCALE = 0.25;
-  const TOP_SCREEN = 140; // gdzie na ekranie ląduje tylna krawędź parapetów
-  // Zaokrąglenie WSZYSTKICH krawędzi (przednich, tylnych, bocznych), w jednostkach kadru 400x400.
-  // Większa wartość = większy promień zaokrąglenia i miększe przejścia między ścianami.
-  const ROUND = 1.5;
+  const TOP_SCREEN = 140;
+  
+  // WIĘKSZE ZAOKRĄGLENIE dla bardziej miękkich krawędzi
+  const ROUND = 2.5; 
   const tx = 200 - ((L + R + DX) / 2) * SCALE;
   const ty = TOP_SCREEN - (TOP + DY) * SCALE;
 
-  // Widoczny fragment łuku: powierzchnia widoczna, gdy normalna · (DX, DY) > 0
   const a = -DX / RX;
   const b = -DY / RY;
-  const phi0 = Math.max(0, Math.atan2(b, a) - Math.PI / 2); // koniec widocznego łuku
+  const phi0 = Math.max(0, Math.atan2(b, a) - Math.PI / 2);
   const p0x = CX + RX * Math.cos(phi0);
   const p0y = CY + RY * Math.sin(phi0);
 
-  // 1. Wnętrze wycięcia: lewa ścianka + widoczna część dna (przemiatanie łuku wzdłuż Z)
+  // Ścieżki
   const innerPath =
     `M ${CL} ${TOP} ` +
     `L ${CL} ${CY} ` +
@@ -151,14 +137,10 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
     `A ${RX} ${RY} 0 0 1 ${CL + DX} ${CY + DY} ` +
     `L ${CL + DX} ${TOP + DY} Z`;
 
-  // 2. Prawa ściana zewnętrzna (grubość frontu)
   const sideWallPath = `M ${R} ${TOP} L ${R + DX} ${TOP + DY} L ${R + DX} ${BOT + DY} L ${R} ${BOT} Z`;
-
-  // 3. Górne parapety
   const leftLedgePath = `M ${L} ${TOP} L ${CL} ${TOP} L ${CL + DX} ${TOP + DY} L ${L + DX} ${TOP + DY} Z`;
   const rightLedgePath = `M ${CR} ${TOP} L ${R} ${TOP} L ${R + DX} ${TOP + DY} L ${CR + DX} ${TOP + DY} Z`;
 
-  // 4. Przód
   const frontPath =
     `M ${L} ${BOT} ` +
     `L ${L} ${TOP} ` +
@@ -176,7 +158,6 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   const idRound = `hh-round-${variant}`;
   const idArc = `hh-arc-${variant}`;
 
-  // Obrys w kolorze wypełnienia domyka mikroszczeliny antyaliasingu na styku ścian
   const seam = { strokeWidth: 1, strokeLinejoin: 'round' as const };
 
   return (
@@ -204,8 +185,6 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
           <stop offset="0%" stopColor={sideTop} />
           <stop offset="100%" stopColor={sideBottom} />
         </linearGradient>
-        {/* Zaokrąglenie krawędzi: lekkie rozmycie + ponowne wyostrzenie kanału alfa.
-            Zaokrągla narożniki sylwetki (też tylne) i zmiękcza przejścia między ścianami. */}
         <filter
           id={idRound}
           filterUnits="userSpaceOnUse"
@@ -222,7 +201,6 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
             values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 8 -4"
           />
         </filter>
-        {/* Obszar, w którym łuk wycięcia na przodzie jest rysowany ostro (bez rozmycia) */}
         <clipPath id={idArc} clipPathUnits="userSpaceOnUse">
           <rect x={CL - 4} y={TOP} width={CR - CL + 8} height={S + RY + 40} />
         </clipPath>
@@ -231,24 +209,15 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
       <rect width="400" height="400" fill={`url(#${idBg})`} />
 
       <g filter={`url(#${idRound})`}>
-      <g transform={`translate(${tx} ${ty}) scale(${SCALE})`}>
-        {/* 1. Wnętrze wycięcia - rysowane pierwsze, bo prawy parapet i prawa ściana są bliżej kamery */}
-        <path d={innerPath} fill={`url(#${idInner})`} stroke={`url(#${idInner})`} {...seam} />
-
-        {/* 2. Prawa ściana zewnętrzna */}
-        <path d={sideWallPath} fill={`url(#${idSide})`} stroke={`url(#${idSide})`} {...seam} />
-
-        {/* 3. Parapety (górne powierzchnie) */}
-        <path d={leftLedgePath} fill={ledge} stroke={ledge} {...seam} />
-        <path d={rightLedgePath} fill={ledge} stroke={ledge} {...seam} />
-
-        {/* 4. Przód na wierzchu */}
-        <path d={frontPath} fill={`url(#${idFront})`} stroke={`url(#${idFront})`} {...seam} />
-      </g>
+        <g transform={`translate(${tx} ${ty}) scale(${SCALE})`}>
+          <path d={innerPath} fill={`url(#${idInner})`} stroke={`url(#${idInner})`} {...seam} />
+          <path d={sideWallPath} fill={`url(#${idSide})`} stroke={`url(#${idSide})`} {...seam} />
+          <path d={leftLedgePath} fill={ledge} stroke={ledge} {...seam} />
+          <path d={rightLedgePath} fill={ledge} stroke={ledge} {...seam} />
+          <path d={frontPath} fill={`url(#${idFront})`} stroke={`url(#${idFront})`} {...seam} />
+        </g>
       </g>
 
-      {/* 5. Ostry łuk wycięcia: ten sam przód narysowany jeszcze raz, bez filtra,
-          przycięty tylko do okolicy łuku. Reszta krawędzi pozostaje zaokrąglona. */}
       <g transform={`translate(${tx} ${ty}) scale(${SCALE})`}>
         <path d={frontPath} fill={`url(#${idFront})`} clipPath={`url(#${idArc})`} />
       </g>
@@ -257,21 +226,8 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 };
 
 /**
- * Detal ryflowania F-15: półwałki 10 mm rozdzielone szczeliną 1 mm.
- *
- * Widok ma ten sam kierunek co detal F-4 (wektor głębi DX:DY = 600:-480 = 330:-264),
- * ale głębia jest krótsza, a widok bliższy, żeby profil półwałków był czytelny.
- *
- * Geometria jest liczona z jednego profilu: półokrąg (przekrój półwałka) jest
- * wyciągany w dół frontu, więc górna płaszczyzna cięcia, walec i szczeliny pasują
- * do siebie krawędź w krawędź. Wymiary w mm przeliczane są na jednostki projektu
- * (MM), dzięki czemu proporcja 10 mm : 1 mm jest zachowana.
- *
- * Kolejność rysowania (od najdalszej):
- *   1. korpus: prawa ściana + górna powierzchnia (zaokrąglone krawędzie, też tylne)
- *   2. tło szczelin
- *   3. półwałki od lewej do prawej (prawy lekko zakrywa lewego, jak w rzucie ukośnym)
- *   4. delikatny cień pionowy na walcach
+ * Detal ryflowania F-15 (Poprawiony)
+ * Półwałki biegną po DŁUGIM boku. (wyciągnięte pionowo, a płyta schodzi na prawo).
  */
 const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) => {
   const baseColors: Record<MaterialVariant, string> = {
@@ -286,90 +242,121 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
   const isDark = variant === 'bazalt' || variant === 'magma';
 
   // --- Kolory ---
-  // Górna płaszczyzna cięcia - najjaśniejsza, łapie światło z góry
+  // Płaszczyzna boczna z lewej strony (wcześniej była na górze)
   const ledge = isDark ? mix(base, '#ffffff', 0.26) : mix(base, '#ffffff', 0.30);
-  // Prawa ściana boczna - odwrócona od światła
+  
+  // Prawa i dolna ściana - boki odwrócone od światła
   const sideTop = isDark ? mix(base, '#ffffff', 0.04) : mix(base, '#000000', 0.22);
   const sideBottom = isDark ? mix(base, '#000000', 0.15) : mix(base, '#000000', 0.34);
-  // Walec półwałka: światło po lewej, cień po prawej
-  const fluteLight = isDark ? mix(base, '#ffffff', 0.24) : mix(base, '#ffffff', 0.32);
-  const fluteMid = isDark ? mix(base, '#ffffff', 0.08) : mix(base, '#ffffff', 0.04);
-  const fluteDark = isDark ? mix(base, '#000000', 0.30) : mix(base, '#000000', 0.24);
-  // Dno szczeliny między półwałkami
-  const groove = isDark ? mix(base, '#000000', 0.62) : mix(base, '#000000', 0.55);
-  // Tło okręgu
+  
+  // Walec (teraz rysowany pionowo, światło z lewej do prawej)
+  const fluteLight = isDark ? mix(base, '#ffffff', 0.20) : mix(base, '#ffffff', 0.30);
+  const fluteMid = isDark ? mix(base, '#ffffff', 0.04) : mix(base, '#ffffff', 0.02);
+  const fluteDark = isDark ? mix(base, '#000000', 0.35) : mix(base, '#000000', 0.28);
+  
+  // Dno szczeliny
+  const groove = isDark ? mix(base, '#000000', 0.65) : mix(base, '#000000', 0.58);
+  
+  // Tło
   const bgCenter = isDark ? '#443c35' : '#3a332e';
   const bgEdge = isDark ? '#1f1b18' : '#171310';
 
-  // --- Widok (kierunek głębi jak w F-4: DY / DX = -0,8) ---
-  const L = 40;          // lewa krawędź frontu
-  const TOP = 195;       // górna krawędź frontu
-  const BOT = 1250;      // poza kadrem - dolną krawędź ucina okrąg
-  const DX = 330;        // głębia frontu w osi Z (wektor wyciągnięcia)
-  const DY = -264;
-  const SCALE = 0.4;     // skala całego detalu w kadrze 400x400
-  const TOP_SCREEN = 140; // gdzie na ekranie ląduje tylna krawędź górnej powierzchni
-  const ROUND = 1.5;     // zaokrąglenie krawędzi korpusu (jak w F-4)
-  const FRONT_W = 300;   // szerokość widocznego fragmentu frontu
-  const R = L + FRONT_W;
-  const tx = 200 - ((L + R + DX) / 2) * SCALE;
-  const ty = TOP_SCREEN - (TOP + DY) * SCALE;
-
-  // --- Ryflowanie: półwałek 10 mm, szczelina 1 mm ---
-  const COUNT = 5;       // liczba widocznych półwałków
-  const FLUTE_MM = 10;
-  const GAP_MM = 1;
-  const MM = FRONT_W / (COUNT * FLUTE_MM + (COUNT - 1) * GAP_MM); // jednostek projektu na 1 mm
-  const FW = FLUTE_MM * MM;  // szerokość półwałka
-  const GW = GAP_MM * MM;    // szerokość szczeliny
-  const RAD = FW / 2;        // promień półokręgu
-
-  // Wysunięcie półwałka w stronę patrzącego (przeciwnie do osi Z). Im więcej, tym bardziej
-  // wypukły wygląd, ale tym bardziej prawy półwałek zakrywa szczelinę po swojej lewej.
-  const PROTRUSION = 0.5;
+  // --- OŚ Z - Wektor perspektywy (identyczny jak F-4) ---
+  const DX = 600;
+  const DY = -480;
   const dirLen = Math.hypot(DX, DY);
   const ux = DX / dirLen;
   const uy = DY / dirLen;
-  const STEPS = 28;
-  // Kąt, przy którym obrys walca sięga najdalej w lewo (stąd biegnie jego lewa krawędź w dół)
-  const thetaLeft = Math.PI - Math.atan(PROTRUSION * ux);
 
-  const pt = (xc: number, theta: number): [number, number] => {
-    const z = -RAD * PROTRUSION * Math.sin(theta);
-    return [xc + RAD * Math.cos(theta) + ux * z, TOP + uy * z];
+  // --- Geometria płyty z poprawionymi proporcjami i ułożeniem ---
+  // Front układa się po przekątnej. Półwałki mają biec w osi Z (w głąb), a deska "rośnie" w dół/w prawo.
+  const THICKNESS = 120; // realna, szczuplejsza grubość płyty w pikselach
+  
+  // --- Parametry półwałków ---
+  const COUNT = 7;
+  const FLUTE_MM = 10;
+  const GAP_MM = 1;
+  const SCALE_MM = 18; // 18 pikseli na milimetr na froncie (półwałki są mniejsze)
+  const FW = FLUTE_MM * SCALE_MM; 
+  const GW = GAP_MM * SCALE_MM;
+  const RAD = FW / 2;
+  
+  // Całkowita "szerokość" (długość) obszaru ryflowania wzdłuż krawędzi
+  const TOTAL_W = COUNT * FW + (COUNT - 1) * GW;
+  
+  // Skalowanie dla widoku
+  const SCALE = 0.35;
+  const tx = -50; 
+  const ty = 250; 
+
+  const ROUND = 1.5;
+
+  const pt = (baseZ: number, theta: number): [number, number] => {
+    // theta = 0 na dole (Y), PI w górę (Z)
+    // Walce leżą wzdłuż osi X. (Wysuwają się do przodu-lewo, a ryflowanie ciągnie się w dół-prawo).
+    // Dopasowanie orientacji, by walec biegł ukośnie zgodnie z krawędzią.
+    const h = RAD * Math.cos(theta);
+    const v = -RAD * Math.sin(theta);
+    // Punkt bazowy (zależny od baseZ, tj. "głębokości" na brzegu płyty)
+    const px = baseZ * (uy); // zamiana osi, żeby frezy układały się po prawej stronie korpusu
+    const py = baseZ * (ux);
+    // Wypukłość półwałka w lewo-górę
+    return [px + h * -ux + v * -uy, py + h * -uy + v * ux];
   };
+
   const fmt = (n: number) => n.toFixed(2);
   const poly = (pts: [number, number][]) => 'M ' + pts.map((p) => `${fmt(p[0])} ${fmt(p[1])}`).join(' L ');
-
+  
+  const STEPS = 20;
+  // Próg, do którego rysujemy widoczną stronę walca
+  const thetaLimit = Math.PI * 0.9;
+  
   const flutes = Array.from({ length: COUNT }, (_, i) => {
-    const xc = L + i * (FW + GW) + RAD;
-    const arc: [number, number][] = [];
-    const arcLeft: [number, number][] = [];
+    // xc określa pozycję "w dół" wzdłuż krawędzi, gdzie leży walec
+    const xc = i * (FW + GW) + RAD;
+    const arcTop: [number, number][] = [];
+    const arcFace: [number, number][] = [];
+    
     for (let k = 0; k <= STEPS; k++) {
-      arc.push(pt(xc, (Math.PI * k) / STEPS));
-      arcLeft.push(pt(xc, (thetaLeft * k) / STEPS));
+      const th = (Math.PI * k) / STEPS;
+      arcTop.push(pt(xc, th));
+      if ((thetaLimit * k) / STEPS <= thetaLimit) {
+        arcFace.push(pt(xc, (thetaLimit * k) / STEPS));
+      }
     }
-    const leftX = pt(xc, thetaLeft)[0];
+    
+    // Koniec powierzchni w głębi (po wektorze Z)
+    const endZ = 1200; // długość "wyciągnięcia" w głąb kadru
+    const faceStr = poly(arcFace) + 
+      ` L ${fmt(arcFace[arcFace.length-1][0] + endZ * ux)} ${fmt(arcFace[arcFace.length-1][1] + endZ * uy)} ` +
+      ` L ${fmt(arcFace[0][0] + endZ * ux)} ${fmt(arcFace[0][1] + endZ * uy)} Z`;
+
     return {
-      // przekrój półwałka na górnej płaszczyźnie cięcia
-      top: poly(arc) + ' Z',
-      // powierzchnia walca - przekrój wyciągnięty w dół frontu
-      face: poly(arcLeft) + ` L ${fmt(leftX)} ${BOT} L ${fmt(xc + RAD)} ${BOT} Z`
+      top: poly(arcTop) + ' Z',
+      face: faceStr
     };
   });
 
-  // Korpus: prawa ściana boczna i górna powierzchnia (grubość frontu w osi Z)
-  const sideWallPath = `M ${R} ${TOP} L ${R + DX} ${TOP + DY} L ${R + DX} ${BOT + DY} L ${R} ${BOT} Z`;
-  const slabTopPath = `M ${L} ${TOP} L ${R} ${TOP} L ${R + DX} ${TOP + DY} L ${L + DX} ${TOP + DY} Z`;
+  // Tło korpusu (ściany)
+  // Przesunięcia bazowe: 0,0 - punkt początkowy. 
+  // Oś W (wzdłuż frezów, po prawej-dół) i oś Z (głębia, prawo-góra) i Grubość (lewo-dół)
+  const Z_LEN = 1500;
+  
+  // Narożniki korpusu
+  const p0 = [0, 0];
+  const pW = [TOTAL_W * uy, TOTAL_W * ux]; // na dół (w prawo dół kadru)
+  const pThick = [THICKNESS * -ux, THICKNESS * -uy]; // w dół/lewo
+  const pWThick = [pW[0] + pThick[0], pW[1] + pThick[1]];
+  
+  const topSurfacePath = `M ${p0[0]} ${p0[1]} L ${pW[0]} ${pW[1]} L ${pWThick[0]} ${pWThick[1]} L ${pThick[0]} ${pThick[1]} Z`;
+  const sideWallPath = `M ${pW[0]} ${pW[1]} L ${pW[0] + Z_LEN * ux} ${pW[1] + Z_LEN * uy} L ${pWThick[0] + Z_LEN * ux} ${pWThick[1] + Z_LEN * uy} L ${pWThick[0]} ${pWThick[1]} Z`;
 
   const idBg = `hr-bg-${variant}`;
   const idSide = `hr-side-${variant}`;
   const idFlute = `hr-flute-${variant}`;
-  const idShade = `hr-shade-${variant}`;
   const idRound = `hr-round-${variant}`;
 
-  // Obrys w kolorze wypełnienia domyka mikroszczeliny antyaliasingu na styku ścian
-  const seam = { strokeWidth: 1, strokeLinejoin: 'round' as const };
+  const seam = { strokeWidth: 1.5, strokeLinejoin: 'round' as const };
 
   return (
     <svg
@@ -384,30 +371,28 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
           <stop offset="0%" stopColor={bgCenter} />
           <stop offset="100%" stopColor={bgEdge} />
         </radialGradient>
-        <linearGradient id={idSide} gradientUnits="userSpaceOnUse" x1="0" y1={TOP + DY} x2="0" y2={BOT - 100}>
+        
+        {/* Gradient ściany bocznej - przyciemniany w dół */}
+        <linearGradient id={idSide} gradientUnits="userSpaceOnUse" x1={pW[0]} y1={pW[1]} x2={pWThick[0]} y2={pWThick[1]}>
           <stop offset="0%" stopColor={sideTop} />
           <stop offset="100%" stopColor={sideBottom} />
         </linearGradient>
-        {/* Poziomy gradient jednego półwałka (wspólny dla wszystkich - liczony od obrysu każdego) */}
-        <linearGradient id={idFlute} x1="0" y1="0" x2="1" y2="0">
+        
+        {/* Gradient ryflowania (teraz obrócony odpowiednio do osi) */}
+        <linearGradient id={idFlute} x1="0" y1="1" x2="1" y2="0">
           <stop offset="0%" stopColor={fluteMid} />
-          <stop offset="28%" stopColor={fluteLight} />
-          <stop offset="62%" stopColor={fluteMid} />
+          <stop offset="35%" stopColor={fluteLight} />
+          <stop offset="65%" stopColor={fluteMid} />
           <stop offset="100%" stopColor={fluteDark} />
         </linearGradient>
-        {/* Delikatne przyciemnienie ku dołowi, jak na froncie F-4 */}
-        <linearGradient id={idShade} gradientUnits="userSpaceOnUse" x1="0" y1={TOP} x2="0" y2={TOP + 320}>
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.02" />
-          <stop offset="100%" stopColor="#000000" stopOpacity="0.14" />
-        </linearGradient>
-        {/* Zaokrąglenie krawędzi korpusu: lekkie rozmycie + ponowne wyostrzenie kanału alfa */}
+
         <filter
           id={idRound}
           filterUnits="userSpaceOnUse"
-          x="-40"
-          y="-40"
-          width="480"
-          height="480"
+          x="-140"
+          y="-140"
+          width="800"
+          height="800"
           colorInterpolationFilters="sRGB"
         >
           <feGaussianBlur in="SourceGraphic" stdDeviation={ROUND} result="blur" />
@@ -417,28 +402,32 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
 
       <rect width="400" height="400" fill={`url(#${idBg})`} />
 
-      {/* 1. Korpus (ściana boczna + górna powierzchnia) z zaokrąglonymi krawędziami, także tylnymi */}
       <g filter={`url(#${idRound})`}>
         <g transform={`translate(${tx} ${ty}) scale(${SCALE})`}>
+          {/* Ściana grubości frontu i przekrój (widoczne "z boku" ucięcie płyty) */}
           <path d={sideWallPath} fill={`url(#${idSide})`} stroke={`url(#${idSide})`} {...seam} />
-          <path d={slabTopPath} fill={ledge} stroke={ledge} {...seam} />
+          <path d={topSurfacePath} fill={ledge} stroke={ledge} {...seam} />
         </g>
       </g>
 
-      {/* 2-4. Ryflowanie rysowane ostro, żeby półwałki i szczeliny pozostały wyraźne */}
+      {/* Ryflowanie (przód płyty, tło szczelin i półwałki) */}
       <g transform={`translate(${tx} ${ty}) scale(${SCALE})`}>
-        <rect x={L} y={TOP} width={FRONT_W} height={BOT - TOP} fill={groove} />
+        {/* Powierzchnia tła w głębi (dno szczeliny) */}
+        <path d={`M 0 0 L ${TOTAL_W * uy} ${TOTAL_W * ux} L ${TOTAL_W * uy + Z_LEN * ux} ${TOTAL_W * ux + Z_LEN * uy} L ${Z_LEN * ux} ${Z_LEN * uy} Z`} fill={groove} />
+        
         {flutes.map((fl, i) => (
           <g key={i}>
+            {/* Przekrój ("dekielek" walca na górnej płaszczyźnie) */}
             <path d={fl.top} fill={ledge} stroke={ledge} {...seam} />
+            {/* Front wyciągniętego walca */}
             <path d={fl.face} fill={`url(#${idFlute})`} />
           </g>
         ))}
-        <path d={flutes.map((fl) => fl.face).join(' ')} fill={`url(#${idShade})`} />
       </g>
     </svg>
   );
 };
+
 
 const FrontBacking: React.FC<{ profile: string; className?: string; children: React.ReactNode }> = ({ profile, className = '', children }) => {
   const isGlass = profile === 'glass-frame' || profile === 'mullion-frame';
