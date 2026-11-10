@@ -26,15 +26,7 @@ const colorOptions: { id: MaterialVariant; name: string; bgClass: string }[] = [
 ];
 
 const catalogFronts: CatalogItem[] = [
-  { 
-    title: "F-1", 
-    desc: "Płaski / Uchwyt pełny", 
-    variant: "lithos", 
-    profile: "integrated-handle-full", 
-    longDesc: "Czysty, płaski front ze zintegrowanym uchwytem frezowanym na całej szerokości krawędzi. Kwintesencja minimalizmu i funkcjonalności.",
-    detailGraphic: 'hidden-handle',
-    detailLabel: 'Detal: pochwyt'
-  },
+  { title: "F-1", desc: "Płaski / Uchwyt pełny", variant: "lithos", profile: "integrated-handle-full", longDesc: "Czysty, płaski front ze zintegrowanym uchwytem frezowanym na całej szerokości krawędzi. Kwintesencja minimalizmu i funkcjonalności.", zoomX: 90, zoomY: 8, zoomScale: 2.6 },
   { title: "F-2", desc: "Płaski / Uchwyt asymetryczny", variant: "lithos", profile: "integrated-handle", longDesc: "Minimalistyczny front z precyzyjnie wyfrezowanym, zintegrowanym uchwytem krawędziowym. Łączy w sobie czystość formy z najwyższą ergonomią bezuchwytowego otwierania.", zoomX: 85, zoomY: 8, zoomScale: 2.6 },
   { title: "F-3", desc: "Płaski / Uchwyt symetryczny", variant: "lithos", profile: "integrated-handle-centered", longDesc: "Nowoczesny front z wycentrowanym, symetrycznym frezem uchwytowym. Zakończony eleganckimi skosami z obu stron.", zoomX: 85, zoomY: 8, zoomScale: 2.6 },
   {
@@ -69,6 +61,17 @@ const catalogFronts: CatalogItem[] = [
   { title: "F-17", desc: "Witryna / Szklana tafla", variant: "lithos", profile: "glass-frame", longDesc: "Klasyczna witryna z szeroką ramą, ściętą precyzyjnie pod kątem 45 stopni w kierunku pojedynczej, dużej tafli szkła. Minimalistyczna forma otwierająca przestrzeń wewnątrz szafki.", zoomX: 80, zoomY: 17, zoomScale: 2.6 },
   { title: "F-18", desc: "Ramowy / Kratka", variant: "lithos", profile: "lattice-frame", longDesc: "Front ramowy z klasycznym, ukośnym dziurkowaniem (kratką) w płaskiej płycinie. Ścięcie ramki pod kątem 45 stopni płynnie łączy się z dekoracyjnym, ażurowym środkiem, zapewniając wentylację i unikalny styl retro.", zoomX: 75, zoomY: 23, zoomScale: 2.6 },
 ];
+const mix = (hex: string, target: string, t: number): string => {
+  const parse = (h: string) => {
+    const c = h.replace('#', '');
+    return [0, 2, 4].map((i) => parseInt(c.slice(i, i + 2), 16));
+  };
+  const a = parse(hex);
+  const b = parse(target);
+  const out = a.map((v, i) => Math.round(v + (b[i] - v) * t));
+  return '#' + out.map((v) => v.toString(16).padStart(2, '0')).join('');
+};
+
 /**
  * Detal ukrytego uchwytu F-4.
  */
