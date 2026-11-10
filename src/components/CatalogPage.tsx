@@ -226,8 +226,8 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 };
 
 /**
- * Detal ryflowania F-15 (Poprawiony)
- * Półwałki biegną po DŁUGIM boku. (wyciągnięte pionowo, a płyta schodzi na prawo).
+ * Detal ryflowania F-15 (Izometryczny, zgodny ze zdjęciem referencyjnym)
+ * Półwałki biegną pionowo, z poprawnie zrzutowaną wypukłością i wyciągnięciem w głąb.
  */
 const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) => {
   const baseColors: Record<MaterialVariant, string> = {
@@ -242,121 +242,74 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
   const isDark = variant === 'bazalt' || variant === 'magma';
 
   // --- Kolory ---
-  // Płaszczyzna boczna z lewej strony (wcześniej była na górze)
-  const ledge = isDark ? mix(base, '#ffffff', 0.26) : mix(base, '#ffffff', 0.30);
+  // Górna płaszczyzna cięcia (parapet) - najjaśniejsza
+  const ledge = isDark ? mix(base, '#ffffff', 0.22) : mix(base, '#ffffff', 0.35);
+  // Prawa ściana boczna - w mocnym cieniu
+  const sideWall = isDark ? mix(base, '#000000', 0.25) : mix(base, '#000000', 0.30);
+  // Dno szczeliny między półwałkami
+  const groove = isDark ? mix(base, '#000000', 0.55) : mix(base, '#000000', 0.45);
   
-  // Prawa i dolna ściana - boki odwrócone od światła
-  const sideTop = isDark ? mix(base, '#ffffff', 0.04) : mix(base, '#000000', 0.22);
-  const sideBottom = isDark ? mix(base, '#000000', 0.15) : mix(base, '#000000', 0.34);
-  
-  // Walec (teraz rysowany pionowo, światło z lewej do prawej)
-  const fluteLight = isDark ? mix(base, '#ffffff', 0.20) : mix(base, '#ffffff', 0.30);
-  const fluteMid = isDark ? mix(base, '#ffffff', 0.04) : mix(base, '#ffffff', 0.02);
-  const fluteDark = isDark ? mix(base, '#000000', 0.35) : mix(base, '#000000', 0.28);
-  
-  // Dno szczeliny
-  const groove = isDark ? mix(base, '#000000', 0.65) : mix(base, '#000000', 0.58);
-  
-  // Tło
-  const bgCenter = isDark ? '#443c35' : '#3a332e';
-  const bgEdge = isDark ? '#1f1b18' : '#171310';
+  // Cieniowanie pojedynczego półwałka (światło z lewej)
+  const fluteLight = isDark ? mix(base, '#ffffff', 0.18) : mix(base, '#ffffff', 0.35);
+  const fluteMid = base;
+  const fluteDark = isDark ? mix(base, '#000000', 0.45) : mix(base, '#000000', 0.35);
 
-  // --- OŚ Z - Wektor perspektywy (identyczny jak F-4) ---
-  const DX = 600;
-  const DY = -480;
-  const dirLen = Math.hypot(DX, DY);
-  const ux = DX / dirLen;
-  const uy = DY / dirLen;
+  const bgCenter = isDark ? '#36302b' : '#2e2825';
+  const bgEdge = isDark ? '#14110f' : '#14110f';
 
-  // --- Geometria płyty z poprawionymi proporcjami i ułożeniem ---
-  // Front układa się po przekątnej. Półwałki mają biec w osi Z (w głąb), a deska "rośnie" w dół/w prawo.
-  const THICKNESS = 120; // realna, szczuplejsza grubość płyty w pikselach
+  // --- Geometria ---
+  const FLUTE_W = 36; // 10mm w proporcji
+  const GAP_W = 4;    // 1mm w proporcji
+  const COUNT = 5;    // Liczba widocznych ryfli
+  const TOTAL_W = COUNT * FLUTE_W + (COUNT - 1) * GAP_W;
   
-  // --- Parametry półwałków ---
-  const COUNT = 7;
-  const FLUTE_MM = 10;
-  const GAP_MM = 1;
-  const SCALE_MM = 18; // 18 pikseli na milimetr na froncie (półwałki są mniejsze)
-  const FW = FLUTE_MM * SCALE_MM; 
-  const GW = GAP_MM * SCALE_MM;
-  const RAD = FW / 2;
+  const L = 105;
+  const TOP = 140;
+  const BOT = 420;
+  const R = L + TOTAL_W;
   
-  // Całkowita "szerokość" (długość) obszaru ryflowania wzdłuż krawędzi
-  const TOTAL_W = COUNT * FW + (COUNT - 1) * GW;
+  // Wektor grubości płyty (DX, DY) - idzie w głąb ekranu, w górę i prawo
+  const DX = 50;
+  const DY = -40;
   
-  // Skalowanie dla widoku
-  const SCALE = 0.35;
-  const tx = -50; 
-  const ty = 250; 
+  // Wektor wypukłości półwałka (VX, VY) - "wystaje" z płyty do przodu i w dół
+  const VX = -0.4;
+  const VY = 0.4;
+  
+  const R_FLUTE = FLUTE_W / 2;
+  const STEPS = 16;
 
-  const ROUND = 1.5;
-
-  const pt = (baseZ: number, theta: number): [number, number] => {
-    // theta = 0 na dole (Y), PI w górę (Z)
-    // Walce leżą wzdłuż osi X. (Wysuwają się do przodu-lewo, a ryflowanie ciągnie się w dół-prawo).
-    // Dopasowanie orientacji, by walec biegł ukośnie zgodnie z krawędzią.
-    const h = RAD * Math.cos(theta);
-    const v = -RAD * Math.sin(theta);
-    // Punkt bazowy (zależny od baseZ, tj. "głębokości" na brzegu płyty)
-    const px = baseZ * (uy); // zamiana osi, żeby frezy układały się po prawej stronie korpusu
-    const py = baseZ * (ux);
-    // Wypukłość półwałka w lewo-górę
-    return [px + h * -ux + v * -uy, py + h * -uy + v * ux];
+  // Funkcja generująca zrzutowany łuk pojedynczego półwałka
+  const getArc = (xc: number, yBase: number) => {
+    const pts: [number, number][] = [];
+    for (let i = 0; i <= STEPS; i++) {
+      const theta = Math.PI * (1 - i / STEPS); // od lewej (PI) do prawej (0)
+      const x = xc + R_FLUTE * Math.cos(theta);
+      const z = R_FLUTE * Math.sin(theta); // Wartość Z określa wypukłość
+      // Rzutowanie na płaszczyznę ekranu
+      const px = x + z * VX;
+      const py = yBase + z * VY;
+      pts.push([px, py]);
+    }
+    return pts;
   };
 
+  const topProfilePts: [number, number][] = [];
+  for (let j = 0; j < COUNT; j++) {
+    const xc = L + j * (FLUTE_W + GAP_W) + R_FLUTE;
+    topProfilePts.push(...getArc(xc, TOP));
+  }
+
   const fmt = (n: number) => n.toFixed(2);
-  const poly = (pts: [number, number][]) => 'M ' + pts.map((p) => `${fmt(p[0])} ${fmt(p[1])}`).join(' L ');
-  
-  const STEPS = 20;
-  // Próg, do którego rysujemy widoczną stronę walca
-  const thetaLimit = Math.PI * 0.9;
-  
-  const flutes = Array.from({ length: COUNT }, (_, i) => {
-    // xc określa pozycję "w dół" wzdłuż krawędzi, gdzie leży walec
-    const xc = i * (FW + GW) + RAD;
-    const arcTop: [number, number][] = [];
-    const arcFace: [number, number][] = [];
-    
-    for (let k = 0; k <= STEPS; k++) {
-      const th = (Math.PI * k) / STEPS;
-      arcTop.push(pt(xc, th));
-      if ((thetaLimit * k) / STEPS <= thetaLimit) {
-        arcFace.push(pt(xc, (thetaLimit * k) / STEPS));
-      }
-    }
-    
-    // Koniec powierzchni w głębi (po wektorze Z)
-    const endZ = 1200; // długość "wyciągnięcia" w głąb kadru
-    const faceStr = poly(arcFace) + 
-      ` L ${fmt(arcFace[arcFace.length-1][0] + endZ * ux)} ${fmt(arcFace[arcFace.length-1][1] + endZ * uy)} ` +
-      ` L ${fmt(arcFace[0][0] + endZ * ux)} ${fmt(arcFace[0][1] + endZ * uy)} Z`;
+  const poly = (pts: [number, number][]) => 'M ' + pts.map(p => `${fmt(p[0])} ${fmt(p[1])}`).join(' L ');
 
-    return {
-      top: poly(arcTop) + ' Z',
-      face: faceStr
-    };
-  });
-
-  // Tło korpusu (ściany)
-  // Przesunięcia bazowe: 0,0 - punkt początkowy. 
-  // Oś W (wzdłuż frezów, po prawej-dół) i oś Z (głębia, prawo-góra) i Grubość (lewo-dół)
-  const Z_LEN = 1500;
-  
-  // Narożniki korpusu
-  const p0 = [0, 0];
-  const pW = [TOTAL_W * uy, TOTAL_W * ux]; // na dół (w prawo dół kadru)
-  const pThick = [THICKNESS * -ux, THICKNESS * -uy]; // w dół/lewo
-  const pWThick = [pW[0] + pThick[0], pW[1] + pThick[1]];
-  
-  const topSurfacePath = `M ${p0[0]} ${p0[1]} L ${pW[0]} ${pW[1]} L ${pWThick[0]} ${pWThick[1]} L ${pThick[0]} ${pThick[1]} Z`;
-  const sideWallPath = `M ${pW[0]} ${pW[1]} L ${pW[0] + Z_LEN * ux} ${pW[1] + Z_LEN * uy} L ${pWThick[0] + Z_LEN * ux} ${pWThick[1] + Z_LEN * uy} L ${pWThick[0]} ${pWThick[1]} Z`;
+  // Ścieżki bryły
+  const topPath = poly(topProfilePts) + ` L ${fmt(R + DX)} ${fmt(TOP + DY)} L ${fmt(L + DX)} ${fmt(TOP + DY)} Z`;
+  const sidePath = `M ${R} ${TOP} L ${R + DX} ${TOP + DY} L ${R + DX} ${BOT + DY} L ${R} ${BOT} Z`;
 
   const idBg = `hr-bg-${variant}`;
-  const idSide = `hr-side-${variant}`;
   const idFlute = `hr-flute-${variant}`;
-  const idRound = `hr-round-${variant}`;
-
-  const seam = { strokeWidth: 1.5, strokeLinejoin: 'round' as const };
+  const seam = { strokeWidth: 1.2, strokeLinejoin: 'round' as const };
 
   return (
     <svg
@@ -367,67 +320,68 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
       aria-label="Detal frontu F-15: półwałki 10 mm ze szczeliną 1 mm, widok pod kątem z góry"
     >
       <defs>
-        <radialGradient id={idBg} cx="50%" cy="45%" r="60%">
+        <radialGradient id={idBg} cx="50%" cy="50%" r="60%">
           <stop offset="0%" stopColor={bgCenter} />
           <stop offset="100%" stopColor={bgEdge} />
         </radialGradient>
         
-        {/* Gradient ściany bocznej - przyciemniany w dół */}
-        <linearGradient id={idSide} gradientUnits="userSpaceOnUse" x1={pW[0]} y1={pW[1]} x2={pWThick[0]} y2={pWThick[1]}>
-          <stop offset="0%" stopColor={sideTop} />
-          <stop offset="100%" stopColor={sideBottom} />
-        </linearGradient>
-        
-        {/* Gradient ryflowania (teraz obrócony odpowiednio do osi) */}
-        <linearGradient id={idFlute} x1="0" y1="1" x2="1" y2="0">
-          <stop offset="0%" stopColor={fluteMid} />
-          <stop offset="35%" stopColor={fluteLight} />
-          <stop offset="65%" stopColor={fluteMid} />
+        {/* Liniowy gradient 3D dla półwałków (światło wyłapane z lewej, cień po prawej) */}
+        <linearGradient id={idFlute} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor={fluteLight} />
+          <stop offset="45%" stopColor={fluteMid} />
           <stop offset="100%" stopColor={fluteDark} />
         </linearGradient>
-
-        <filter
-          id={idRound}
-          filterUnits="userSpaceOnUse"
-          x="-140"
-          y="-140"
-          width="800"
-          height="800"
-          colorInterpolationFilters="sRGB"
-        >
-          <feGaussianBlur in="SourceGraphic" stdDeviation={ROUND} result="blur" />
-          <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 8 -4" />
-        </filter>
       </defs>
 
       <rect width="400" height="400" fill={`url(#${idBg})`} />
 
-      <g filter={`url(#${idRound})`}>
-        <g transform={`translate(${tx} ${ty}) scale(${SCALE})`}>
-          {/* Ściana grubości frontu i przekrój (widoczne "z boku" ucięcie płyty) */}
-          <path d={sideWallPath} fill={`url(#${idSide})`} stroke={`url(#${idSide})`} {...seam} />
-          <path d={topSurfacePath} fill={ledge} stroke={ledge} {...seam} />
-        </g>
-      </g>
-
-      {/* Ryflowanie (przód płyty, tło szczelin i półwałki) */}
-      <g transform={`translate(${tx} ${ty}) scale(${SCALE})`}>
-        {/* Powierzchnia tła w głębi (dno szczeliny) */}
-        <path d={`M 0 0 L ${TOTAL_W * uy} ${TOTAL_W * ux} L ${TOTAL_W * uy + Z_LEN * ux} ${TOTAL_W * ux + Z_LEN * uy} L ${Z_LEN * ux} ${Z_LEN * uy} Z`} fill={groove} />
+      {/* Rzut bryły z miękkim cieniem ciskającym na tło */}
+      <g filter="drop-shadow(0px 15px 25px rgba(0,0,0,0.7))">
+        {/* Prawa ściana grubość */}
+        <path d={sidePath} fill={sideWall} stroke={sideWall} {...seam} />
         
-        {flutes.map((fl, i) => (
-          <g key={i}>
-            {/* Przekrój ("dekielek" walca na górnej płaszczyźnie) */}
-            <path d={fl.top} fill={ledge} stroke={ledge} {...seam} />
-            {/* Front wyciągniętego walca */}
-            <path d={fl.face} fill={`url(#${idFlute})`} />
-          </g>
-        ))}
+        {/* Górna płaszczyzna z wyciętym profilem */}
+        <path d={topPath} fill={ledge} stroke={ledge} {...seam} />
+
+        {/* Szczeliny ryflowania (tło frezu) */}
+        {Array.from({ length: COUNT - 1 }).map((_, j) => {
+          const gx1 = L + j * (FLUTE_W + GAP_W) + FLUTE_W;
+          const gx2 = gx1 + GAP_W;
+          return (
+            <path 
+              key={`gap-${j}`}
+              d={`M ${gx1} ${TOP} L ${gx2} ${TOP} L ${gx2} ${BOT} L ${gx1} ${BOT} Z`} 
+              fill={groove} 
+              stroke={groove} 
+              {...seam} 
+            />
+          );
+        })}
+
+        {/* Wyciągnięte Półwałki */}
+        {Array.from({ length: COUNT }).map((_, j) => {
+          const xc = L + j * (FLUTE_W + GAP_W) + R_FLUTE;
+          const topArc = getArc(xc, TOP);
+          const botArc = getArc(xc, BOT);
+          
+          // Zamykanie ścieżki wymaga odwrócenia łuku dennego
+          const revBotArc = [...botArc].reverse();
+          const pathD = poly(topArc) + ' L ' + revBotArc.map(p => `${fmt(p[0])} ${fmt(p[1])}`).join(' L ') + ' Z';
+          
+          return (
+            <path 
+              key={`flute-${j}`} 
+              d={pathD} 
+              fill={`url(#${idFlute})`} 
+              stroke={`url(#${idFlute})`} 
+              {...seam} 
+            />
+          );
+        })}
       </g>
     </svg>
   );
 };
-
 
 const FrontBacking: React.FC<{ profile: string; className?: string; children: React.ReactNode }> = ({ profile, className = '', children }) => {
   const isGlass = profile === 'glass-frame' || profile === 'mullion-frame';
