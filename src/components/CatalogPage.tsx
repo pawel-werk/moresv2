@@ -87,38 +87,45 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   // --- Kolory ---
   const frontTop = isDark ? mix(base, '#ffffff', 0.12) : mix(base, '#ffffff', 0.10);
   const frontBottom = isDark ? mix(base, '#ffffff', 0.04) : mix(base, '#000000', 0.05);
-  // Górne powierzchnie (parapety)
   const ledge = isDark ? mix(base, '#ffffff', 0.26) : mix(base, '#ffffff', 0.30);
-  // Prawa ściana zewnętrzna
   const sideTop = isDark ? mix(base, '#ffffff', 0.04) : mix(base, '#000000', 0.22);
   const sideBottom = isDark ? mix(base, '#000000', 0.15) : mix(base, '#000000', 0.34);
-  // Wnętrze wycięcia
   const innerBack = isDark ? mix(base, '#000000', 0.25) : mix(base, '#000000', 0.40);
   const innerFront = isDark ? mix(base, '#ffffff', 0.08) : mix(base, '#000000', 0.10);
-  // Tło okręgu
   const bgCenter = isDark ? '#443c35' : '#3a332e';
   const bgEdge = isDark ? '#1f1b18' : '#171310';
 
-  // --- Geometria ---
+  // ============ WYMIARY DO STROJENIA ============
+  const THICK = 150;      // grubość frontu (dawniej 220)
+  const LEN = 900;        // długość frontu w głąb kadru (dawniej ok. 768)
+  const BOT = 1250;       // wysokość frontu (i tak ucinana przez kadr)
+  const WALL = 24;        // grubość ścianki po obu stronach wycięcia
+  const ANGLE_DEG = 38.7; // kąt perspektywy (większy = bardziej "z góry")
+  const SCALE = 0.25;     // powiększenie całego detalu w kadrze
+  const TOP_SCREEN = 140; // pozycja górnej krawędzi na ekranie (px z 400)
+  const ROUND = 1.2;      // zaokrąglenie narożników (0 = ostre)
+
+  // Proporcje wycięcia względem jego szerokości (zwykle nie trzeba ruszać)
+  const NOTCH_DEPTH = 1.14;  // głębokość łuku (RY = RX * to)
+  const NOTCH_LIFT = 0.77;   // prosty odcinek przed łukiem (S = RX * to)
+  // ==============================================
+
+  // --- Geometria (wyliczana) ---
   const L = 40;
-  const R = 260;
-  const CL = 69;
-  const CR = 231;
+  const R = L + THICK;
+  const CL = L + WALL;
+  const CR = R - WALL;
   const TOP = 195;
-  const BOT = 1250;
-  const S = 62;
   const RX = (CR - CL) / 2;
-  const RY = 92;
+  const RY = RX * NOTCH_DEPTH;
+  const S = RX * NOTCH_LIFT;
   const CX = (CL + CR) / 2;
   const CY = TOP + S;
-  const DX = 600;
-  const DY = -480;
 
-  const SCALE = 0.25;
-  const TOP_SCREEN = 140;
+  const ang = (ANGLE_DEG * Math.PI) / 180;
+  const DX = LEN * Math.cos(ang);
+  const DY = -LEN * Math.sin(ang);
 
-  // Promień zaokrąglenia ZEWNĘTRZNYCH narożników (im mniej, tym ostrzej)
-  const ROUND = 1.4;
   const tx = 200 - ((L + R + DX) / 2) * SCALE;
   const ty = TOP_SCREEN - (TOP + DY) * SCALE;
 
@@ -186,11 +193,7 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
           <stop offset="100%" stopColor={sideBottom} />
         </linearGradient>
 
-        {/*
-          Zaokrąglenie narożników BEZ rozmywania kolorów:
-          rozmywamy tylko kanał alfa (kształt), progujemy go, a następnie
-          przycinamy nim ORYGINALNĄ, ostrą grafikę.
-        */}
+        {/* Zaokrąglenie narożników bez rozmywania kolorów (rozmywamy tylko kształt) */}
         <filter
           id={idRound}
           filterUnits="userSpaceOnUse"
