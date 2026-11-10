@@ -12,10 +12,10 @@ type CatalogItem = {
   longDesc: string;
   detailGraphic?: 'hidden-handle' | 'half-round';
   detailLabel?: string;
-  // Parametry pozwalające łatwo sterować kółkiem (zoomem) dla standardowych frontów:
-  zoomScale?: number; // mnożnik powiększenia (domyślnie 1.8)
-  zoomX?: string;     // przesunięcie w osi X, np. '-30%' (przesuwa front w lewo, pokazując prawą krawędź)
-  zoomY?: string;     // przesunięcie w osi Y, np. '30%' (przesuwa front w dół, pokazując górną krawędź)
+  // Zoom w kółku dla standardowych frontów (punkt na froncie trafia na środek kółka):
+  zoomX?: number;     // 0-100: punkt poziomo (0 = lewa krawędź frontu, 100 = prawa)
+  zoomY?: number;     // 0-100: punkt pionowo (0 = góra frontu, 100 = dół)
+  zoomScale?: number; // siła powiększenia (domyślnie 2.5)
 };
 
 const colorOptions: { id: MaterialVariant; name: string; bgClass: string }[] = [
@@ -26,28 +26,28 @@ const colorOptions: { id: MaterialVariant; name: string; bgClass: string }[] = [
 ];
 
 const catalogFronts: CatalogItem[] = [
-  { title: "F-1", desc: "Płaski / Uchwyt pełny", variant: "lithos", profile: "integrated-handle-full", longDesc: "Czysty, płaski front ze zintegrowanym uchwytem frezowanym na całej szerokości krawędzi. Kwintesencja minimalizmu i funkcjonalności." },
-  { title: "F-2", desc: "Płaski / Uchwyt asymetryczny", variant: "lithos", profile: "integrated-handle", longDesc: "Minimalistyczny front z precyzyjnie wyfrezowanym, zintegrowanym uchwytem krawędziowym. Łączy w sobie czystość formy z najwyższą ergonomią bezuchwytowego otwierania." },
-  { title: "F-3", desc: "Płaski / Uchwyt symetryczny", variant: "lithos", profile: "integrated-handle-centered", longDesc: "Nowoczesny front z wycentrowanym, symetrycznym frezem uchwytowym. Zakończony eleganckimi skosami z obu stron." },
-  { 
-    title: "F-4", 
-    desc: "Płaski / Uchwyt ukryty", 
-    variant: "lithos", 
-    profile: "integrated-handle-hidden", 
+  { title: "F-1", desc: "Płaski / Uchwyt pełny", variant: "lithos", profile: "integrated-handle-full", longDesc: "Czysty, płaski front ze zintegrowanym uchwytem frezowanym na całej szerokości krawędzi. Kwintesencja minimalizmu i funkcjonalności.", zoomX: 80, zoomY: 10, zoomScale: 3 },
+  { title: "F-2", desc: "Płaski / Uchwyt asymetryczny", variant: "lithos", profile: "integrated-handle", longDesc: "Minimalistyczny front z precyzyjnie wyfrezowanym, zintegrowanym uchwytem krawędziowym. Łączy w sobie czystość formy z najwyższą ergonomią bezuchwytowego otwierania.", zoomX: 75, zoomY: 10, zoomScale: 3 },
+  { title: "F-3", desc: "Płaski / Uchwyt symetryczny", variant: "lithos", profile: "integrated-handle-centered", longDesc: "Nowoczesny front z wycentrowanym, symetrycznym frezem uchwytowym. Zakończony eleganckimi skosami z obu stron.", zoomX: 50, zoomY: 10, zoomScale: 3 },
+  {
+    title: "F-4",
+    desc: "Płaski / Uchwyt ukryty",
+    variant: "lithos",
+    profile: "integrated-handle-hidden",
     longDesc: "Front z wycięciem w górnej krawędzi. Front od przodu zachowuje jednolitą, gładką płaszczyznę, a frez uchwytowy pozostaje całkowicie niewidoczny.",
     detailGraphic: 'hidden-handle',
     detailLabel: 'Detal: ukryty uchwyt'
   },
-  { title: "F-5", desc: "Płaski / Gładki", variant: "lithos", profile: "flat", longDesc: "Klasyczny, gładki front lakierowany bez żadnych dodatkowych frezowań i detali. Minimalistyczna, jednolita płaszczyzna, która stanowi doskonałą bazę dla nowoczesnych projektów." },
-  { title: "F-6", desc: "Ramowy / Wypukła płycina", variant: "lithos", profile: "raised-panel", longDesc: "Klasyczny front ramowy z frezowaną, wypukłą płyciną wewnętrzną. Wprowadza tradycyjny, elegancki charakter do nowoczesnych projektów, nawiązując do najwyższej klasy stolarki angielskiej." },
-  { title: "F-7", desc: "Płaski / Mikroramka", variant: "lithos", profile: "micro-frame", longDesc: "Nowoczesny front z niezwykle cienką, subtelną ramką na samych krawędziach. Idealny kompromis między gładkim minimalizmem a klasycznym, ramiakowym stylem." },
-  { title: "F-8", desc: "Ramowy / Shaker", variant: "lithos", profile: "shaker", longDesc: "Klasyczny, ponadczasowy front ramiakowy (tzw. Shaker) z głęboko osadzoną, płaską płyciną opadającą pod kątem 45 stopni. Wprowadza architektoniczny rygor i czystość formy." },
-  { title: "F-9", desc: "Ramowy / Klasyczny z frezem", variant: "lithos", profile: "complex-raised-panel", longDesc: "Rozbudowany front klasyczny łączący szeroką ramę, podwójne fazy pod kątem 45 stopni (w dół i w górę) oraz dodatkowy, subtelny frez obwiedniowy na zewnętrznej płaszczyźnie." },
-  { title: "F-10", desc: "Ramowy / Podwójny schodek", variant: "lithos", profile: "double-stepped-panel", longDesc: "Elegancki front z szeroką ramą, która schodkuje w dół pod kątem 45 stopni, rozdzielona płaską frezą i kolejnym spadkiem, aż do zagłębionej płyciny. Nowoczesna interpretacja tradycyjnego stylu ramiakowego." },
-  { title: "F-11", desc: "Ramowy / Pionowe ramiaki", variant: "lithos", profile: "vertical-stiles-raised", longDesc: "Front inspirowany klasyczną konstrukcją z wyraźnymi, pionowymi fugami przechodzącymi przez całą wysokość. Wewnętrzna płycina jest dodatkowo wyprofilowana i wypukła, wprowadzając rzemieślniczy, tradycyjny detal do zabudowy." },
-  { title: "F-12", desc: "Ryflowany / Płaskie frezy", variant: "lithos", profile: "flat-grooves", longDesc: "Front ryflowany o geometrycznym, technicznym charakterze. Pionowe, płaskie wycięcia tworzą powtarzalny, nowoczesny rytm. Idealny do urozmaicenia gładkich powierzchni zabudowy." },
-  { title: "F-13", desc: "Płaski / Frez obwiedniowy", variant: "lithos", profile: "grooved", longDesc: "Klasyczny, elegancki front z subtelnym, pojedynczym frezem obwiedniowym. Detal, który dodaje wyrafinowania bez obciążania przestrzeni." },
-  { title: "F-14", desc: "Ryflowany / Wklęsłe frezy", variant: "lithos", profile: "concave-grooves", longDesc: "Gęste, rytmiczne ryflowanie w formie wklęsłych wcięć oddzielonych wąskimi, płaskimi paskami. Niezwykle taktylna powierzchnia o mocnym, wertykalnym rysunku." },
+  { title: "F-5", desc: "Płaski / Gładki", variant: "lithos", profile: "flat", longDesc: "Klasyczny, gładki front lakierowany bez żadnych dodatkowych frezowań i detali. Minimalistyczna, jednolita płaszczyzna, która stanowi doskonałą bazę dla nowoczesnych projektów.", zoomX: 85, zoomY: 12, zoomScale: 2.5 },
+  { title: "F-6", desc: "Ramowy / Wypukła płycina", variant: "lithos", profile: "raised-panel", longDesc: "Klasyczny front ramowy z frezowaną, wypukłą płyciną wewnętrzną. Wprowadza tradycyjny, elegancki charakter do nowoczesnych projektów, nawiązując do najwyższej klasy stolarki angielskiej.", zoomX: 18, zoomY: 14, zoomScale: 2.8 },
+  { title: "F-7", desc: "Płaski / Mikroramka", variant: "lithos", profile: "micro-frame", longDesc: "Nowoczesny front z niezwykle cienką, subtelną ramką na samych krawędziach. Idealny kompromis między gładkim minimalizmem a klasycznym, ramiakowym stylem.", zoomX: 12, zoomY: 12, zoomScale: 3.5 },
+  { title: "F-8", desc: "Ramowy / Shaker", variant: "lithos", profile: "shaker", longDesc: "Klasyczny, ponadczasowy front ramiakowy (tzw. Shaker) z głęboko osadzoną, płaską płyciną opadającą pod kątem 45 stopni. Wprowadza architektoniczny rygor i czystość formy.", zoomX: 18, zoomY: 14, zoomScale: 2.8 },
+  { title: "F-9", desc: "Ramowy / Klasyczny z frezem", variant: "lithos", profile: "complex-raised-panel", longDesc: "Rozbudowany front klasyczny łączący szeroką ramę, podwójne fazy pod kątem 45 stopni (w dół i w górę) oraz dodatkowy, subtelny frez obwiedniowy na zewnętrznej płaszczyźnie.", zoomX: 18, zoomY: 14, zoomScale: 2.8 },
+  { title: "F-10", desc: "Ramowy / Podwójny schodek", variant: "lithos", profile: "double-stepped-panel", longDesc: "Elegancki front z szeroką ramą, która schodkuje w dół pod kątem 45 stopni, rozdzielona płaską frezą i kolejnym spadkiem, aż do zagłębionej płyciny. Nowoczesna interpretacja tradycyjnego stylu ramiakowego.", zoomX: 18, zoomY: 14, zoomScale: 2.6 },
+  { title: "F-11", desc: "Ramowy / Pionowe ramiaki", variant: "lithos", profile: "vertical-stiles-raised", longDesc: "Front inspirowany klasyczną konstrukcją z wyraźnymi, pionowymi fugami przechodzącymi przez całą wysokość. Wewnętrzna płycina jest dodatkowo wyprofilowana i wypukła, wprowadzając rzemieślniczy, tradycyjny detal do zabudowy.", zoomX: 20, zoomY: 14, zoomScale: 2.6 },
+  { title: "F-12", desc: "Ryflowany / Płaskie frezy", variant: "lithos", profile: "flat-grooves", longDesc: "Front ryflowany o geometrycznym, technicznym charakterze. Pionowe, płaskie wycięcia tworzą powtarzalny, nowoczesny rytm. Idealny do urozmaicenia gładkich powierzchni zabudowy.", zoomX: 50, zoomY: 20, zoomScale: 3 },
+  { title: "F-13", desc: "Płaski / Frez obwiedniowy", variant: "lithos", profile: "grooved", longDesc: "Klasyczny, elegancki front z subtelnym, pojedynczym frezem obwiedniowym. Detal, który dodaje wyrafinowania bez obciążania przestrzeni.", zoomX: 12, zoomY: 12, zoomScale: 3.5 },
+  { title: "F-14", desc: "Ryflowany / Wklęsłe frezy", variant: "lithos", profile: "concave-grooves", longDesc: "Gęste, rytmiczne ryflowanie w formie wklęsłych wcięć oddzielonych wąskimi, płaskimi paskami. Niezwykle taktylna powierzchnia o mocnym, wertykalnym rysunku.", zoomX: 50, zoomY: 20, zoomScale: 3 },
   {
     title: "F-15",
     desc: "Ryflowany / Półwałek",
@@ -57,9 +57,9 @@ const catalogFronts: CatalogItem[] = [
     detailGraphic: 'half-round',
     detailLabel: 'Detal: półwałek 10 mm'
   },
-  { title: "F-16", desc: "Witryna / Szprosy krzyżowe", variant: "lithos", profile: "mullion-frame", longDesc: "Klasyczny front witrynowy z krzyżowymi szprosami i fazowanymi krawędziami okienek pod kątem 45 stopni. Nadaje zabudowie lekkości i eksponuje zawartość szafek." },
-  { title: "F-17", desc: "Witryna / Szklana tafla", variant: "lithos", profile: "glass-frame", longDesc: "Klasyczna witryna z szeroką ramą, ściętą precyzyjnie pod kątem 45 stopni w kierunku pojedynczej, dużej tafli szkła. Minimalistyczna forma otwierająca przestrzeń wewnątrz szafki." },
-  { title: "F-18", desc: "Ramowy / Kratka", variant: "lithos", profile: "lattice-frame", longDesc: "Front ramowy z klasycznym, ukośnym dziurkowaniem (kratką) w płaskiej płycinie. Ścięcie ramki pod kątem 45 stopni płynnie łączy się z dekoracyjnym, ażurowym środkiem, zapewniając wentylację i unikalny styl retro." }
+  { title: "F-16", desc: "Witryna / Szprosy krzyżowe", variant: "lithos", profile: "mullion-frame", longDesc: "Klasyczny front witrynowy z krzyżowymi szprosami i fazowanymi krawędziami okienek pod kątem 45 stopni. Nadaje zabudowie lekkości i eksponuje zawartość szafek.", zoomX: 50, zoomY: 50, zoomScale: 2 },
+  { title: "F-17", desc: "Witryna / Szklana tafla", variant: "lithos", profile: "glass-frame", longDesc: "Klasyczna witryna z szeroką ramą, ściętą precyzyjnie pod kątem 45 stopni w kierunku pojedynczej, dużej tafli szkła. Minimalistyczna forma otwierająca przestrzeń wewnątrz szafki.", zoomX: 20, zoomY: 15, zoomScale: 2.5 },
+  { title: "F-18", desc: "Ramowy / Kratka", variant: "lithos", profile: "lattice-frame", longDesc: "Front ramowy z klasycznym, ukośnym dziurkowaniem (kratką) w płaskiej płycinie. Ścięcie ramki pod kątem 45 stopni płynnie łączy się z dekoracyjnym, ażurowym środkiem, zapewniając wentylację i unikalny styl retro.", zoomX: 25, zoomY: 20, zoomScale: 3 }
 ];
 
 const mix = (hex: string, target: string, t: number): string => {
@@ -425,7 +425,7 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
 const FrontBacking: React.FC<{ profile: string; className?: string; children: React.ReactNode }> = ({ profile, className = '', children }) => {
   const isGlass = profile === 'glass-frame' || profile === 'mullion-frame';
   const isLattice = profile === 'lattice-frame';
-  
+
   if (isLattice) {
     return (
       <div className={`w-full h-full rounded-sm overflow-hidden relative bg-[#2A2522] ${className}`}>
@@ -438,7 +438,7 @@ const FrontBacking: React.FC<{ profile: string; className?: string; children: Re
   }
 
   const background = isGlass ? 'linear-gradient(135deg, #DCEBF7, #BFD8EC)' : '#F7F4EF';
-  
+
   return (
     <div className={`w-full h-full rounded-sm overflow-hidden ${className}`} style={{ background }}>
       {children}
@@ -486,15 +486,15 @@ export const CatalogPage: React.FC = () => {
 
   return (
     <div className="pt-16 md:pt-24 pb-24 md:pb-32 bg-night min-h-screen">
-      
+
       {/* --- MODAL DETALU FRONTU --- */}
       {selectedFront && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-8 bg-night/90 backdrop-blur-sm transition-opacity duration-300">
-          
+
           <div className="relative w-full max-w-[1600px] w-[98vw] bg-surface rounded-sm shadow-2xl flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-300 max-h-[95dvh] md:h-[94vh] border border-line-dark">
-            
-            <button 
-              onClick={() => setSelectedFront(null)} 
+
+            <button
+              onClick={() => setSelectedFront(null)}
               className="absolute top-3 right-3 md:top-8 md:right-8 p-2 text-ivory hover:text-copper transition-colors z-50 bg-surface-2 backdrop-blur-md rounded-full border border-line-dark outline-none focus-visible:ring-2 focus-visible:ring-copper shadow-sm"
               aria-label="Zamknij podgląd"
             >
@@ -504,13 +504,13 @@ export const CatalogPage: React.FC = () => {
             {/* LEWA STRONA: Grafika i Swatche */}
             <div className="w-full md:w-1/2 bg-night p-6 pt-12 pb-8 md:p-20 lg:p-24 relative flex flex-col items-center justify-center min-h-[340px] md:min-h-0 md:h-full shrink-0 border-b md:border-b-0 md:border-r border-line-dark overflow-y-auto">
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(184,107,62,0.12),transparent_70%)] pointer-events-none scale-150" />
-              
+
               <div className="relative w-full max-w-[160px] sm:max-w-[200px] md:max-w-[280px] lg:max-w-[340px] aspect-[3/4] rounded-sm mt-4 md:mt-0 shadow-[0_20px_40px_rgba(0,0,0,0.8)]">
                 <FrontBacking profile={selectedFront.profile}>
                   <MaterialPanel variant={activeVariant} profile={selectedFront.profile} className="w-full h-full rounded-sm transition-all duration-300" />
                 </FrontBacking>
-                
-                {/* Lupa powiększająca: wróciła do dużego rozmiaru na mobile, ale uniesiona w górę i prawo aby nie zasłaniać frontu */}
+
+                {/* Lupa powiększająca */}
                 <div className="absolute -top-16 -right-20 sm:-top-24 sm:-right-28 md:-top-[110px] md:-right-[150px] lg:-top-[170px] lg:-right-[200px] w-40 h-40 sm:w-48 sm:h-48 md:w-72 md:h-72 lg:w-[340px] lg:h-[340px] rounded-full border-[4px] md:border-[8px] border-line-dark shadow-2xl overflow-hidden z-20 pointer-events-none bg-surface flex items-center justify-center">
                   {selectedFront.detailGraphic ? (
                     <>
@@ -528,20 +528,20 @@ export const CatalogPage: React.FC = () => {
                       )}
                     </>
                   ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div 
-                        className="w-[160px] sm:w-[200px] md:w-[280px] lg:w-[340px] aspect-[3/4] rounded-sm flex-shrink-0 transition-transform duration-300"
+                    <div className="absolute inset-0">
+                      <div
+                        className="absolute left-1/2 top-1/2 w-[160px] sm:w-[200px] md:w-[280px] lg:w-[340px] aspect-[3/4] rounded-sm"
                         style={{
-                          transformOrigin: 'center',
-                          // Dynamiczne wyliczenie przesunięcia z parametrów konfiguracyjnych, jeśli są określone:
-                          transform: `translate(calc(-50% + ${selectedFront.zoomX || '-25%'}), calc(-50% + ${selectedFront.zoomY || '25%'})) scale(${selectedFront.zoomScale ?? 1.8})`
+                          // Punkt (zoomX, zoomY) frontu ląduje w środku kółka, a skala rośnie wokół niego
+                          transformOrigin: `${selectedFront.zoomX ?? 85}% ${selectedFront.zoomY ?? 15}%`,
+                          transform: `translate(-${selectedFront.zoomX ?? 85}%, -${selectedFront.zoomY ?? 15}%) scale(${selectedFront.zoomScale ?? 2.5})`
                         }}
                       >
                         <FrontBacking profile={selectedFront.profile}>
-                          <MaterialPanel 
-                            variant={activeVariant} 
-                            profile={selectedFront.profile} 
-                            className="w-full h-full" 
+                          <MaterialPanel
+                            variant={activeVariant}
+                            profile={selectedFront.profile}
+                            className="w-full h-full"
                           />
                         </FrontBacking>
                       </div>
@@ -560,10 +560,10 @@ export const CatalogPage: React.FC = () => {
                     title={opt.name}
                     aria-label={`Wybierz kolor ${opt.name}`}
                   >
-                    <span 
+                    <span
                       className={`w-10 h-10 md:w-14 md:h-14 rounded-sm border-[2px] transition-all duration-300 flex items-center justify-center ${opt.bgClass} ${
-                        activeVariant === opt.id 
-                          ? 'border-copper scale-125 shadow-[0_0_25px_rgba(184,107,62,0.6)] z-10' 
+                        activeVariant === opt.id
+                          ? 'border-copper scale-125 shadow-[0_0_25px_rgba(184,107,62,0.6)] z-10'
                           : 'border-line-dark/50 hover:border-gold/50'
                       }`}
                     >
@@ -579,13 +579,13 @@ export const CatalogPage: React.FC = () => {
             <div className="w-full md:w-1/2 p-5 sm:p-8 md:p-16 lg:p-24 flex flex-col justify-center text-center md:text-left overflow-y-auto">
               <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-ivory mb-1 md:mb-4">{selectedFront.title}</h2>
               <p className="text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-widest font-semibold text-gold mb-3 md:mb-10">{selectedFront.desc}</p>
-              
+
               <p className="text-ivory/70 font-light leading-snug md:leading-relaxed mb-6 md:mb-12 text-[14px] sm:text-[15px] md:text-xl lg:text-2xl text-left">
                 {selectedFront.longDesc}
               </p>
 
-              <a 
-                href="#kontakt" 
+              <a
+                href="#kontakt"
                 onClick={handleContactClick}
                 className="bg-[linear-gradient(135deg,var(--color-copper),var(--color-gold))] text-night px-6 py-3 md:px-12 md:py-5 text-[14px] md:text-lg font-medium hover:brightness-110 transition-all rounded-sm inline-block w-max mx-auto md:mx-0 mt-1 shadow-[0_0_20px_rgba(184,107,62,0.15)] hover:shadow-[0_0_30px_rgba(184,107,62,0.25)] outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
               >
@@ -599,7 +599,7 @@ export const CatalogPage: React.FC = () => {
 
       {/* --- GŁÓWNY WIDOK KATALOGU --- */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         <header className="mb-16 md:mb-20 flex flex-col lg:flex-row lg:justify-between lg:items-end gap-10">
           <Reveal className="lg:w-1/2">
             <div className="flex items-center gap-4 mb-6">
@@ -614,9 +614,9 @@ export const CatalogPage: React.FC = () => {
             </p>
           </Reveal>
           <Reveal delay={100} className="flex flex-col sm:flex-row gap-6">
-             <a 
-              href={pdfUrl} 
-              target="_blank" 
+             <a
+              href={pdfUrl}
+              target="_blank"
               rel="noopener noreferrer"
               className="text-[15px] font-medium text-ivory hover:text-copper transition-colors relative group inline-flex items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-copper rounded-sm"
             >
@@ -635,20 +635,20 @@ export const CatalogPage: React.FC = () => {
               </div>
             </div>
           </Reveal>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-10 lg:gap-x-6 lg:gap-y-12">
             {catalogFronts.map((item, idx) => (
               <Reveal key={idx} delay={(idx % 6) * 50} variant="slide-up">
-                <button 
-                  className="group cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-4 focus-visible:ring-offset-night rounded-sm text-left w-full block" 
+                <button
+                  className="group cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-4 focus-visible:ring-offset-night rounded-sm text-left w-full block"
                   onClick={() => setSelectedFront(item)}
                 >
                   <div className="w-full aspect-[3/4] rounded-sm transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-2 relative flex items-center justify-center bg-surface-2/30 shadow-[0_10px_20px_rgba(0,0,0,0.4)] group-hover:shadow-[0_15px_30px_rgba(0,0,0,0.6)]">
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(184,107,62,0.08),transparent_70%)] pointer-events-none scale-150" />
-                    
+
                     <FrontBacking profile={item.profile} className="relative z-10">
-                      <MaterialPanel 
-                        variant={item.variant} 
+                      <MaterialPanel
+                        variant={item.variant}
                         profile={item.profile}
                         className="w-full h-full rounded-sm"
                       />
@@ -694,20 +694,20 @@ export const CatalogPage: React.FC = () => {
               ))}
             </div>
           </div>
-          
+
           <div className="lg:col-span-6">
             <Reveal delay={200}>
               <div className="bg-surface p-12 md:p-16 relative overflow-hidden flex flex-col justify-center rounded-sm border border-line-dark shadow-2xl">
                 <div className="absolute inset-0 bg-rings text-ivory opacity-5 pointer-events-none" aria-hidden="true" />
                 <div className="absolute inset-0 bg-grain mix-blend-overlay opacity-10 pointer-events-none" aria-hidden="true" />
-                
+
                 <div className="relative z-10">
                   <h3 className="font-serif text-3xl text-ivory mb-6">Potrzebujesz wyceny konkretnych wzorów?</h3>
                   <p className="mb-10 text-ivory/70 font-light leading-relaxed">
                     Skopiuj numery wzorów z katalogu, dodaj wymiary i prześlij zapytanie do naszego zespołu za pomocą formularza.
                   </p>
-                  <a 
-                    href="#kontakt" 
+                  <a
+                    href="#kontakt"
                     onClick={handleContactClick}
                     className="inline-block bg-[linear-gradient(135deg,var(--color-copper),var(--color-gold))] text-night px-8 py-4 text-[15px] font-medium hover:brightness-110 transition-all rounded-sm shadow-[0_0_20px_rgba(184,107,62,0.15)] hover:shadow-[0_0_30px_rgba(184,107,62,0.25)] outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
                   >
