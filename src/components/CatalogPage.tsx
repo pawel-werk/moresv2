@@ -96,7 +96,7 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   const bgEdge = isDark ? '#1f1b18' : '#171310';
 
   // ============ WYMIARY DO STROJENIA ============
-  const THICK = 150;      // grubość frontu (dawniej 220)
+  const THICK = 130;      // grubość frontu (dawniej 220)
   const LEN = 900;        // długość frontu w głąb kadru (dawniej ok. 768)
   const BOT = 1250;       // wysokość frontu (i tak ucinana przez kadr)
   const WALL = 24;        // grubość ścianki po obu stronach wycięcia
