@@ -92,7 +92,7 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   // Prawa ściana zewnętrzna
   const sideTop = isDark ? mix(base, '#ffffff', 0.04) : mix(base, '#000000', 0.22);
   const sideBottom = isDark ? mix(base, '#000000', 0.15) : mix(base, '#000000', 0.34);
-  // Wnętrze wycięcia - Cienie zostały zmienione, aby były łagodniejsze
+  // Wnętrze wycięcia
   const innerBack = isDark ? mix(base, '#000000', 0.25) : mix(base, '#000000', 0.40);
   const innerFront = isDark ? mix(base, '#ffffff', 0.08) : mix(base, '#000000', 0.10);
   // Tło okręgu
@@ -116,9 +116,9 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 
   const SCALE = 0.25;
   const TOP_SCREEN = 140;
-  
-  // WIĘKSZE ZAOKRĄGLENIE dla bardziej miękkich krawędzi
-  const ROUND = 2.5; 
+
+  // Promień zaokrąglenia ZEWNĘTRZNYCH narożników (im mniej, tym ostrzej)
+  const ROUND = 1.2;
   const tx = 200 - ((L + R + DX) / 2) * SCALE;
   const ty = TOP_SCREEN - (TOP + DY) * SCALE;
 
@@ -185,6 +185,12 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
           <stop offset="0%" stopColor={sideTop} />
           <stop offset="100%" stopColor={sideBottom} />
         </linearGradient>
+
+        {/*
+          Zaokrąglenie narożników BEZ rozmywania kolorów:
+          rozmywamy tylko kanał alfa (kształt), progujemy go, a następnie
+          przycinamy nim ORYGINALNĄ, ostrą grafikę.
+        */}
         <filter
           id={idRound}
           filterUnits="userSpaceOnUse"
@@ -194,12 +200,14 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
           height="480"
           colorInterpolationFilters="sRGB"
         >
-          <feGaussianBlur in="SourceGraphic" stdDeviation={ROUND} result="blur" />
+          <feGaussianBlur in="SourceAlpha" stdDeviation={ROUND} result="blurA" />
           <feColorMatrix
-            in="blur"
+            in="blurA"
             type="matrix"
-            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 8 -4"
+            values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 12 -5.5"
+            result="shape"
           />
+          <feComposite in="SourceGraphic" in2="shape" operator="in" />
         </filter>
         <clipPath id={idArc} clipPathUnits="userSpaceOnUse">
           <rect x={CL - 4} y={TOP} width={CR - CL + 8} height={S + RY + 40} />
