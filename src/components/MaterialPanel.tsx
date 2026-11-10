@@ -377,70 +377,55 @@ export const MaterialPanel: React.FC<MaterialPanelProps> = ({
         </div>
       )}
 
-            {profile === 'vertical-stiles-raised' && (() => {
-        const dark = `rgba(0,0,0,${Number(shadowOp) * 0.8})`;
-        const light = `rgba(255,255,255,${Number(highlightOp) * 0.9})`;
-        return (
-          <>
-            {/* JASNE linie fug: jeden ciągły element na całą wysokość, na wierzchu */}
-            <div className="absolute top-0 bottom-0 left-[18%] w-[4px] pointer-events-none z-20" style={{ background: `linear-gradient(to right, transparent 0 2px, ${light} 2px 4px)` }} />
-            <div className="absolute top-0 bottom-0 right-[18%] w-[2px] pointer-events-none z-20" style={{ background: light }} />
+      {profile === 'vertical-stiles-raised' && (
+        <>
+          <div className="absolute top-0 h-[18%] left-[18%] w-[4px] pointer-events-none z-10" style={{
+            borderLeft: `2px solid rgba(0,0,0,${Number(shadowOp) * 0.8})`,
+            borderRight: `2px solid rgba(255,255,255,${Number(highlightOp) * 0.9})`,
+          }} />
+          <div className="absolute bottom-0 h-[18%] left-[18%] w-[4px] pointer-events-none z-10" style={{
+            borderLeft: `2px solid rgba(0,0,0,${Number(shadowOp) * 0.8})`,
+            borderRight: `2px solid rgba(255,255,255,${Number(highlightOp) * 0.9})`,
+          }} />
+          <div className="absolute top-0 h-[18%] right-[18%] w-[4px] pointer-events-none z-10" style={{
+            borderLeft: `2px solid rgba(0,0,0,${Number(shadowOp) * 0.8})`,
+            borderRight: `2px solid rgba(255,255,255,${Number(highlightOp) * 0.9})`,
+          }} />
+          <div className="absolute bottom-0 h-[18%] right-[18%] w-[4px] pointer-events-none z-10" style={{
+            borderLeft: `2px solid rgba(0,0,0,${Number(shadowOp) * 0.8})`,
+            borderRight: `2px solid rgba(255,255,255,${Number(highlightOp) * 0.9})`,
+          }} />
 
-            {/* CIEMNE pionowe fugi w górnej belce – kończą się skosem 45° na poprzeczce */}
-            <div className="absolute top-0 left-[18%] w-[2px] pointer-events-none z-10" style={{
-              height: 'calc(18% + 2px)', background: dark,
-              clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 2px), 0 100%)'
-            }} />
-            <div className="absolute top-0 w-[2px] pointer-events-none z-10" style={{
-              right: 'calc(18% + 2px)', height: 'calc(18% + 2px)', background: dark,
-              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 calc(100% - 2px))'
-            }} />
-
-            {/* Ciemna poprzeczka u góry – końce ścięte pod 45° */}
-            <div className="absolute top-[18%] left-[18%] h-[4px] pointer-events-none z-10" style={{
-              right: 'calc(18% + 2px)', background: dark,
-              clipPath: 'polygon(0 2px, 2px 0, calc(100% - 2px) 0, 100% 2px, 100% 100%, 0 100%)'
-            }} />
-
-            {/* Ciemna lewa krawędź ramki (między górną a dolną poprzeczką) */}
-            <div className="absolute left-[18%] w-[2px] pointer-events-none z-10" style={{
-              top: 'calc(18% + 4px)', bottom: '0', background: dark
-            }} />
-
-            {/* Jasna prawa krawędź ramki (doklejona do ciągłej linii) */}
-            <div className="absolute pointer-events-none z-10" style={{
-              top: 'calc(18% + 4px)', bottom: '18%', right: 'calc(18% + 2px)', width: '2px', background: light
-            }} />
-
-            {/* Jasna dolna poprzeczka */}
-            <div className="absolute bottom-[18%] h-[4px] pointer-events-none z-10" style={{
-              left: 'calc(18% + 4px)', right: 'calc(18% + 2px)', background: light
-            }} />
-
-            {/* Płycina wypukła (jak wcześniej, ale bez własnych skosów na obrzeżu) */}
-            <div className="absolute inset-[18%] pointer-events-none">
-              <div className="absolute inset-0" style={{ borderStyle: 'solid', borderWidth: '4px', borderColor: 'transparent' }}>
-                <div className="absolute inset-0 bg-black/[0.08]" style={{
+          <div className="absolute inset-[18%] pointer-events-none">
+            <div className="absolute inset-0" style={{
+              borderStyle: 'solid',
+              borderWidth: '4px', 
+              borderTopColor: `rgba(0,0,0,${Number(shadowOp) * 0.8})`,
+              borderLeftColor: `rgba(0,0,0,${Number(shadowOp) * 0.8})`,
+              borderBottomColor: `rgba(255,255,255,${Number(highlightOp) * 0.9})`,
+              borderRightColor: `rgba(255,255,255,${Number(highlightOp) * 0.9})`,
+            }}>
+              <div className="absolute inset-0 bg-black/[0.08]" style={{
+                borderStyle: 'solid',
+                borderWidth: '18px',
+                borderColor: 'transparent'
+              }}>
+                <div className={`absolute inset-0 ${getVariantStyle()}`} style={{
                   borderStyle: 'solid',
-                  borderWidth: '18px',
-                  borderColor: 'transparent'
+                  borderWidth: '4px',
+                  borderTopColor: `rgba(255,255,255,${Number(highlightOp) * 0.9})`,
+                  borderLeftColor: `rgba(255,255,255,${Number(highlightOp) * 0.9})`,
+                  borderBottomColor: `rgba(0,0,0,${Number(shadowOp) * 0.7})`,
+                  borderRightColor: `rgba(0,0,0,${Number(shadowOp) * 0.7})`,
                 }}>
-                  <div className={`absolute inset-0 ${getVariantStyle()}`} style={{
-                    borderStyle: 'solid',
-                    borderWidth: '4px',
-                    borderTopColor: `rgba(255,255,255,${Number(highlightOp) * 0.9})`,
-                    borderLeftColor: `rgba(255,255,255,${Number(highlightOp) * 0.9})`,
-                    borderBottomColor: `rgba(0,0,0,${Number(shadowOp) * 0.7})`,
-                    borderRightColor: `rgba(0,0,0,${Number(shadowOp) * 0.7})`,
-                  }}>
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/10 pointer-events-none" />
-                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/10 pointer-events-none" />
                 </div>
               </div>
             </div>
-          </>
-        );
-      })()}
+          </div>
+        </>
+      )}
+
       {profile === 'flat-grooves' && (
         <div className="absolute inset-0 flex justify-evenly pointer-events-none">
           {Array.from({ length: 9 }).map((_, i) => (
