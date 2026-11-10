@@ -107,7 +107,7 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 
   // Proporcje wycięcia względem jego szerokości (zwykle nie trzeba ruszać)
   const NOTCH_DEPTH = 1.14;  // głębokość łuku (RY = RX * to)
-  const NOTCH_LIFT = 0.77;   // prosty odcinek przed łukiem (S = RX * to)
+  const NOTCH_LIFT = 0.47;   // prosty odcinek przed łukiem (S = RX * to)
   // ==============================================
 
   // --- Geometria (wyliczana) ---
