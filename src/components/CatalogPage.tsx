@@ -255,9 +255,9 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
   const bgEdge = isDark ? '#1f1b18' : '#171310';
 
   // --- Parametry do strojenia ---
-  const THICK = 17;    // grubość płyty (poprzednio 27, czyli ok. 37% mniej)
+  const THICK = 15;    // grubość płyty (poprzednio 27, czyli ok. 37% mniej)
   const COUNT = 17;    // liczba półwałków
-  const FLUTE = 10;    // szerokość półwałka (10 mm)
+  const FLUTE = 13;    // szerokość półwałka (10 mm)
   const GAP = 1;       // szczelina (1 mm)
   const RAD = FLUTE / 2;
   const HEIGHT = 320;  // wysokość frontu (i tak ucinana przez kadr)
