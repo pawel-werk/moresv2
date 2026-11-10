@@ -226,8 +226,11 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 };
 
 /**
- * Detal ryflowania F-15 (Odwzorowanie 1:1 z referencji)
- * 2D rzut aksonometryczny wyciągnięty w dół.
+ * Detal ryflowania F-15 (Poprawiony)
+ * Półwałki biegną po DŁUGIM boku. (wyciągnięte pionowo, a płyta schodzi na prawo).
+ *
+ * v3: geometria jak w F-4 (ta sama perspektywa), cieńsza płyta, drobniejsze
+ * półwałki, a front zaczyna i kończy się PEŁNYM półwałkiem.
  */
 const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) => {
   const baseColors: Record<MaterialVariant, string> = {
@@ -241,38 +244,96 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
   const base = baseColors[variant] ?? baseColors.lithos;
   const isDark = variant === 'bazalt' || variant === 'magma';
 
-  // --- Paleta i cieniowanie ---
-  const sideWall = mix(base, '#000000', isDark ? 0.35 : 0.25);
-  const groove = mix(base, '#000000', isDark ? 0.70 : 0.65);
-  const highlight = mix(base, '#ffffff', isDark ? 0.15 : 0.60);
+  // --- Kolory ---
+  const frontTop = isDark ? mix(base, '#ffffff', 0.12) : mix(base, '#ffffff', 0.10);
+  const frontBottom = isDark ? mix(base, '#ffffff', 0.04) : mix(base, '#000000', 0.05);
+  const ledge = isDark ? mix(base, '#ffffff', 0.26) : mix(base, '#ffffff', 0.30);
 
-  const fluteLeft = mix(base, '#ffffff', isDark ? 0.12 : 0.45);
-  const fluteRight = mix(base, '#000000', isDark ? 0.45 : 0.35);
+  const fluteLight = isDark ? mix(base, '#ffffff', 0.20) : mix(base, '#ffffff', 0.30);
+  const fluteMid = isDark ? mix(base, '#ffffff', 0.04) : mix(base, '#ffffff', 0.02);
+  const fluteDark = isDark ? mix(base, '#000000', 0.35) : mix(base, '#000000', 0.28);
+  const groove = isDark ? mix(base, '#000000', 0.65) : mix(base, '#000000', 0.58);
 
-  const bgCenter = isDark ? '#36302b' : '#2e2825';
-  const bgEdge = '#14110f';
+  const bgCenter = isDark ? '#443c35' : '#3a332e';
+  const bgEdge = isDark ? '#1f1b18' : '#171310';
 
-  // --- Geometria i perspektywa ---
-  const START_X = 60;
-  const START_Y = 260;
-  
-  // Wektor grubości lewej ściany (idzie w górę i w prawo)
-  const THICK_DX = 45;
-  const THICK_DY = -65;
-  
-  // Wektory dla pojedynczego półwałka i szczeliny (wzdłuż górnej krawędzi)
-  const FLUTE_DX = 38;
-  const FLUTE_DY = -22;
-  const GAP_DX = 4;
-  const GAP_DY = -2.3;
-  
-  const COUNT = 6; // Ilość widocznych półwałków
-  const BOT = 450; // Punkt ucięcia na dole (poza kółkiem)
+  // --- Parametry do strojenia ---
+  const THICK = 27;    // grubość płyty w px (poprzednio ok. 55, F-4 = 55). Zmień np. na 55, jeśli ma być identyczna jak F-4
+  const COUNT = 17;    // liczba półwałków (3x drobniejsze => ok. 3x więcej)
+  const FLUTE = 10;    // szerokość półwałka (10 mm)
+  const GAP = 1;       // szczelina (1 mm) - proporcja 10:1 zachowana
+  const RAD = FLUTE / 2;
+  const HEIGHT = 320;  // wysokość frontu (i tak ucinana przez kadr)
 
-  const cornerX = START_X + THICK_DX;
-  const cornerY = START_Y + THICK_DY;
+  // Pozycja w kadrze (viewBox 400x400), zbliżona do F-4
+  const AX = 105;
+  const AY = 262;
+
+  // --- Perspektywa jak w F-4: głębia = wektor (600, -480) ---
+  const DX = 600;
+  const DY = -480;
+  const dirLen = Math.hypot(DX, DY);
+  const ux = DX / dirLen;
+  const uy = DY / dirLen;
+
+  // Długość frontu = dokładnie COUNT półwałków + szczeliny między nimi,
+  // więc front zaczyna się i kończy pełnym półwałkiem.
+  const LEN = COUNT * FLUTE + (COUNT - 1) * GAP;
+
+  // Płaszczyzna ściany z ryflami (prawa krawędź przekroju)
+  const WX = AX + THICK;
+
+  // Punkt na ścianie: s = odległość wzdłuż frontu, b = wypukłość półwałka (w prawo)
+  const P = (s: number, b: number): [number, number] => [WX + s * ux + b, AY + s * uy];
+
+  const fmt = (n: number) => n.toFixed(2);
+  const poly = (pts: [number, number][]) =>
+    'M ' + pts.map((p) => `${fmt(p[0])} ${fmt(p[1])}`).join(' L ');
+
+  // Półwałek widać tylko do krawędzi sylwetki (dalej zakrywa go sam siebie)
+  const thetaVis = Math.PI - Math.atan(1 / ux);
+  const STEPS = 18;
+
+  const flutes = Array.from({ length: COUNT }, (_, i) => {
+    const sc = i * (FLUTE + GAP) + RAD;
+    const curve = (t0: number, t1: number) =>
+      Array.from({ length: STEPS + 1 }, (_, k) => {
+        const th = t0 + ((t1 - t0) * k) / STEPS;
+        return P(sc - RAD * Math.cos(th), RAD * Math.sin(th));
+      });
+
+    const vis = curve(0, thetaVis);
+    const full = curve(0, Math.PI);
+    const first = vis[0];
+    const last = vis[vis.length - 1];
+
+    return {
+      // widoczna, walcowata powierzchnia półwałka
+      face:
+        poly(vis) +
+        ` L ${fmt(last[0])} ${fmt(last[1] + HEIGHT)}` +
+        ` L ${fmt(first[0])} ${fmt(first[1] + HEIGHT)} Z`,
+      // pełny półokrągły "dekielek" na górnej płaszczyźnie
+      cap: poly(full) + ' Z'
+    };
+  });
+
+  // --- Bryła bazowa ---
+  const endFacePath = `M ${AX} ${AY} L ${WX} ${AY} L ${WX} ${AY + HEIGHT} L ${AX} ${AY + HEIGHT} Z`;
+  const topFacePath =
+    `M ${AX} ${AY} L ${WX} ${AY} ` +
+    `L ${fmt(WX + LEN * ux)} ${fmt(AY + LEN * uy)} ` +
+    `L ${fmt(AX + LEN * ux)} ${fmt(AY + LEN * uy)} Z`;
+  const wallPath =
+    `M ${WX} ${AY} L ${fmt(WX + LEN * ux)} ${fmt(AY + LEN * uy)} ` +
+    `L ${fmt(WX + LEN * ux)} ${fmt(AY + LEN * uy + HEIGHT)} L ${WX} ${AY + HEIGHT} Z`;
 
   const idBg = `hr-bg-${variant}`;
+  const idEnd = `hr-end-${variant}`;
+  const idFlute = `hr-flute-${variant}`;
+  const idRound = `hr-round-${variant}`;
+
+  const seam = { strokeWidth: 1, strokeLinejoin: 'round' as const };
 
   return (
     <svg
@@ -280,89 +341,59 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
       className="w-full h-full animate-in fade-in duration-300"
       preserveAspectRatio="xMidYMid slice"
       role="img"
-      aria-label="Detal frontu F-15: półwałki 10 mm ze szczeliną 1 mm"
+      aria-label="Detal frontu F-15: półwałki 10 mm ze szczeliną 1 mm, widok pod kątem z góry"
     >
       <defs>
-        {/* Tło kółka */}
-        <radialGradient id={idBg} cx="50%" cy="50%" r="60%">
+        <radialGradient id={idBg} cx="50%" cy="45%" r="60%">
           <stop offset="0%" stopColor={bgCenter} />
           <stop offset="100%" stopColor={bgEdge} />
         </radialGradient>
-        
-        {/* Indywidualne gradienty dla walców (światło z lewej) */}
-        {Array.from({ length: COUNT }).map((_, i) => {
-          const x = cornerX + i * (FLUTE_DX + GAP_DX);
-          const x1 = x + FLUTE_DX;
-          return (
-            <linearGradient 
-              key={`grad-${i}`} 
-              id={`flute-grad-${variant}-${i}`} 
-              gradientUnits="userSpaceOnUse" 
-              x1={x} y1="0" x2={x1} y2="0"
-            >
-              <stop offset="0%" stopColor={mix(base, '#ffffff', isDark ? 0.02 : 0.08)} />
-              <stop offset="25%" stopColor={fluteLeft} />
-              <stop offset="65%" stopColor={base} />
-              <stop offset="100%" stopColor={fluteRight} />
-            </linearGradient>
-          );
-        })}
+
+        {/* Przekrój czołowy płyty */}
+        <linearGradient id={idEnd} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={frontTop} />
+          <stop offset="100%" stopColor={frontBottom} />
+        </linearGradient>
+
+        {/* Walcowaty gradient półwałka (po poziomie, światło z lewej) */}
+        <linearGradient id={idFlute} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor={fluteMid} />
+          <stop offset="25%" stopColor={fluteLight} />
+          <stop offset="60%" stopColor={fluteMid} />
+          <stop offset="100%" stopColor={fluteDark} />
+        </linearGradient>
+
+        {/* Delikatne zaokrąglenie krawędzi bryły bazowej */}
+        <filter
+          id={idRound}
+          filterUnits="userSpaceOnUse"
+          x="-40"
+          y="-40"
+          width="480"
+          height="480"
+          colorInterpolationFilters="sRGB"
+        >
+          <feGaussianBlur in="SourceGraphic" stdDeviation="1.2" result="blur" />
+          <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 8 -4" />
+        </filter>
       </defs>
 
       <rect width="400" height="400" fill={`url(#${idBg})`} />
 
-      <g filter="drop-shadow(0px 20px 30px rgba(0,0,0,0.5))">
-        {/* Lewa ściana (grubość płyty) */}
-        <path 
-          d={`M ${START_X} ${START_Y} L ${cornerX} ${cornerY} L ${cornerX} ${BOT} L ${START_X} ${BOT} Z`} 
-          fill={sideWall} 
-        />
-        {/* Połysk na górnej krawędzi lewej ściany */}
-        <path 
-          d={`M ${START_X} ${START_Y} L ${cornerX} ${cornerY}`} 
-          stroke={highlight} 
-          strokeWidth="1.5" 
-          fill="none" 
-        />
-
-        {/* Półwałki i szczeliny (wyciągnięte w dół) */}
-        {Array.from({ length: COUNT }).map((_, i) => {
-          const x = cornerX + i * (FLUTE_DX + GAP_DX);
-          const y = cornerY + i * (FLUTE_DY + GAP_DY);
-          const x1 = x + FLUTE_DX;
-          const y1 = y + FLUTE_DY;
-          const x2 = x1 + GAP_DX;
-          const y2 = y1 + GAP_DY;
-
-          // Asymetryczny punkt kontrolny Beziera - wybrzusza łuk idealnie w lewo i w górę
-          const cpX = x + 12;
-          const cpY = y - 28;
-
-          return (
-            <g key={`flute-group-${i}`}>
-              {/* Powierzchnia półwałka */}
-              <path 
-                d={`M ${x} ${y} Q ${cpX} ${cpY} ${x1} ${y1} L ${x1} ${BOT} L ${x} ${BOT} Z`} 
-                fill={`url(#flute-grad-${variant}-${i})`} 
-              />
-              {/* Połysk na górnym łuku półwałka */}
-              <path 
-                d={`M ${x} ${y} Q ${cpX} ${cpY} ${x1} ${y1}`} 
-                stroke={highlight} 
-                strokeWidth="1.5" 
-                fill="none" 
-                strokeLinecap="round"
-              />
-              
-              {/* Szczelina (wgłębienie) */}
-              <path 
-                d={`M ${x1} ${y1} L ${x2} ${y2} L ${x2} ${BOT} L ${x1} ${BOT} Z`} 
-                fill={groove} 
-              />
-            </g>
-          );
-        })}
+      {/* Bryła bazowa: dno szczelin, górna płaszczyzna, przekrój czołowy */}
+      <g filter={`url(#${idRound})`}>
+        <path d={wallPath} fill={groove} stroke={groove} {...seam} />
+        <path d={topFacePath} fill={ledge} stroke={ledge} {...seam} />
+        <path d={endFacePath} fill={`url(#${idEnd})`} stroke={`url(#${idEnd})`} {...seam} />
       </g>
+
+      {/* Półwałki: od najdalszego do najbliższego, żeby poprawnie się zasłaniały */}
+      {[...flutes].reverse().map((fl, k) => (
+        <g key={k}>
+          <path d={fl.face} fill={`url(#${idFlute})`} />
+          <path d={fl.cap} fill={ledge} stroke={ledge} strokeWidth={0.4} strokeLinejoin="round" />
+        </g>
+      ))}
     </svg>
   );
 };
