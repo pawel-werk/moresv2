@@ -10,7 +10,7 @@ type CatalogItem = {
   variant: MaterialVariant;
   profile: 'flat' | 'frame' | 'slatted' | 'grooved' | 'integrated-handle' | 'half-round' | 'integrated-handle-full' | 'integrated-handle-centered' | 'integrated-handle-hidden' | 'raised-panel' | 'micro-frame' | 'shaker' | 'complex-raised-panel' | 'double-stepped-panel' | 'vertical-stiles-raised' | 'flat-grooves' | 'concave-grooves' | 'mullion-frame' | 'glass-frame' | 'lattice-frame';
   longDesc: string;
-  detailGraphic?: 'hidden-handle';
+  detailGraphic?: 'hidden-handle' | 'half-round';
   detailLabel?: string;
 };
 
@@ -44,7 +44,15 @@ const catalogFronts: CatalogItem[] = [
   { title: "F-12", desc: "Ryflowany / Płaskie frezy", variant: "lithos", profile: "flat-grooves", longDesc: "Front ryflowany o geometrycznym, technicznym charakterze. Pionowe, płaskie wycięcia tworzą powtarzalny, nowoczesny rytm. Idealny do urozmaicenia gładkich powierzchni zabudowy." },
   { title: "F-13", desc: "Płaski / Frez obwiedniowy", variant: "lithos", profile: "grooved", longDesc: "Klasyczny, elegancki front z subtelnym, pojedynczym frezem obwiedniowym. Detal, który dodaje wyrafinowania bez obciążania przestrzeni." },
   { title: "F-14", desc: "Ryflowany / Wklęsłe frezy", variant: "lithos", profile: "concave-grooves", longDesc: "Gęste, rytmiczne ryflowanie w formie wklęsłych wcięć oddzielonych wąskimi, płaskimi paskami. Niezwykle taktylna powierzchnia o mocnym, wertykalnym rysunku." },
-  { title: "F-15", desc: "Ryflowany / Półwałek", variant: "lithos", profile: "half-round", longDesc: "Niezwykle modne ryflowanie o miękkim, wypukłym profilu półwałka. Tworzy powtarzalny, organiczny wzór, który doskonale rozprasza światło i nadaje wnętrzu przytulny, a zarazem nowoczesny charakter." },
+  {
+    title: "F-15",
+    desc: "Ryflowany / Półwałek",
+    variant: "lithos",
+    profile: "half-round",
+    longDesc: "Niezwykle modne ryflowanie o miękkim, wypukłym profilu półwałka. Tworzy powtarzalny, organiczny wzór, który doskonale rozprasza światło i nadaje wnętrzu przytulny, a zarazem nowoczesny charakter. Każdy półwałek ma 10 mm szerokości, a między nimi pozostaje 1 mm przerwy.",
+    detailGraphic: 'half-round',
+    detailLabel: 'Detal: półwałek 10 mm'
+  },
   { title: "F-16", desc: "Witryna / Szprosy krzyżowe", variant: "lithos", profile: "mullion-frame", longDesc: "Klasyczny front witrynowy z krzyżowymi szprosami i fazowanymi krawędziami okienek pod kątem 45 stopni. Nadaje zabudowie lekkości i eksponuje zawartość szafek." },
   { title: "F-17", desc: "Witryna / Szklana tafla", variant: "lithos", profile: "glass-frame", longDesc: "Klasyczna witryna z szeroką ramą, ściętą precyzyjnie pod kątem 45 stopni w kierunku pojedynczej, dużej tafli szkła. Minimalistyczna forma otwierająca przestrzeń wewnątrz szafki." },
   { title: "F-18", desc: "Ramowy / Kratka", variant: "lithos", profile: "lattice-frame", longDesc: "Front ramowy z klasycznym, ukośnym dziurkowaniem (kratką) w płaskiej płycinie. Ścięcie ramki pod kątem 45 stopni płynnie łączy się z dekoracyjnym, ażurowym środkiem, zapewniając wentylację i unikalny styl retro." }
@@ -248,6 +256,190 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   );
 };
 
+/**
+ * Detal ryflowania F-15: półwałki 10 mm rozdzielone szczeliną 1 mm.
+ *
+ * Widok ma ten sam kierunek co detal F-4 (wektor głębi DX:DY = 600:-480 = 330:-264),
+ * ale głębia jest krótsza, a widok bliższy, żeby profil półwałków był czytelny.
+ *
+ * Geometria jest liczona z jednego profilu: półokrąg (przekrój półwałka) jest
+ * wyciągany w dół frontu, więc górna płaszczyzna cięcia, walec i szczeliny pasują
+ * do siebie krawędź w krawędź. Wymiary w mm przeliczane są na jednostki projektu
+ * (MM), dzięki czemu proporcja 10 mm : 1 mm jest zachowana.
+ *
+ * Kolejność rysowania (od najdalszej):
+ *   1. korpus: prawa ściana + górna powierzchnia (zaokrąglone krawędzie, też tylne)
+ *   2. tło szczelin
+ *   3. półwałki od lewej do prawej (prawy lekko zakrywa lewego, jak w rzucie ukośnym)
+ *   4. delikatny cień pionowy na walcach
+ */
+const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) => {
+  const baseColors: Record<MaterialVariant, string> = {
+    lithos: '#D3CCC3',
+    azure: '#5c7a8c',
+    magma: '#5D4037',
+    bazalt: '#212121',
+    tundra: '#8E918F',
+    lumina: '#EAE6E1'
+  };
+  const base = baseColors[variant] ?? baseColors.lithos;
+  const isDark = variant === 'bazalt' || variant === 'magma';
+
+  // --- Kolory ---
+  // Górna płaszczyzna cięcia - najjaśniejsza, łapie światło z góry
+  const ledge = isDark ? mix(base, '#ffffff', 0.26) : mix(base, '#ffffff', 0.30);
+  // Prawa ściana boczna - odwrócona od światła
+  const sideTop = isDark ? mix(base, '#ffffff', 0.04) : mix(base, '#000000', 0.22);
+  const sideBottom = isDark ? mix(base, '#000000', 0.15) : mix(base, '#000000', 0.34);
+  // Walec półwałka: światło po lewej, cień po prawej
+  const fluteLight = isDark ? mix(base, '#ffffff', 0.24) : mix(base, '#ffffff', 0.32);
+  const fluteMid = isDark ? mix(base, '#ffffff', 0.08) : mix(base, '#ffffff', 0.04);
+  const fluteDark = isDark ? mix(base, '#000000', 0.30) : mix(base, '#000000', 0.24);
+  // Dno szczeliny między półwałkami
+  const groove = isDark ? mix(base, '#000000', 0.62) : mix(base, '#000000', 0.55);
+  // Tło okręgu
+  const bgCenter = isDark ? '#443c35' : '#3a332e';
+  const bgEdge = isDark ? '#1f1b18' : '#171310';
+
+  // --- Widok (kierunek głębi jak w F-4: DY / DX = -0,8) ---
+  const L = 40;          // lewa krawędź frontu
+  const TOP = 195;       // górna krawędź frontu
+  const BOT = 1250;      // poza kadrem - dolną krawędź ucina okrąg
+  const DX = 330;        // głębia frontu w osi Z (wektor wyciągnięcia)
+  const DY = -264;
+  const SCALE = 0.4;     // skala całego detalu w kadrze 400x400
+  const TOP_SCREEN = 140; // gdzie na ekranie ląduje tylna krawędź górnej powierzchni
+  const ROUND = 1.5;     // zaokrąglenie krawędzi korpusu (jak w F-4)
+  const FRONT_W = 300;   // szerokość widocznego fragmentu frontu
+  const R = L + FRONT_W;
+  const tx = 200 - ((L + R + DX) / 2) * SCALE;
+  const ty = TOP_SCREEN - (TOP + DY) * SCALE;
+
+  // --- Ryflowanie: półwałek 10 mm, szczelina 1 mm ---
+  const COUNT = 5;       // liczba widocznych półwałków
+  const FLUTE_MM = 10;
+  const GAP_MM = 1;
+  const MM = FRONT_W / (COUNT * FLUTE_MM + (COUNT - 1) * GAP_MM); // jednostek projektu na 1 mm
+  const FW = FLUTE_MM * MM;  // szerokość półwałka
+  const GW = GAP_MM * MM;    // szerokość szczeliny
+  const RAD = FW / 2;        // promień półokręgu
+
+  // Wysunięcie półwałka w stronę patrzącego (przeciwnie do osi Z). Im więcej, tym bardziej
+  // wypukły wygląd, ale tym bardziej prawy półwałek zakrywa szczelinę po swojej lewej.
+  const PROTRUSION = 0.5;
+  const dirLen = Math.hypot(DX, DY);
+  const ux = DX / dirLen;
+  const uy = DY / dirLen;
+  const STEPS = 28;
+  // Kąt, przy którym obrys walca sięga najdalej w lewo (stąd biegnie jego lewa krawędź w dół)
+  const thetaLeft = Math.PI - Math.atan(PROTRUSION * ux);
+
+  const pt = (xc: number, theta: number): [number, number] => {
+    const z = -RAD * PROTRUSION * Math.sin(theta);
+    return [xc + RAD * Math.cos(theta) + ux * z, TOP + uy * z];
+  };
+  const fmt = (n: number) => n.toFixed(2);
+  const poly = (pts: [number, number][]) => 'M ' + pts.map((p) => `${fmt(p[0])} ${fmt(p[1])}`).join(' L ');
+
+  const flutes = Array.from({ length: COUNT }, (_, i) => {
+    const xc = L + i * (FW + GW) + RAD;
+    const arc: [number, number][] = [];
+    const arcLeft: [number, number][] = [];
+    for (let k = 0; k <= STEPS; k++) {
+      arc.push(pt(xc, (Math.PI * k) / STEPS));
+      arcLeft.push(pt(xc, (thetaLeft * k) / STEPS));
+    }
+    const leftX = pt(xc, thetaLeft)[0];
+    return {
+      // przekrój półwałka na górnej płaszczyźnie cięcia
+      top: poly(arc) + ' Z',
+      // powierzchnia walca - przekrój wyciągnięty w dół frontu
+      face: poly(arcLeft) + ` L ${fmt(leftX)} ${BOT} L ${fmt(xc + RAD)} ${BOT} Z`
+    };
+  });
+
+  // Korpus: prawa ściana boczna i górna powierzchnia (grubość frontu w osi Z)
+  const sideWallPath = `M ${R} ${TOP} L ${R + DX} ${TOP + DY} L ${R + DX} ${BOT + DY} L ${R} ${BOT} Z`;
+  const slabTopPath = `M ${L} ${TOP} L ${R} ${TOP} L ${R + DX} ${TOP + DY} L ${L + DX} ${TOP + DY} Z`;
+
+  const idBg = `hr-bg-${variant}`;
+  const idSide = `hr-side-${variant}`;
+  const idFlute = `hr-flute-${variant}`;
+  const idShade = `hr-shade-${variant}`;
+  const idRound = `hr-round-${variant}`;
+
+  // Obrys w kolorze wypełnienia domyka mikroszczeliny antyaliasingu na styku ścian
+  const seam = { strokeWidth: 1, strokeLinejoin: 'round' as const };
+
+  return (
+    <svg
+      viewBox="0 0 400 400"
+      className="w-full h-full animate-in fade-in duration-300"
+      preserveAspectRatio="xMidYMid slice"
+      role="img"
+      aria-label="Detal frontu F-15: półwałki 10 mm ze szczeliną 1 mm, widok pod kątem z góry"
+    >
+      <defs>
+        <radialGradient id={idBg} cx="50%" cy="45%" r="60%">
+          <stop offset="0%" stopColor={bgCenter} />
+          <stop offset="100%" stopColor={bgEdge} />
+        </radialGradient>
+        <linearGradient id={idSide} gradientUnits="userSpaceOnUse" x1="0" y1={TOP + DY} x2="0" y2={BOT - 100}>
+          <stop offset="0%" stopColor={sideTop} />
+          <stop offset="100%" stopColor={sideBottom} />
+        </linearGradient>
+        {/* Poziomy gradient jednego półwałka (wspólny dla wszystkich - liczony od obrysu każdego) */}
+        <linearGradient id={idFlute} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor={fluteMid} />
+          <stop offset="28%" stopColor={fluteLight} />
+          <stop offset="62%" stopColor={fluteMid} />
+          <stop offset="100%" stopColor={fluteDark} />
+        </linearGradient>
+        {/* Delikatne przyciemnienie ku dołowi, jak na froncie F-4 */}
+        <linearGradient id={idShade} gradientUnits="userSpaceOnUse" x1="0" y1={TOP} x2="0" y2={TOP + 320}>
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.02" />
+          <stop offset="100%" stopColor="#000000" stopOpacity="0.14" />
+        </linearGradient>
+        {/* Zaokrąglenie krawędzi korpusu: lekkie rozmycie + ponowne wyostrzenie kanału alfa */}
+        <filter
+          id={idRound}
+          filterUnits="userSpaceOnUse"
+          x="-40"
+          y="-40"
+          width="480"
+          height="480"
+          colorInterpolationFilters="sRGB"
+        >
+          <feGaussianBlur in="SourceGraphic" stdDeviation={ROUND} result="blur" />
+          <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 8 -4" />
+        </filter>
+      </defs>
+
+      <rect width="400" height="400" fill={`url(#${idBg})`} />
+
+      {/* 1. Korpus (ściana boczna + górna powierzchnia) z zaokrąglonymi krawędziami, także tylnymi */}
+      <g filter={`url(#${idRound})`}>
+        <g transform={`translate(${tx} ${ty}) scale(${SCALE})`}>
+          <path d={sideWallPath} fill={`url(#${idSide})`} stroke={`url(#${idSide})`} {...seam} />
+          <path d={slabTopPath} fill={ledge} stroke={ledge} {...seam} />
+        </g>
+      </g>
+
+      {/* 2-4. Ryflowanie rysowane ostro, żeby półwałki i szczeliny pozostały wyraźne */}
+      <g transform={`translate(${tx} ${ty}) scale(${SCALE})`}>
+        <rect x={L} y={TOP} width={FRONT_W} height={BOT - TOP} fill={groove} />
+        {flutes.map((fl, i) => (
+          <g key={i}>
+            <path d={fl.top} fill={ledge} stroke={ledge} {...seam} />
+            <path d={fl.face} fill={`url(#${idFlute})`} />
+          </g>
+        ))}
+        <path d={flutes.map((fl) => fl.face).join(' ')} fill={`url(#${idShade})`} />
+      </g>
+    </svg>
+  );
+};
+
 const FrontBacking: React.FC<{ profile: string; className?: string; children: React.ReactNode }> = ({ profile, className = '', children }) => {
   const isGlass = profile === 'glass-frame' || profile === 'mullion-frame';
   const isLattice = profile === 'lattice-frame';
@@ -337,9 +529,13 @@ export const CatalogPage: React.FC = () => {
                 </FrontBacking>
                 
                 <div className="absolute -top-8 -right-10 sm:-top-10 sm:-right-12 md:-top-24 md:-right-28 lg:-top-[130px] lg:-right-[150px] w-40 h-40 sm:w-48 sm:h-48 md:w-72 md:h-72 lg:w-[340px] lg:h-[340px] rounded-full border-[4px] md:border-[8px] border-line-dark shadow-2xl overflow-hidden z-20 pointer-events-none bg-surface flex items-center justify-center">
-                  {selectedFront.detailGraphic === 'hidden-handle' ? (
+                  {selectedFront.detailGraphic ? (
                     <>
-                      <HiddenHandleDetail key={activeVariant} variant={activeVariant} />
+                      {selectedFront.detailGraphic === 'half-round' ? (
+                        <HalfRoundDetail key={activeVariant} variant={activeVariant} />
+                      ) : (
+                        <HiddenHandleDetail key={activeVariant} variant={activeVariant} />
+                      )}
                       {selectedFront.detailLabel && (
                         <div className="absolute left-1/2 -translate-x-1/2 top-[15%] sm:top-[19%] md:top-[12%] lg:top-[9%] bg-night/70 backdrop-blur-sm rounded-full px-2 md:px-3 py-1 z-10">
                           <span className="text-[7px] sm:text-[9px] md:text-[10px] uppercase tracking-wider md:tracking-widest font-semibold text-ivory whitespace-nowrap">
