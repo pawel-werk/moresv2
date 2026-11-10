@@ -238,11 +238,8 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 };
 
 /**
- * Detal ryflowania F-15 (Poprawiony)
- * Półwałki biegną po DŁUGIM boku. (wyciągnięte pionowo, a płyta schodzi na prawo).
- *
- * v5: wyraźnie walcowate półwałki (własny gradient na każdy półwałek, połysk
- * i cień), jaśniejsza górna płaszczyzna z czytelnym profilem.
+ * Detal ryflowania F-15 (Odwzorowanie 1:1 z referencji)
+ * 2D rzut aksonometryczny wyciągnięty w dół.
  */
 const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) => {
   const baseColors: Record<MaterialVariant, string> = {
@@ -256,102 +253,38 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
   const base = baseColors[variant] ?? baseColors.lithos;
   const isDark = variant === 'bazalt' || variant === 'magma';
 
-  // --- Kolory ---
-  const frontTop = isDark ? mix(base, '#ffffff', 0.12) : mix(base, '#ffffff', 0.10);
-  const frontBottom = isDark ? mix(base, '#ffffff', 0.04) : mix(base, '#000000', 0.05);
-  // Górna płaszczyzna jaśniejsza niż wcześniej - mocniej odcina się profil półwałków
-  const ledge = isDark ? mix(base, '#ffffff', 0.38) : mix(base, '#ffffff', 0.45);
-  // Szczeliny: ciemniejsze niż w v4, ale nie czarne
-  const wallMid = isDark ? mix(base, '#000000', 0.45) : mix(base, '#000000', 0.34);
+  // --- Paleta i cieniowanie ---
+  const sideWall = mix(base, '#000000', isDark ? 0.35 : 0.25);
+  const groove = mix(base, '#000000', isDark ? 0.70 : 0.65);
+  const highlight = mix(base, '#ffffff', isDark ? 0.15 : 0.60);
 
-  const bgCenter = isDark ? '#443c35' : '#3a332e';
-  const bgEdge = isDark ? '#1f1b18' : '#171310';
+  const fluteLeft = mix(base, '#ffffff', isDark ? 0.12 : 0.45);
+  const fluteRight = mix(base, '#000000', isDark ? 0.45 : 0.35);
 
-  // --- Siła cieniowania półwałków (do strojenia) ---
-  const HILITE = isDark ? 0.34 : 0.55;   // połysk
-  const SHADOW = isDark ? 0.60 : 0.42;   // cień po stronie odwróconej od światła
-  const EDGE_AO = isDark ? 0.30 : 0.22;  // zaciemnienie przy szczelinie
+  const bgCenter = isDark ? '#36302b' : '#2e2825';
+  const bgEdge = '#14110f';
 
-  // --- Parametry do strojenia ---
-  const THICK = 15;    // grubość płyty
-  const COUNT = 19;    // liczba półwałków
-  const FLUTE = 11;    // szerokość półwałka
-  const GAP = 1;       // szczelina
-  const RAD = FLUTE / 2;
-  const HEIGHT = 320;  // wysokość frontu (i tak ucinana przez kadr)
+  // --- Geometria i perspektywa ---
+  const START_X = 60;
+  const START_Y = 260;
+  
+  // Wektor grubości lewej ściany (idzie w górę i w prawo)
+  const THICK_DX = 45;
+  const THICK_DY = -65;
+  
+  // Wektory dla pojedynczego półwałka i szczeliny (wzdłuż górnej krawędzi)
+  const FLUTE_DX = 38;
+  const FLUTE_DY = -22;
+  const GAP_DX = 4;
+  const GAP_DY = -2.3;
+  
+  const COUNT = 6; // Ilość widocznych półwałków
+  const BOT = 450; // Punkt ucięcia na dole (poza kółkiem)
 
-  // Pozycja w kadrze (viewBox 400x400)
-  const AX = 105;
-  const AY = 262;
-
-  // --- Perspektywa jak w F-4: głębia = wektor (600, -480) ---
-  const DX = 600;
-  const DY = -480;
-  const dirLen = Math.hypot(DX, DY);
-  const ux = DX / dirLen;
-  const uy = DY / dirLen;
-
-  // Front zaczyna i kończy się pełnym półwałkiem
-  const LEN = COUNT * FLUTE + (COUNT - 1) * GAP;
-
-  // Płaszczyzna ściany z ryflami
-  const WX = AX + THICK;
-
-  // Punkt na ścianie: s = odległość wzdłuż frontu, b = wypukłość półwałka
-  const P = (s: number, b: number): [number, number] => [WX + s * ux + b, AY + s * uy];
-
-  const fmt = (n: number) => n.toFixed(2);
-  const poly = (pts: [number, number][]) =>
-    'M ' + pts.map((p) => `${fmt(p[0])} ${fmt(p[1])}`).join(' L ');
-
-  // Półwałek widać tylko do krawędzi sylwetki
-  const thetaVis = Math.PI - Math.atan(1 / ux);
-  const STEPS = 18;
-
-  const curve = (i: number, t0: number, t1: number): [number, number][] => {
-    const sc = i * (FLUTE + GAP) + RAD;
-    return Array.from({ length: STEPS + 1 }, (_, k) => {
-      const th = t0 + ((t1 - t0) * k) / STEPS;
-      return P(sc - RAD * Math.cos(th), RAD * Math.sin(th));
-    });
-  };
-
-  const flutes = Array.from({ length: COUNT }, (_, i) => {
-    const vis = curve(i, 0, thetaVis);
-    const first = vis[0];
-    const last = vis[vis.length - 1];
-    return {
-      d:
-        poly(vis) +
-        ` L ${fmt(last[0])} ${fmt(last[1] + HEIGHT)}` +
-        ` L ${fmt(first[0])} ${fmt(first[1] + HEIGHT)} Z`,
-      // zakres X widocznej części tego półwałka - gradient liczony dokładnie po nim
-      x1: first[0],
-      x2: last[0]
-    };
-  });
-
-  // --- Płaszczyzna szczelin (tło pod półwałkami) ---
-  const wallPath =
-    `M ${WX} ${AY} L ${fmt(WX + LEN * ux)} ${fmt(AY + LEN * uy)} ` +
-    `L ${fmt(WX + LEN * ux)} ${fmt(AY + LEN * uy + HEIGHT)} L ${WX} ${AY + HEIGHT} Z`;
-
-  // --- Górna powierzchnia: JEDEN kształt z profilem półwałków ---
-  const profileReverse: [number, number][] = [];
-  for (let i = COUNT - 1; i >= 0; i--) {
-    profileReverse.push(...curve(i, Math.PI, 0));
-  }
-  const ledgePath =
-    `M ${AX} ${AY} L ${fmt(AX + LEN * ux)} ${fmt(AY + LEN * uy)} ` +
-    profileReverse.map((p) => `L ${fmt(p[0])} ${fmt(p[1])}`).join(' ') +
-    ' Z';
-
-  // --- Przekrój czołowy (lewa ściana) ---
-  const endFacePath = `M ${AX} ${AY} L ${WX} ${AY} L ${WX} ${AY + HEIGHT} L ${AX} ${AY + HEIGHT} Z`;
+  const cornerX = START_X + THICK_DX;
+  const cornerY = START_Y + THICK_DY;
 
   const idBg = `hr-bg-${variant}`;
-  const idFront = `hr-front-${variant}`;
-  const idShade = (i: number) => `hr-shade-${variant}-${i}`;
 
   return (
     <svg
@@ -359,62 +292,79 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
       className="w-full h-full animate-in fade-in duration-300"
       preserveAspectRatio="xMidYMid slice"
       role="img"
-      aria-label="Detal frontu F-15: półwałki 10 mm ze szczeliną 1 mm, widok pod kątem z góry"
+      aria-label="Detal frontu F-15: półwałki 10 mm ze szczeliną 1 mm"
     >
       <defs>
-        <radialGradient id={idBg} cx="50%" cy="45%" r="60%">
+        <radialGradient id={idBg} cx="50%" cy="50%" r="60%">
           <stop offset="0%" stopColor={bgCenter} />
           <stop offset="100%" stopColor={bgEdge} />
         </radialGradient>
-
-        {/* Pionowy gradient bazowy (ten sam dla przekroju i półwałków) */}
-        <linearGradient id={idFront} gradientUnits="userSpaceOnUse" x1="0" y1={AY} x2="0" y2="400">
-          <stop offset="0%" stopColor={frontTop} />
-          <stop offset="100%" stopColor={frontBottom} />
-        </linearGradient>
-
-        {/* Osobny gradient walcowy dla KAŻDEGO półwałka, liczony po jego szerokości */}
-        {flutes.map((fl, i) => (
-          <linearGradient
-            key={i}
-            id={idShade(i)}
-            gradientUnits="userSpaceOnUse"
-            x1={fl.x1}
-            y1="0"
-            x2={fl.x2}
-            y2="0"
-          >
-            <stop offset="0%" stopColor="#000000" stopOpacity={EDGE_AO} />
-            <stop offset="14%" stopColor="#ffffff" stopOpacity={HILITE * 0.35} />
-            <stop offset="30%" stopColor="#ffffff" stopOpacity={HILITE} />
-            <stop offset="50%" stopColor="#ffffff" stopOpacity={HILITE * 0.15} />
-            <stop offset="68%" stopColor="#000000" stopOpacity={SHADOW * 0.35} />
-            <stop offset="100%" stopColor="#000000" stopOpacity={SHADOW} />
-          </linearGradient>
-        ))}
+        
+        {Array.from({ length: COUNT }).map((_, i) => {
+          const x = cornerX + i * (FLUTE_DX + GAP_DX);
+          const x1 = x + FLUTE_DX;
+          return (
+            <linearGradient 
+              key={`grad-${i}`} 
+              id={`flute-grad-${variant}-${i}`} 
+              gradientUnits="userSpaceOnUse" 
+              x1={x} y1="0" x2={x1} y2="0"
+            >
+              <stop offset="0%" stopColor={mix(base, '#ffffff', isDark ? 0.02 : 0.08)} />
+              <stop offset="25%" stopColor={fluteLeft} />
+              <stop offset="65%" stopColor={base} />
+              <stop offset="100%" stopColor={fluteRight} />
+            </linearGradient>
+          );
+        })}
       </defs>
 
       <rect width="400" height="400" fill={`url(#${idBg})`} />
 
-      {/* Tło szczelin */}
-      <path d={wallPath} fill={wallMid} />
+      <g filter="drop-shadow(0px 20px 30px rgba(0,0,0,0.5))">
+        <path 
+          d={`M ${START_X} ${START_Y} L ${cornerX} ${cornerY} L ${cornerX} ${BOT} L ${START_X} ${BOT} Z`} 
+          fill={sideWall} 
+        />
+        <path 
+          d={`M ${START_X} ${START_Y} L ${cornerX} ${cornerY}`} 
+          stroke={highlight} 
+          strokeWidth="1.5" 
+          fill="none" 
+        />
 
-      {/* Półwałki: od najdalszego do najbliższego */}
-      {[...flutes]
-        .map((fl, i) => ({ fl, i }))
-        .reverse()
-        .map(({ fl, i }) => (
-          <g key={i}>
-            <path d={fl.d} fill={`url(#${idFront})`} />
-            <path d={fl.d} fill={`url(#${idShade(i)})`} />
-          </g>
-        ))}
+        {Array.from({ length: COUNT }).map((_, i) => {
+          const x = cornerX + i * (FLUTE_DX + GAP_DX);
+          const y = cornerY + i * (FLUTE_DY + GAP_DY);
+          const x1 = x + FLUTE_DX;
+          const y1 = y + FLUTE_DY;
+          const x2 = x1 + GAP_DX;
+          const y2 = y1 + GAP_DY;
 
-      {/* Górna płaszczyzna z profilem półwałków - jeden kształt */}
-      <path d={ledgePath} fill={ledge} stroke={ledge} strokeWidth={1} strokeLinejoin="round" />
+          const cpX = x + 12;
+          const cpY = y - 28;
 
-      {/* Przekrój czołowy - na wierzchu */}
-      <path d={endFacePath} fill={`url(#${idFront})`} stroke={`url(#${idFront})`} strokeWidth={1} strokeLinejoin="round" />
+          return (
+            <g key={`flute-group-${i}`}>
+              <path 
+                d={`M ${x} ${y} Q ${cpX} ${cpY} ${x1} ${y1} L ${x1} ${BOT} L ${x} ${BOT} Z`} 
+                fill={`url(#flute-grad-${variant}-${i})`} 
+              />
+              <path 
+                d={`M ${x} ${y} Q ${cpX} ${cpY} ${x1} ${y1}`} 
+                stroke={highlight} 
+                strokeWidth="1.5" 
+                fill="none" 
+                strokeLinecap="round"
+              />
+              <path 
+                d={`M ${x1} ${y1} L ${x2} ${y2} L ${x2} ${BOT} L ${x1} ${BOT} Z`} 
+                fill={groove} 
+              />
+            </g>
+          );
+        })}
+      </g>
     </svg>
   );
 };
@@ -508,8 +458,8 @@ export const CatalogPage: React.FC = () => {
                   <MaterialPanel variant={activeVariant} profile={selectedFront.profile} className="w-full h-full rounded-sm transition-all duration-300" />
                 </FrontBacking>
                 
-                {/* Lupa (kółko) przesunięta do góry i w prawo aby mniej zasłaniała front */}
-                <div className="absolute -top-12 -right-14 sm:-top-16 sm:-right-20 md:-top-[110px] md:-right-[150px] lg:-top-[170px] lg:-right-[200px] w-40 h-40 sm:w-48 sm:h-48 md:w-72 md:h-72 lg:w-[340px] lg:h-[340px] rounded-full border-[4px] md:border-[8px] border-line-dark shadow-2xl overflow-hidden z-20 pointer-events-none bg-surface flex items-center justify-center">
+                {/* Lupa (kółko) przesunięta do góry i w prawo oraz znacznie pomniejszona na mobile */}
+                <div className="absolute -top-6 -right-8 sm:-top-10 sm:-right-12 md:-top-[110px] md:-right-[150px] lg:-top-[170px] lg:-right-[200px] w-28 h-28 sm:w-40 sm:h-40 md:w-72 md:h-72 lg:w-[340px] lg:h-[340px] rounded-full border-[3px] md:border-[8px] border-line-dark shadow-2xl overflow-hidden z-20 pointer-events-none bg-surface flex items-center justify-center">
                   {selectedFront.detailGraphic ? (
                     <>
                       {selectedFront.detailGraphic === 'half-round' ? (
@@ -518,8 +468,8 @@ export const CatalogPage: React.FC = () => {
                         <HiddenHandleDetail key={activeVariant} variant={activeVariant} />
                       )}
                       {selectedFront.detailLabel && (
-                        <div className="absolute left-1/2 -translate-x-1/2 top-[15%] sm:top-[19%] md:top-[12%] lg:top-[9%] bg-night/70 backdrop-blur-sm rounded-full px-2 md:px-3 py-1 z-10">
-                          <span className="text-[7px] sm:text-[9px] md:text-[10px] uppercase tracking-wider md:tracking-widest font-semibold text-ivory whitespace-nowrap">
+                        <div className="absolute left-1/2 -translate-x-1/2 top-[12%] sm:top-[15%] md:top-[12%] lg:top-[9%] bg-night/70 backdrop-blur-sm rounded-full px-1.5 py-0.5 sm:px-2 sm:py-1 md:px-3 md:py-1 z-10">
+                          <span className="text-[6px] sm:text-[8px] md:text-[10px] uppercase tracking-wider md:tracking-widest font-semibold text-ivory whitespace-nowrap">
                             {selectedFront.detailLabel}
                           </span>
                         </div>
@@ -527,7 +477,7 @@ export const CatalogPage: React.FC = () => {
                     </>
                   ) : (
                     <div className="w-full h-full flex items-start justify-end origin-top-right transform scale-[1.6] sm:scale-[1.8] md:scale-[2.2] lg:scale-[2.5]">
-                      <div className="w-[120px] sm:w-[140px] md:w-[180px] lg:w-[220px] aspect-[3/4] rounded-sm flex-shrink-0 mt-4 mr-4 md:mt-10 md:mr-10">
+                      <div className="w-[80px] sm:w-[110px] md:w-[180px] lg:w-[220px] aspect-[3/4] rounded-sm flex-shrink-0 mt-2 mr-2 sm:mt-4 sm:mr-4 md:mt-10 md:mr-10">
                         <FrontBacking profile={selectedFront.profile}>
                           <MaterialPanel 
                             variant={activeVariant} 
