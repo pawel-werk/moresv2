@@ -112,7 +112,7 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 
   // --- Geometria (wyliczana) ---
   const L = 40;
-  const WALL = (THICK * (1 - NOTCH_RATIO)) / 3; // ścianka po każdej stronie wycięcia
+  const WALL = (THICK * (1 - NOTCH_RATIO)) / 2.5; // ścianka po każdej stronie wycięcia
   const R = L + THICK;
   const CL = L + WALL;
   const CR = R - WALL;
