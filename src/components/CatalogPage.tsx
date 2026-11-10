@@ -226,8 +226,9 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 };
 
 /**
- * Detal ryflowania F-15 (Izometryczny, zgodny ze zdjęciem referencyjnym)
- * Półwałki biegną pionowo, z poprawnie zrzutowaną wypukłością i wyciągnięciem w głąb.
+ * Detal ryflowania F-15 (Poprawiony wektor perspektywy)
+ * Płyta jest ustawiona frontem do nas, ryfle biegną z góry na dół (po krótkim boku w kadrze).
+ * Grubość płyty ucieka w lewo-górę.
  */
 const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) => {
   const baseColors: Record<MaterialVariant, string> = {
@@ -242,51 +243,47 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
   const isDark = variant === 'bazalt' || variant === 'magma';
 
   // --- Kolory ---
-  // Górna płaszczyzna cięcia (parapet) - najjaśniejsza
-  const ledge = isDark ? mix(base, '#ffffff', 0.22) : mix(base, '#ffffff', 0.35);
-  // Prawa ściana boczna - w mocnym cieniu
-  const sideWall = isDark ? mix(base, '#000000', 0.25) : mix(base, '#000000', 0.30);
-  // Dno szczeliny między półwałkami
-  const groove = isDark ? mix(base, '#000000', 0.55) : mix(base, '#000000', 0.45);
+  const ledge = isDark ? mix(base, '#ffffff', 0.15) : mix(base, '#ffffff', 0.25);
+  const sideWall = isDark ? mix(base, '#000000', 0.15) : mix(base, '#000000', 0.20);
+  const groove = isDark ? mix(base, '#000000', 0.50) : mix(base, '#000000', 0.40);
   
-  // Cieniowanie pojedynczego półwałka (światło z lewej)
-  const fluteLight = isDark ? mix(base, '#ffffff', 0.18) : mix(base, '#ffffff', 0.35);
-  const fluteMid = base;
-  const fluteDark = isDark ? mix(base, '#000000', 0.45) : mix(base, '#000000', 0.35);
+  const fluteLight = isDark ? mix(base, '#ffffff', 0.18) : mix(base, '#ffffff', 0.28);
+  const fluteMid = isDark ? mix(base, '#000000', 0.05) : mix(base, '#000000', 0.02);
+  const fluteDark = isDark ? mix(base, '#000000', 0.35) : mix(base, '#000000', 0.25);
 
   const bgCenter = isDark ? '#36302b' : '#2e2825';
   const bgEdge = isDark ? '#14110f' : '#14110f';
 
   // --- Geometria ---
-  const FLUTE_W = 36; // 10mm w proporcji
-  const GAP_W = 4;    // 1mm w proporcji
-  const COUNT = 5;    // Liczba widocznych ryfli
-  const TOTAL_W = COUNT * FLUTE_W + (COUNT - 1) * GAP_W;
+  // Skala dostosowana, aby walce (10mm) i przerwy (1mm) wyglądały drobno na tle płyty (18mm)
+  const FLUTE_W = 12; // Szerokość półwałka 
+  const GAP_W = 1.2;  // Szerokość przerwy
+  const COUNT = 14;   // Liczba ryfli, by wypełnić kadr z mniejszymi półwałkami
   
-  const L = 105;
-  const TOP = 140;
-  const BOT = 420;
+  const TOTAL_W = COUNT * FLUTE_W + (COUNT - 1) * GAP_W;
+  const L = 140; // Lewa krawędź
+  const TOP = 160;
+  const BOT = 450;
   const R = L + TOTAL_W;
   
-  // Wektor grubości płyty (DX, DY) - idzie w głąb ekranu, w górę i prawo
-  const DX = 50;
-  const DY = -40;
+  // Wektor grubości płyty idzie w głąb: lewo-góra (ujemne DX, ujemne DY)
+  // Grubość frontu (18mm) jest teraz mniejsza w stosunku do całości
+  const DX = -45;
+  const DY = -35;
   
-  // Wektor wypukłości półwałka (VX, VY) - "wystaje" z płyty do przodu i w dół
-  const VX = -0.4;
-  const VY = 0.4;
+  // Wektor wypukłości półwałka (do przodu i lekko w dół)
+  const VX = 0;
+  const VY = 0.5;
   
   const R_FLUTE = FLUTE_W / 2;
-  const STEPS = 16;
+  const STEPS = 12;
 
-  // Funkcja generująca zrzutowany łuk pojedynczego półwałka
   const getArc = (xc: number, yBase: number) => {
     const pts: [number, number][] = [];
     for (let i = 0; i <= STEPS; i++) {
-      const theta = Math.PI * (1 - i / STEPS); // od lewej (PI) do prawej (0)
+      const theta = Math.PI * (1 - i / STEPS); // od lewej do prawej
       const x = xc + R_FLUTE * Math.cos(theta);
-      const z = R_FLUTE * Math.sin(theta); // Wartość Z określa wypukłość
-      // Rzutowanie na płaszczyznę ekranu
+      const z = R_FLUTE * Math.sin(theta);
       const px = x + z * VX;
       const py = yBase + z * VY;
       pts.push([px, py]);
@@ -303,9 +300,9 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
   const fmt = (n: number) => n.toFixed(2);
   const poly = (pts: [number, number][]) => 'M ' + pts.map(p => `${fmt(p[0])} ${fmt(p[1])}`).join(' L ');
 
-  // Ścieżki bryły
+  // Ścieżki bryły korpusu (grubość po lewej stronie, bo front przesunięty w prawo)
   const topPath = poly(topProfilePts) + ` L ${fmt(R + DX)} ${fmt(TOP + DY)} L ${fmt(L + DX)} ${fmt(TOP + DY)} Z`;
-  const sidePath = `M ${R} ${TOP} L ${R + DX} ${TOP + DY} L ${R + DX} ${BOT + DY} L ${R} ${BOT} Z`;
+  const leftSidePath = `M ${L} ${TOP} L ${L + DX} ${TOP + DY} L ${L + DX} ${BOT + DY} L ${L} ${BOT} Z`;
 
   const idBg = `hr-bg-${variant}`;
   const idFlute = `hr-flute-${variant}`;
@@ -325,7 +322,7 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
           <stop offset="100%" stopColor={bgEdge} />
         </radialGradient>
         
-        {/* Liniowy gradient 3D dla półwałków (światło wyłapane z lewej, cień po prawej) */}
+        {/* Liniowy gradient 3D dla półwałków pionowych (światło z lewej do prawej) */}
         <linearGradient id={idFlute} x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor={fluteLight} />
           <stop offset="45%" stopColor={fluteMid} />
@@ -335,10 +332,10 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
 
       <rect width="400" height="400" fill={`url(#${idBg})`} />
 
-      {/* Rzut bryły z miękkim cieniem ciskającym na tło */}
-      <g filter="drop-shadow(0px 15px 25px rgba(0,0,0,0.7))">
-        {/* Prawa ściana grubość */}
-        <path d={sidePath} fill={sideWall} stroke={sideWall} {...seam} />
+      {/* Rzut bryły z miękkim cieniem ciskającym na tło (w prawo w dół) */}
+      <g filter="drop-shadow(10px 10px 20px rgba(0,0,0,0.6))">
+        {/* Lewa ściana grubość (bo płyta "rośnie" w lewo-górę) */}
+        <path d={leftSidePath} fill={sideWall} stroke={sideWall} {...seam} />
         
         {/* Górna płaszczyzna z wyciętym profilem */}
         <path d={topPath} fill={ledge} stroke={ledge} {...seam} />
@@ -364,7 +361,6 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
           const topArc = getArc(xc, TOP);
           const botArc = getArc(xc, BOT);
           
-          // Zamykanie ścieżki wymaga odwrócenia łuku dennego
           const revBotArc = [...botArc].reverse();
           const pathD = poly(topArc) + ' L ' + revBotArc.map(p => `${fmt(p[0])} ${fmt(p[1])}`).join(' L ') + ' Z';
           
