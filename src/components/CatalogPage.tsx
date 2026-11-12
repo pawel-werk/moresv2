@@ -82,7 +82,7 @@ const mix = (hex: string, target: string, t: number): string => {
 };
 
 /**
- * Detal uchwytu (Pochwyt frontu F-1) - Kopią 1:1 do ukrytego uchwytu, z asymetrią ścianek.
+ * Detal uchwytu (Pochwyt frontu F-1) - Kopią 1:1 do ukrytego uchwytu
  */
 const TopHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) => {
   const baseColors: Record<MaterialVariant, string> = {
@@ -108,43 +108,39 @@ const TopHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
   const bgEdge = isDark ? '#1f1b18' : '#171310';
 
   // ============ WYMIARY DO STROJENIA ============
-  const THICK = 130;      // grubość frontu
-  const LEN = 900;        // długość frontu w głąb kadru
-  const BOT = 1250;       // wysokość frontu
-  const NOTCH_RATIO = 0.68; // szerokość wycięcia / grubość frontu
-  const ANGLE_DEG = 38.7; // kąt perspektywy
+  const THICK = 130;      // grubość frontu (dawniej 220)
+  const LEN = 900;        // długość frontu w głąb kadru (dawniej ok. 768)
+  const BOT = 1250;       // wysokość frontu (i tak ucinana przez kadr)
+  const NOTCH_RATIO = 0.68; // szerokość wycięcia / grubość frontu (0.1 = wąskie, 0.9 = bardzo szerokie)
+  const ANGLE_DEG = 38.7; // kąt perspektywy (większy = bardziej "z góry")
   const SCALE = 0.25;      // powiększenie całego detalu w kadrze
-  const TOP_SCREEN = 140; // pozycja górnej krawędzi na ekranie
-  const ROUND = 1.2;      // zaokrąglenie narożników
-  
-  const NOTCH_DEPTH = 1.14;  // głębokość łuku
-  const NOTCH_LIFT = 0.67;   // prosty odcinek przed łukiem
+  const TOP_SCREEN = 140; // pozycja górnej krawędzi na ekranie (px z 400)
+  const ROUND = 1.2;      // zaokrąglenie narożników (0 = ostre)
 
-  // ===== RÓŻNICA WYSOKOŚCI ŚCIANEK ZGODNIE ZE ZDJĘCIEM =====
-  const TOP_L = 150; // Lewa ścianka WYŻSZA (mniejsza wartość Y)
-  const TOP_R = 240; // Prawa ścianka NIŻSZA (większa wartość Y)
-  // =========================================================
+  // Proporcje wycięcia względem jego szerokości (zwykle nie trzeba ruszać)
+  const NOTCH_DEPTH = 1.14;  // głębokość łuku (RY = RX * to)
+  const NOTCH_LIFT = 0.67;   // prosty odcinek przed łukiem (S = RX * to)
+  // ==============================================
 
   // --- Geometria (wyliczana) ---
   const L = 40;
-  const WALL = (THICK * (1 - NOTCH_RATIO)) / 2.7; // grubość pionowych krawędzi
+  const WALL = (THICK * (1 - NOTCH_RATIO)) / 2.7; // ścianka po każdej stronie wycięcia
   const R = L + THICK;
   const CL = L + WALL;
   const CR = R - WALL;
-  
+  const TOP = 195;
   const RX = (CR - CL) / 2;
   const RY = RX * NOTCH_DEPTH;
   const S = RX * NOTCH_LIFT;
   const CX = (CL + CR) / 2;
-  // CY wyliczamy od średniej wysokości, aby łuk pozostał na tej samej głębokości
-  const CY = 195 + S; 
+  const CY = TOP + S;
 
   const ang = (ANGLE_DEG * Math.PI) / 180;
   const DX = LEN * Math.cos(ang);
   const DY = -LEN * Math.sin(ang);
 
   const tx = 200 - ((L + R + DX) / 2) * SCALE;
-  const ty = TOP_SCREEN - (195 + DY) * SCALE;
+  const ty = TOP_SCREEN - (TOP + DY) * SCALE;
 
   const a = -DX / RX;
   const b = -DY / RY;
@@ -154,25 +150,25 @@ const TopHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
 
   // Ścieżki
   const innerPath =
-    `M ${CL} ${TOP_L} ` +
+    `M ${CL} ${TOP} ` +
     `L ${CL} ${CY} ` +
     `A ${RX} ${RY} 0 0 0 ${p0x} ${p0y} ` +
     `L ${p0x + DX} ${p0y + DY} ` +
     `A ${RX} ${RY} 0 0 1 ${CL + DX} ${CY + DY} ` +
-    `L ${CL + DX} ${TOP_L + DY} Z`;
+    `L ${CL + DX} ${TOP + DY} Z`;
 
-  const sideWallPath = `M ${R} ${TOP_R} L ${R + DX} ${TOP_R + DY} L ${R + DX} ${BOT + DY} L ${R} ${BOT} Z`;
-  const leftLedgePath = `M ${L} ${TOP_L} L ${CL} ${TOP_L} L ${CL + DX} ${TOP_L + DY} L ${L + DX} ${TOP_L + DY} Z`;
-  const rightLedgePath = `M ${CR} ${TOP_R} L ${R} ${TOP_R} L ${R + DX} ${TOP_R + DY} L ${CR + DX} ${TOP_R + DY} Z`;
+  const sideWallPath = `M ${R} ${TOP} L ${R + DX} ${TOP + DY} L ${R + DX} ${BOT + DY} L ${R} ${BOT} Z`;
+  const leftLedgePath = `M ${L} ${TOP} L ${CL} ${TOP} L ${CL + DX} ${TOP + DY} L ${L + DX} ${TOP + DY} Z`;
+  const rightLedgePath = `M ${CR} ${TOP} L ${R} ${TOP} L ${R + DX} ${TOP + DY} L ${CR + DX} ${TOP + DY} Z`;
 
   const frontPath =
     `M ${L} ${BOT} ` +
-    `L ${L} ${TOP_L} ` +
-    `L ${CL} ${TOP_L} ` +
+    `L ${L} ${TOP} ` +
+    `L ${CL} ${TOP} ` +
     `L ${CL} ${CY} ` +
     `A ${RX} ${RY} 0 0 0 ${CR} ${CY} ` +
-    `L ${CR} ${TOP_R} ` +
-    `L ${R} ${TOP_R} ` +
+    `L ${CR} ${TOP} ` +
+    `L ${R} ${TOP} ` +
     `L ${R} ${BOT} Z`;
 
   const idBg = `th-bg-${variant}`;
@@ -197,15 +193,15 @@ const TopHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
           <stop offset="0%" stopColor={bgCenter} />
           <stop offset="100%" stopColor={bgEdge} />
         </radialGradient>
-        <linearGradient id={idFront} gradientUnits="userSpaceOnUse" x1="0" y1={TOP_L} x2="0" y2={CY + RY + 140}>
+        <linearGradient id={idFront} gradientUnits="userSpaceOnUse" x1="0" y1={TOP} x2="0" y2={CY + RY + 140}>
           <stop offset="0%" stopColor={frontTop} />
           <stop offset="100%" stopColor={frontBottom} />
         </linearGradient>
-        <linearGradient id={idInner} gradientUnits="userSpaceOnUse" x1="0" y1={TOP_L + DY} x2="0" y2={CY + RY}>
+        <linearGradient id={idInner} gradientUnits="userSpaceOnUse" x1="0" y1={TOP + DY} x2="0" y2={CY + RY}>
           <stop offset="0%" stopColor={innerBack} />
           <stop offset="100%" stopColor={innerFront} />
         </linearGradient>
-        <linearGradient id={idSide} gradientUnits="userSpaceOnUse" x1="0" y1={TOP_R + DY} x2="0" y2={BOT - 100}>
+        <linearGradient id={idSide} gradientUnits="userSpaceOnUse" x1="0" y1={TOP + DY} x2="0" y2={BOT - 100}>
           <stop offset="0%" stopColor={sideTop} />
           <stop offset="100%" stopColor={sideBottom} />
         </linearGradient>
@@ -229,7 +225,7 @@ const TopHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
           <feComposite in="SourceGraphic" in2="shape" operator="in" />
         </filter>
         <clipPath id={idArc} clipPathUnits="userSpaceOnUse">
-          <rect x={CL - 4} y={Math.min(TOP_L, TOP_R) - 10} width={CR - CL + 8} height={CY + RY - Math.min(TOP_L, TOP_R) + 50} />
+          <rect x={CL - 4} y={TOP} width={CR - CL + 8} height={S + RY + 40} />
         </clipPath>
       </defs>
 
