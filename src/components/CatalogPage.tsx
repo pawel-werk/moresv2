@@ -109,7 +109,7 @@ const TopHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
 
   // ============ WYMIARY DO STROJENIA ============
   const THICK = 120;      // grubość frontu
-  const LEN = 900;        // długość frontu w głąb kadru
+  const LEN = 1100;        // długość frontu w głąb kadru
   const BOT = 1250;       // wysokość frontu
   const NOTCH_RATIO = 0.68; // szerokość wycięcia / grubość frontu
   const ANGLE_DEG = 38.7; // kąt perspektywy
