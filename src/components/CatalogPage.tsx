@@ -108,7 +108,7 @@ const TopHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
   const bgEdge = isDark ? '#1f1b18' : '#171310';
 
   // ============ WYMIARY DO STROJENIA ============
-  const THICK = 110;      // grubość frontu
+  const THICK = 100;      // grubość frontu
   const LEN = 1100;        // długość frontu w głąb kadru
   const BOT = 1250;       // wysokość frontu
   const NOTCH_RATIO = 0.68; // szerokość wycięcia / grubość frontu
@@ -121,7 +121,7 @@ const TopHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
   const NOTCH_LIFT = 0.67;   // prosty odcinek przed łukiem
 
   // ===== RÓŻNICA WYSOKOŚCI ŚCIANEK =====
-  const TOP_L = 120; // Lewa ścianka WYŻSZA (mniejsza wartość Y)
+  const TOP_L = 100; // Lewa ścianka WYŻSZA (mniejsza wartość Y)
   const TOP_R = 240; // Prawa ścianka NIŻSZA (większa wartość Y)
   // =====================================
 
