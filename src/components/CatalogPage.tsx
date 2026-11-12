@@ -82,7 +82,7 @@ const mix = (hex: string, target: string, t: number): string => {
 };
 
 /**
- * Detal uchwytu (Pochwyt frontu F-1) - Kopią 1:1 do ukrytego uchwytu
+ * Detal uchwytu (Pochwyt frontu F-1) - Kopią 1:1 do ukrytego uchwytu, z asymetrią ścianek.
  */
 const TopHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) => {
   const baseColors: Record<MaterialVariant, string> = {
@@ -108,46 +108,41 @@ const TopHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
   const bgEdge = isDark ? '#1f1b18' : '#171310';
 
   // ============ WYMIARY DO STROJENIA ============
-  const THICK = 130;      // grubość frontu (dawniej 220)
-  const LEN = 900;        // długość frontu w głąb kadru (dawniej ok. 768)
-  const BOT = 1250;       // wysokość frontu (i tak ucinana przez kadr)
-  const NOTCH_RATIO = 0.68; // szerokość wycięcia / grubość frontu (0.1 = wąskie, 0.9 = bardzo szerokie)
-  const ANGLE_DEG = 38.7; // kąt perspektywy (większy = bardziej "z góry")
+  const THICK = 130;      // grubość frontu
+  const LEN = 900;        // długość frontu w głąb kadru
+  const BOT = 1250;       // wysokość frontu
+  const NOTCH_RATIO = 0.68; // szerokość wycięcia / grubość frontu
+  const ANGLE_DEG = 38.7; // kąt perspektywy
   const SCALE = 0.25;      // powiększenie całego detalu w kadrze
-  const TOP_SCREEN = 140; // pozycja górnej krawędzi na ekranie (px z 400)
-  const ROUND = 1.2;      // zaokrąglenie narożników (0 = ostre)
+  const TOP_SCREEN = 140; // pozycja górnej krawędzi na ekranie
+  const ROUND = 1.2;      // zaokrąglenie narożników
+  
+  const NOTCH_DEPTH = 1.14;  // głębokość łuku
+  const NOTCH_LIFT = 0.67;   // prosty odcinek przed łukiem
 
-<<<<<<< HEAD
-  // Proporcje wycięcia względem jego szerokości (zwykle nie trzeba ruszać)
-  const NOTCH_DEPTH = 1.14;  // głębokość łuku (RY = RX * to)
-  const NOTCH_LIFT = 0.67;   // prosty odcinek przed łukiem (S = RX * to)
-  // ==============================================
-=======
-  // ===== RÓŻNICA WYSOKOŚCI ŚCIANEK ZGODNIE ZE ZDJĘCIEM =====
-  const TOP_L = 120; // Lewa ścianka WYŻSZA (mniejsza wartość Y)
+  // ===== RÓŻNICA WYSOKOŚCI ŚCIANEK =====
+  const TOP_L = 150; // Lewa ścianka WYŻSZA (mniejsza wartość Y)
   const TOP_R = 240; // Prawa ścianka NIŻSZA (większa wartość Y)
-  // =========================================================
->>>>>>> parent of 18c16ce (a)
+  // =====================================
 
-  // --- Geometria (wyliczana) ---
   const L = 40;
-  const WALL = (THICK * (1 - NOTCH_RATIO)) / 2.7; // ścianka po każdej stronie wycięcia
+  const WALL = (THICK * (1 - NOTCH_RATIO)) / 2.7;
   const R = L + THICK;
   const CL = L + WALL;
   const CR = R - WALL;
-  const TOP = 195;
+  
   const RX = (CR - CL) / 2;
   const RY = RX * NOTCH_DEPTH;
   const S = RX * NOTCH_LIFT;
   const CX = (CL + CR) / 2;
-  const CY = TOP + S;
+  const CY = 195 + S; 
 
   const ang = (ANGLE_DEG * Math.PI) / 180;
   const DX = LEN * Math.cos(ang);
   const DY = -LEN * Math.sin(ang);
 
   const tx = 200 - ((L + R + DX) / 2) * SCALE;
-  const ty = TOP_SCREEN - (TOP + DY) * SCALE;
+  const ty = TOP_SCREEN - (195 + DY) * SCALE;
 
   const a = -DX / RX;
   const b = -DY / RY;
@@ -155,28 +150,13 @@ const TopHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
   const p0x = CX + RX * Math.cos(phi0);
   const p0y = CY + RY * Math.sin(phi0);
 
-  // Ścieżki
   const innerPath =
-    `M ${CL} ${TOP} ` +
-    `L ${CL} ${CY} ` +
-    `A ${RX} ${RY} 0 0 0 ${p0x} ${p0y} ` +
-    `L ${p0x + DX} ${p0y + DY} ` +
-    `A ${RX} ${RY} 0 0 1 ${CL + DX} ${CY + DY} ` +
-    `L ${CL + DX} ${TOP + DY} Z`;
-
-  const sideWallPath = `M ${R} ${TOP} L ${R + DX} ${TOP + DY} L ${R + DX} ${BOT + DY} L ${R} ${BOT} Z`;
-  const leftLedgePath = `M ${L} ${TOP} L ${CL} ${TOP} L ${CL + DX} ${TOP + DY} L ${L + DX} ${TOP + DY} Z`;
-  const rightLedgePath = `M ${CR} ${TOP} L ${R} ${TOP} L ${R + DX} ${TOP + DY} L ${CR + DX} ${TOP + DY} Z`;
-
+    `M ${CL} ${TOP_L} L ${CL} ${CY} A ${RX} ${RY} 0 0 0 ${p0x} ${p0y} L ${p0x + DX} ${p0y + DY} A ${RX} ${RY} 0 0 1 ${CL + DX} ${CY + DY} L ${CL + DX} ${TOP_L + DY} Z`;
+  const sideWallPath = `M ${R} ${TOP_R} L ${R + DX} ${TOP_R + DY} L ${R + DX} ${BOT + DY} L ${R} ${BOT} Z`;
+  const leftLedgePath = `M ${L} ${TOP_L} L ${CL} ${TOP_L} L ${CL + DX} ${TOP_L + DY} L ${L + DX} ${TOP_L + DY} Z`;
+  const rightLedgePath = `M ${CR} ${TOP_R} L ${R} ${TOP_R} L ${R + DX} ${TOP_R + DY} L ${CR + DX} ${TOP_R + DY} Z`;
   const frontPath =
-    `M ${L} ${BOT} ` +
-    `L ${L} ${TOP} ` +
-    `L ${CL} ${TOP} ` +
-    `L ${CL} ${CY} ` +
-    `A ${RX} ${RY} 0 0 0 ${CR} ${CY} ` +
-    `L ${CR} ${TOP} ` +
-    `L ${R} ${TOP} ` +
-    `L ${R} ${BOT} Z`;
+    `M ${L} ${BOT} L ${L} ${TOP_L} L ${CL} ${TOP_L} L ${CL} ${CY} A ${RX} ${RY} 0 0 0 ${CR} ${CY} L ${CR} ${TOP_R} L ${R} ${TOP_R} L ${R} ${BOT} Z`;
 
   const idBg = `th-bg-${variant}`;
   const idFront = `th-front-${variant}`;
@@ -188,51 +168,31 @@ const TopHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
   const seam = { strokeWidth: 1, strokeLinejoin: 'round' as const };
 
   return (
-    <svg
-      viewBox="0 0 400 400"
-      className="w-full h-full animate-in fade-in duration-300"
-      preserveAspectRatio="xMidYMid slice"
-      role="img"
-      aria-label="Pochwyt frontu F-1, widok pod kątem z góry"
-    >
+    <svg viewBox="0 0 400 400" className="w-full h-full animate-in fade-in duration-300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Pochwyt frontu F-1, widok pod kątem z góry">
       <defs>
         <radialGradient id={idBg} cx="50%" cy="45%" r="60%">
           <stop offset="0%" stopColor={bgCenter} />
           <stop offset="100%" stopColor={bgEdge} />
         </radialGradient>
-        <linearGradient id={idFront} gradientUnits="userSpaceOnUse" x1="0" y1={TOP} x2="0" y2={CY + RY + 140}>
+        <linearGradient id={idFront} gradientUnits="userSpaceOnUse" x1="0" y1={TOP_L} x2="0" y2={CY + RY + 140}>
           <stop offset="0%" stopColor={frontTop} />
           <stop offset="100%" stopColor={frontBottom} />
         </linearGradient>
-        <linearGradient id={idInner} gradientUnits="userSpaceOnUse" x1="0" y1={TOP + DY} x2="0" y2={CY + RY}>
+        <linearGradient id={idInner} gradientUnits="userSpaceOnUse" x1="0" y1={TOP_L + DY} x2="0" y2={CY + RY}>
           <stop offset="0%" stopColor={innerBack} />
           <stop offset="100%" stopColor={innerFront} />
         </linearGradient>
-        <linearGradient id={idSide} gradientUnits="userSpaceOnUse" x1="0" y1={TOP + DY} x2="0" y2={BOT - 100}>
+        <linearGradient id={idSide} gradientUnits="userSpaceOnUse" x1="0" y1={TOP_R + DY} x2="0" y2={BOT - 100}>
           <stop offset="0%" stopColor={sideTop} />
           <stop offset="100%" stopColor={sideBottom} />
         </linearGradient>
-
-        <filter
-          id={idRound}
-          filterUnits="userSpaceOnUse"
-          x="-40"
-          y="-40"
-          width="480"
-          height="480"
-          colorInterpolationFilters="sRGB"
-        >
+        <filter id={idRound} filterUnits="userSpaceOnUse" x="-40" y="-40" width="480" height="480" colorInterpolationFilters="sRGB">
           <feGaussianBlur in="SourceAlpha" stdDeviation={ROUND} result="blurA" />
-          <feColorMatrix
-            in="blurA"
-            type="matrix"
-            values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 12 -5.5"
-            result="shape"
-          />
+          <feColorMatrix in="blurA" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 12 -5.5" result="shape" />
           <feComposite in="SourceGraphic" in2="shape" operator="in" />
         </filter>
         <clipPath id={idArc} clipPathUnits="userSpaceOnUse">
-          <rect x={CL - 4} y={TOP} width={CR - CL + 8} height={S + RY + 40} />
+          <rect x={CL - 4} y={Math.min(TOP_L, TOP_R) - 10} width={CR - CL + 8} height={CY + RY - Math.min(TOP_L, TOP_R) + 50} />
         </clipPath>
       </defs>
 
@@ -247,7 +207,6 @@ const TopHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
           <path d={frontPath} fill={`url(#${idFront})`} stroke={`url(#${idFront})`} {...seam} />
         </g>
       </g>
-
       <g transform={`translate(${tx} ${ty}) scale(${SCALE})`}>
         <path d={frontPath} fill={`url(#${idFront})`} clipPath={`url(#${idArc})`} />
       </g>
@@ -271,7 +230,6 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   const base = baseColors[variant] ?? baseColors.lithos;
   const isDark = variant === 'bazalt' || variant === 'magma';
 
-  // --- Kolory ---
   const frontTop = isDark ? mix(base, '#ffffff', 0.12) : mix(base, '#ffffff', 0.10);
   const frontBottom = isDark ? mix(base, '#ffffff', 0.04) : mix(base, '#000000', 0.05);
   const ledge = isDark ? mix(base, '#ffffff', 0.26) : mix(base, '#ffffff', 0.30);
@@ -282,24 +240,19 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   const bgCenter = isDark ? '#443c35' : '#3a332e';
   const bgEdge = isDark ? '#1f1b18' : '#171310';
 
-  // ============ WYMIARY DO STROJENIA ============
-  const THICK = 130;      // grubość frontu (dawniej 220)
-  const LEN = 900;        // długość frontu w głąb kadru (dawniej ok. 768)
-  const BOT = 1250;       // wysokość frontu (i tak ucinana przez kadr)
-  const NOTCH_RATIO = 0.68; // szerokość wycięcia / grubość frontu (0.1 = wąskie, 0.9 = bardzo szerokie)
-  const ANGLE_DEG = 38.7; // kąt perspektywy (większy = bardziej "z góry")
-  const SCALE = 0.25;      // powiększenie całego detalu w kadrze
-  const TOP_SCREEN = 140; // pozycja górnej krawędzi na ekranie (px z 400)
-  const ROUND = 1.2;      // zaokrąglenie narożników (0 = ostre)
+  const THICK = 130;
+  const LEN = 900;
+  const BOT = 1250;
+  const NOTCH_RATIO = 0.68;
+  const ANGLE_DEG = 38.7;
+  const SCALE = 0.25;
+  const TOP_SCREEN = 140;
+  const ROUND = 1.2;
+  const NOTCH_DEPTH = 1.14;
+  const NOTCH_LIFT = 0.67;
 
-  // Proporcje wycięcia względem jego szerokości (zwykle nie trzeba ruszać)
-  const NOTCH_DEPTH = 1.14;  // głębokość łuku (RY = RX * to)
-  const NOTCH_LIFT = 0.67;   // prosty odcinek przed łukiem (S = RX * to)
-  // ==============================================
-
-  // --- Geometria (wyliczana) ---
   const L = 40;
-  const WALL = (THICK * (1 - NOTCH_RATIO)) / 2.7; // ścianka po każdej stronie wycięcia
+  const WALL = (THICK * (1 - NOTCH_RATIO)) / 2.7;
   const R = L + THICK;
   const CL = L + WALL;
   const CR = R - WALL;
@@ -323,28 +276,13 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   const p0x = CX + RX * Math.cos(phi0);
   const p0y = CY + RY * Math.sin(phi0);
 
-  // Ścieżki
   const innerPath =
-    `M ${CL} ${TOP} ` +
-    `L ${CL} ${CY} ` +
-    `A ${RX} ${RY} 0 0 0 ${p0x} ${p0y} ` +
-    `L ${p0x + DX} ${p0y + DY} ` +
-    `A ${RX} ${RY} 0 0 1 ${CL + DX} ${CY + DY} ` +
-    `L ${CL + DX} ${TOP + DY} Z`;
-
+    `M ${CL} ${TOP} L ${CL} ${CY} A ${RX} ${RY} 0 0 0 ${p0x} ${p0y} L ${p0x + DX} ${p0y + DY} A ${RX} ${RY} 0 0 1 ${CL + DX} ${CY + DY} L ${CL + DX} ${TOP + DY} Z`;
   const sideWallPath = `M ${R} ${TOP} L ${R + DX} ${TOP + DY} L ${R + DX} ${BOT + DY} L ${R} ${BOT} Z`;
   const leftLedgePath = `M ${L} ${TOP} L ${CL} ${TOP} L ${CL + DX} ${TOP + DY} L ${L + DX} ${TOP + DY} Z`;
   const rightLedgePath = `M ${CR} ${TOP} L ${R} ${TOP} L ${R + DX} ${TOP + DY} L ${CR + DX} ${TOP + DY} Z`;
-
   const frontPath =
-    `M ${L} ${BOT} ` +
-    `L ${L} ${TOP} ` +
-    `L ${CL} ${TOP} ` +
-    `L ${CL} ${CY} ` +
-    `A ${RX} ${RY} 0 0 0 ${CR} ${CY} ` +
-    `L ${CR} ${TOP} ` +
-    `L ${R} ${TOP} ` +
-    `L ${R} ${BOT} Z`;
+    `M ${L} ${BOT} L ${L} ${TOP} L ${CL} ${TOP} L ${CL} ${CY} A ${RX} ${RY} 0 0 0 ${CR} ${CY} L ${CR} ${TOP} L ${R} ${TOP} L ${R} ${BOT} Z`;
 
   const idBg = `hh-bg-${variant}`;
   const idFront = `hh-front-${variant}`;
@@ -356,13 +294,7 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
   const seam = { strokeWidth: 1, strokeLinejoin: 'round' as const };
 
   return (
-    <svg
-      viewBox="0 0 400 400"
-      className="w-full h-full animate-in fade-in duration-300"
-      preserveAspectRatio="xMidYMid slice"
-      role="img"
-      aria-label="Ukryty uchwyt frontu F-4, widok pod kątem z góry"
-    >
+    <svg viewBox="0 0 400 400" className="w-full h-full animate-in fade-in duration-300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Ukryty uchwyt frontu F-4, widok pod kątem z góry">
       <defs>
         <radialGradient id={idBg} cx="50%" cy="45%" r="60%">
           <stop offset="0%" stopColor={bgCenter} />
@@ -380,23 +312,9 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
           <stop offset="0%" stopColor={sideTop} />
           <stop offset="100%" stopColor={sideBottom} />
         </linearGradient>
-
-        <filter
-          id={idRound}
-          filterUnits="userSpaceOnUse"
-          x="-40"
-          y="-40"
-          width="480"
-          height="480"
-          colorInterpolationFilters="sRGB"
-        >
+        <filter id={idRound} filterUnits="userSpaceOnUse" x="-40" y="-40" width="480" height="480" colorInterpolationFilters="sRGB">
           <feGaussianBlur in="SourceAlpha" stdDeviation={ROUND} result="blurA" />
-          <feColorMatrix
-            in="blurA"
-            type="matrix"
-            values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 12 -5.5"
-            result="shape"
-          />
+          <feColorMatrix in="blurA" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 12 -5.5" result="shape" />
           <feComposite in="SourceGraphic" in2="shape" operator="in" />
         </filter>
         <clipPath id={idArc} clipPathUnits="userSpaceOnUse">
@@ -415,7 +333,6 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
           <path d={frontPath} fill={`url(#${idFront})`} stroke={`url(#${idFront})`} {...seam} />
         </g>
       </g>
-
       <g transform={`translate(${tx} ${ty}) scale(${SCALE})`}>
         <path d={frontPath} fill={`url(#${idFront})`} clipPath={`url(#${idArc})`} />
       </g>
@@ -424,8 +341,8 @@ const HiddenHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant })
 };
 
 /**
- * Detal ryflowania F-15 (Odwzorowanie 1:1 z referencji)
- * 2D rzut aksonometryczny wyciągnięty w dół.
+ * Detal ryflowania F-15 
+ * Odwzorowanie geometryczne (eliminacja błędów przycinania filtrów CSS na iOS).
  */
 const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) => {
   const baseColors: Record<MaterialVariant, string> = {
@@ -439,36 +356,88 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
   const base = baseColors[variant] ?? baseColors.lithos;
   const isDark = variant === 'bazalt' || variant === 'magma';
 
-  // --- Paleta i cieniowanie ---
-  const sideWall = mix(base, '#000000', isDark ? 0.35 : 0.25);
-  const groove = mix(base, '#000000', isDark ? 0.70 : 0.65);
-  const highlight = mix(base, '#ffffff', isDark ? 0.15 : 0.60);
+  // --- Kolory ---
+  const topColor = mix(base, '#ffffff', isDark ? 0.20 : 0.45);
+  const sideColor = mix(base, '#000000', isDark ? 0.30 : 0.20);
+  const frontColor = mix(base, '#ffffff', isDark ? 0.05 : 0.10);
+  const grooveColor = mix(base, '#000000', isDark ? 0.65 : 0.45);
 
-  const fluteLeft = mix(base, '#ffffff', isDark ? 0.12 : 0.45);
-  const fluteRight = mix(base, '#000000', isDark ? 0.45 : 0.35);
+  const fluteLight = mix(base, '#ffffff', isDark ? 0.15 : 0.40);
+  const fluteMid = frontColor;
+  const fluteDark = mix(base, '#000000', isDark ? 0.45 : 0.30);
 
   const bgCenter = isDark ? '#36302b' : '#2e2825';
   const bgEdge = '#14110f';
 
-  // --- Geometria i perspektywa ---
-  const START_X = 60;
-  const START_Y = 260;
+  // --- Geometria izometryczna (kierunek: lewo-góra) ---
+  const START_X = 110;
+  const START_Y = 270;
+  const DX = -40; // Głębia (lewo)
+  const DY = -25; // Głębia (góra)
+  const WX = 36;  // Szerokość pojedynczego segmentu w prawo
+  const WY = -20; // Szerokość w górę
   
-  // Wektor grubości lewej ściany (idzie w górę i w prawo)
-  const THICK_DX = 45;
-  const THICK_DY = -65;
-  
-  // Wektory dla pojedynczego półwałka i szczeliny (wzdłuż górnej krawędzi)
-  const FLUTE_DX = 38;
-  const FLUTE_DY = -22;
-  const GAP_DX = 4;
-  const GAP_DY = -2.3;
-  
-  const COUNT = 6; // Ilość widocznych półwałków
-  const BOT = 450; // Punkt ucięcia na dole (poza kółkiem)
+  const MARGIN = 1.3;
+  const GAP = 0.15;
+  const FLUTE = 1.0;
+  const COUNT = 5;
+  const BOT = 480;
 
-  const cornerX = START_X + THICK_DX;
-  const cornerY = START_Y + THICK_DY;
+  // Wybrzuszenie półwałka
+  const CX_OFF = 14;
+  const CY_OFF = 16;
+
+  const elements: React.ReactElement[] = [];
+  let cx = START_X;
+  let cy = START_Y;
+
+  // 1. Lewa ściana (grubość frontu)
+  elements.push(
+    <path key="left-wall" d={`M ${cx} ${cy} L ${cx + DX} ${cy + DY} L ${cx + DX} ${BOT} L ${cx} ${BOT} Z`} fill={sideColor} stroke={sideColor} strokeWidth={0.5} />
+  );
+
+  // 2. Płaski margines po lewej
+  let nx = cx + WX * MARGIN;
+  let ny = cy + WY * MARGIN;
+  elements.push(
+    <path key="margin-top" d={`M ${cx} ${cy} L ${nx} ${ny} L ${nx + DX} ${ny + DY} L ${cx + DX} ${cy + DY} Z`} fill={topColor} stroke={topColor} strokeWidth={0.5} />
+  );
+  elements.push(
+    <path key="margin-front" d={`M ${cx} ${cy} L ${nx} ${ny} L ${nx} ${BOT} L ${cx} ${BOT} Z`} fill={frontColor} stroke={frontColor} strokeWidth={0.5} />
+  );
+  cx = nx; cy = ny;
+
+  // 3. Generowanie ryfli
+  for (let i = 0; i < COUNT; i++) {
+    // Przerwa (groove)
+    nx = cx + WX * GAP;
+    ny = cy + WY * GAP;
+    elements.push(
+      <path key={`g-top-${i}`} d={`M ${cx} ${cy} L ${nx} ${ny} L ${nx + DX} ${ny + DY} L ${cx + DX} ${cy + DY} Z`} fill={grooveColor} stroke={grooveColor} strokeWidth={0.5} />
+    );
+    elements.push(
+      <path key={`g-front-${i}`} d={`M ${cx} ${cy} L ${nx} ${ny} L ${nx} ${BOT} L ${cx} ${BOT} Z`} fill={grooveColor} stroke={grooveColor} strokeWidth={0.5} />
+    );
+    cx = nx; cy = ny;
+
+    // Półwałek (flute)
+    nx = cx + WX * FLUTE;
+    ny = cy + WY * FLUTE;
+    const ctrlX = (cx + nx)/2 + CX_OFF;
+    const ctrlY = (cy + ny)/2 + CY_OFF;
+    
+    const topPath = `M ${cx} ${cy} Q ${ctrlX} ${ctrlY} ${nx} ${ny} L ${nx + DX} ${ny + DY} Q ${ctrlX + DX} ${ctrlY + DY} ${cx + DX} ${cy + DY} Z`;
+    elements.push(
+      <path key={`f-top-${i}`} d={topPath} fill={topColor} stroke={topColor} strokeWidth={0.5} />
+    );
+
+    const frontPath = `M ${cx} ${cy} Q ${ctrlX} ${ctrlY} ${nx} ${ny} L ${nx} ${BOT} L ${cx} ${BOT} Z`;
+    elements.push(
+      <path key={`f-front-${i}`} d={frontPath} fill={`url(#flute-grad-${variant}-${i})`} />
+    );
+    
+    cx = nx; cy = ny;
+  }
 
   const idBg = `hr-bg-${variant}`;
 
@@ -478,30 +447,29 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
       className="w-full h-full animate-in fade-in duration-300"
       preserveAspectRatio="xMidYMid slice"
       role="img"
-      aria-label="Detal frontu F-15: półwałki 10 mm ze szczeliną 1 mm"
+      aria-label="Detal frontu F-15: półwałki 10 mm ze szczeliną 1 mm, widok pod kątem z góry"
     >
       <defs>
-        {/* Tło kółka */}
         <radialGradient id={idBg} cx="50%" cy="50%" r="60%">
           <stop offset="0%" stopColor={bgCenter} />
           <stop offset="100%" stopColor={bgEdge} />
         </radialGradient>
         
-        {/* Indywidualne gradienty dla walców (światło z lewej) */}
+        {/* Bezpieczny filtr cienia dla iOS */}
+        <filter id={`shadow-${variant}`} x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="15" stdDeviation="15" floodColor="#000" floodOpacity="0.5" />
+        </filter>
+
+        {/* Indywidualne gradienty dla każdego półwałka wyliczane ściśle pod ich koordynaty osi X */}
         {Array.from({ length: COUNT }).map((_, i) => {
-          const x = cornerX + i * (FLUTE_DX + GAP_DX);
-          const x1 = x + FLUTE_DX;
+          const startX = START_X + WX * MARGIN + i * (WX * GAP + WX * FLUTE) + WX * GAP;
+          const endX = startX + WX * FLUTE;
           return (
-            <linearGradient 
-              key={`grad-${i}`} 
-              id={`flute-grad-${variant}-${i}`} 
-              gradientUnits="userSpaceOnUse" 
-              x1={x} y1="0" x2={x1} y2="0"
-            >
+            <linearGradient key={`grad-${i}`} id={`flute-grad-${variant}-${i}`} gradientUnits="userSpaceOnUse" x1={startX} y1="0" x2={endX} y2="0">
               <stop offset="0%" stopColor={mix(base, '#ffffff', isDark ? 0.02 : 0.08)} />
-              <stop offset="25%" stopColor={fluteLeft} />
-              <stop offset="65%" stopColor={base} />
-              <stop offset="100%" stopColor={fluteRight} />
+              <stop offset="25%" stopColor={fluteLight} />
+              <stop offset="65%" stopColor={fluteMid} />
+              <stop offset="100%" stopColor={fluteDark} />
             </linearGradient>
           );
         })}
@@ -509,67 +477,18 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
 
       <rect width="400" height="400" fill={`url(#${idBg})`} />
 
-      <g filter="drop-shadow(0px 20px 30px rgba(0,0,0,0.5))">
-        {/* Lewa ściana (grubość płyty) */}
-        <path 
-          d={`M ${START_X} ${START_Y} L ${cornerX} ${cornerY} L ${cornerX} ${BOT} L ${START_X} ${BOT} Z`} 
-          fill={sideWall} 
-        />
-        {/* Połysk na górnej krawędzi lewej ściany */}
-        <path 
-          d={`M ${START_X} ${START_Y} L ${cornerX} ${cornerY}`} 
-          stroke={highlight} 
-          strokeWidth="1.5" 
-          fill="none" 
-        />
-
-        {/* Półwałki i szczeliny (wyciągnięte w dół) */}
-        {Array.from({ length: COUNT }).map((_, i) => {
-          const x = cornerX + i * (FLUTE_DX + GAP_DX);
-          const y = cornerY + i * (FLUTE_DY + GAP_DY);
-          const x1 = x + FLUTE_DX;
-          const y1 = y + FLUTE_DY;
-          const x2 = x1 + GAP_DX;
-          const y2 = y1 + GAP_DY;
-
-          // Asymetryczny punkt kontrolny Beziera - wybrzusza łuk idealnie w lewo i w górę
-          const cpX = x + 12;
-          const cpY = y - 28;
-
-          return (
-            <g key={`flute-group-${i}`}>
-              {/* Powierzchnia półwałka */}
-              <path 
-                d={`M ${x} ${y} Q ${cpX} ${cpY} ${x1} ${y1} L ${x1} ${BOT} L ${x} ${BOT} Z`} 
-                fill={`url(#flute-grad-${variant}-${i})`} 
-              />
-              {/* Połysk na górnym łuku półwałka */}
-              <path 
-                d={`M ${x} ${y} Q ${cpX} ${cpY} ${x1} ${y1}`} 
-                stroke={highlight} 
-                strokeWidth="1.5" 
-                fill="none" 
-                strokeLinecap="round"
-              />
-              
-              {/* Szczelina (wgłębienie) */}
-              <path 
-                d={`M ${x1} ${y1} L ${x2} ${y2} L ${x2} ${BOT} L ${x1} ${BOT} Z`} 
-                fill={groove} 
-              />
-            </g>
-          );
-        })}
+      {/* Wszystkie elementy ścieżek SVG wyrenderowane w bezpiecznej, wspólnej grupie cieniującej */}
+      <g filter={`url(#shadow-${variant})`}>
+        {elements}
       </g>
     </svg>
   );
 };
 
-
 const FrontBacking: React.FC<{ profile: string; className?: string; children: React.ReactNode }> = ({ profile, className = '', children }) => {
   const isGlass = profile === 'glass-frame' || profile === 'mullion-frame';
   const isLattice = profile === 'lattice-frame';
-  
+
   if (isLattice) {
     return (
       <div className={`w-full h-full rounded-sm overflow-hidden relative bg-[#2A2522] ${className}`}>
@@ -582,7 +501,7 @@ const FrontBacking: React.FC<{ profile: string; className?: string; children: Re
   }
 
   const background = isGlass ? 'linear-gradient(135deg, #DCEBF7, #BFD8EC)' : '#F7F4EF';
-  
+
   return (
     <div className={`w-full h-full rounded-sm overflow-hidden ${className}`} style={{ background }}>
       {children}
@@ -630,15 +549,15 @@ export const CatalogPage: React.FC = () => {
 
   return (
     <div className="pt-16 md:pt-24 pb-24 md:pb-32 bg-night min-h-screen">
-      
+
       {/* --- MODAL DETALU FRONTU --- */}
       {selectedFront && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-8 bg-night/90 backdrop-blur-sm transition-opacity duration-300">
-          
+
           <div className="relative w-full max-w-[1600px] w-[98vw] bg-surface rounded-sm shadow-2xl flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-300 max-h-[95dvh] md:h-[94vh] border border-line-dark">
-            
-            <button 
-              onClick={() => setSelectedFront(null)} 
+
+            <button
+              onClick={() => setSelectedFront(null)}
               className="absolute top-3 right-3 md:top-8 md:right-8 p-2 text-ivory hover:text-copper transition-colors z-50 bg-surface-2 backdrop-blur-md rounded-full border border-line-dark outline-none focus-visible:ring-2 focus-visible:ring-copper shadow-sm"
               aria-label="Zamknij podgląd"
             >
@@ -648,13 +567,13 @@ export const CatalogPage: React.FC = () => {
             {/* LEWA STRONA: Grafika i Swatche */}
             <div className="w-full md:w-1/2 bg-night p-6 pt-12 pb-8 md:p-20 lg:p-24 relative flex flex-col items-center justify-center min-h-[340px] md:min-h-0 md:h-full shrink-0 border-b md:border-b-0 md:border-r border-line-dark overflow-y-auto">
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(184,107,62,0.12),transparent_70%)] pointer-events-none scale-150" />
-              
+
               <div className="relative w-full max-w-[160px] sm:max-w-[200px] md:max-w-[280px] lg:max-w-[340px] aspect-[3/4] rounded-sm mt-4 md:mt-0 shadow-[0_20px_40px_rgba(0,0,0,0.8)]">
                 <FrontBacking profile={selectedFront.profile}>
                   <MaterialPanel variant={activeVariant} profile={selectedFront.profile} className="w-full h-full rounded-sm transition-all duration-300" />
                 </FrontBacking>
-                
-                {/* Lupa powiększająca: wróciła do dużego rozmiaru na mobile, ale uniesiona w górę i prawo aby nie zasłaniać frontu */}
+
+                {/* Lupa powiększająca */}
                 <div className="absolute -top-16 -right-20 sm:-top-24 sm:-right-28 md:-top-[110px] md:-right-[150px] lg:-top-[170px] lg:-right-[200px] w-40 h-40 sm:w-48 sm:h-48 md:w-72 md:h-72 lg:w-[340px] lg:h-[340px] rounded-full border-[4px] md:border-[8px] border-line-dark shadow-2xl overflow-hidden z-20 pointer-events-none bg-surface flex items-center justify-center">
                   {selectedFront.detailGraphic ? (
                     <>
@@ -667,7 +586,6 @@ export const CatalogPage: React.FC = () => {
                       {selectedFront.detailGraphic === 'top-handle' && (
                         <TopHandleDetail key={activeVariant} variant={activeVariant} />
                       )}
-                      
                       {selectedFront.detailLabel && (
                         <div className="absolute left-1/2 -translate-x-1/2 top-4 sm:top-6 md:top-8 bg-night/70 backdrop-blur-sm rounded-full px-2 md:px-3 py-1 z-10">
                           <span className="text-[7px] sm:text-[9px] md:text-[10px] uppercase tracking-wider md:tracking-widest font-semibold text-ivory whitespace-nowrap">
@@ -677,19 +595,19 @@ export const CatalogPage: React.FC = () => {
                       )}
                     </>
                   ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div 
-                        className="w-[160px] sm:w-[200px] md:w-[280px] lg:w-[340px] aspect-[3/4] rounded-sm flex-shrink-0 transition-transform duration-300"
+                    <div className="absolute inset-0">
+                      <div
+                        className="absolute left-1/2 top-1/2 w-[160px] sm:w-[200px] md:w-[280px] lg:w-[340px] aspect-[3/4] rounded-sm"
                         style={{
-                          transformOrigin: 'center',
-                          transform: `translate(calc(-50% + ${selectedFront.zoomX ?? -25}%), calc(-50% + ${selectedFront.zoomY ?? 25}%)) scale(${selectedFront.zoomScale ?? 2.8})`
+                          transformOrigin: `${selectedFront.zoomX ?? 125}% ${selectedFront.zoomY ?? -25}%`,
+                          transform: `translate(${-(selectedFront.zoomX ?? 125)}%, ${-(selectedFront.zoomY ?? -25)}%) scale(${selectedFront.zoomScale ?? 2.8})`
                         }}
                       >
                         <FrontBacking profile={selectedFront.profile}>
-                          <MaterialPanel 
-                            variant={activeVariant} 
-                            profile={selectedFront.profile} 
-                            className="w-full h-full" 
+                          <MaterialPanel
+                            variant={activeVariant}
+                            profile={selectedFront.profile}
+                            className="w-full h-full"
                           />
                         </FrontBacking>
                       </div>
@@ -708,10 +626,10 @@ export const CatalogPage: React.FC = () => {
                     title={opt.name}
                     aria-label={`Wybierz kolor ${opt.name}`}
                   >
-                    <span 
+                    <span
                       className={`w-10 h-10 md:w-14 md:h-14 rounded-sm border-[2px] transition-all duration-300 flex items-center justify-center ${opt.bgClass} ${
-                        activeVariant === opt.id 
-                          ? 'border-copper scale-125 shadow-[0_0_25px_rgba(184,107,62,0.6)] z-10' 
+                        activeVariant === opt.id
+                          ? 'border-copper scale-125 shadow-[0_0_25px_rgba(184,107,62,0.6)] z-10'
                           : 'border-line-dark/50 hover:border-gold/50'
                       }`}
                     >
@@ -727,13 +645,13 @@ export const CatalogPage: React.FC = () => {
             <div className="w-full md:w-1/2 p-5 sm:p-8 md:p-16 lg:p-24 flex flex-col justify-center text-center md:text-left overflow-y-auto">
               <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-ivory mb-1 md:mb-4">{selectedFront.title}</h2>
               <p className="text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-widest font-semibold text-gold mb-3 md:mb-10">{selectedFront.desc}</p>
-              
+
               <p className="text-ivory/70 font-light leading-snug md:leading-relaxed mb-6 md:mb-12 text-[14px] sm:text-[15px] md:text-xl lg:text-2xl text-left">
                 {selectedFront.longDesc}
               </p>
 
-              <a 
-                href="#kontakt" 
+              <a
+                href="#kontakt"
                 onClick={handleContactClick}
                 className="bg-[linear-gradient(135deg,var(--color-copper),var(--color-gold))] text-night px-6 py-3 md:px-12 md:py-5 text-[14px] md:text-lg font-medium hover:brightness-110 transition-all rounded-sm inline-block w-max mx-auto md:mx-0 mt-1 shadow-[0_0_20px_rgba(184,107,62,0.15)] hover:shadow-[0_0_30px_rgba(184,107,62,0.25)] outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
               >
@@ -747,7 +665,7 @@ export const CatalogPage: React.FC = () => {
 
       {/* --- GŁÓWNY WIDOK KATALOGU --- */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         <header className="mb-16 md:mb-20 flex flex-col lg:flex-row lg:justify-between lg:items-end gap-10">
           <Reveal className="lg:w-1/2">
             <div className="flex items-center gap-4 mb-6">
@@ -762,9 +680,9 @@ export const CatalogPage: React.FC = () => {
             </p>
           </Reveal>
           <Reveal delay={100} className="flex flex-col sm:flex-row gap-6">
-             <a 
-              href={pdfUrl} 
-              target="_blank" 
+             <a
+              href={pdfUrl}
+              target="_blank"
               rel="noopener noreferrer"
               className="text-[15px] font-medium text-ivory hover:text-copper transition-colors relative group inline-flex items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-copper rounded-sm"
             >
@@ -783,20 +701,20 @@ export const CatalogPage: React.FC = () => {
               </div>
             </div>
           </Reveal>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-10 lg:gap-x-6 lg:gap-y-12">
             {catalogFronts.map((item, idx) => (
               <Reveal key={idx} delay={(idx % 6) * 50} variant="slide-up">
-                <button 
-                  className="group cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-4 focus-visible:ring-offset-night rounded-sm text-left w-full block" 
+                <button
+                  className="group cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-4 focus-visible:ring-offset-night rounded-sm text-left w-full block"
                   onClick={() => setSelectedFront(item)}
                 >
                   <div className="w-full aspect-[3/4] rounded-sm transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-2 relative flex items-center justify-center bg-surface-2/30 shadow-[0_10px_20px_rgba(0,0,0,0.4)] group-hover:shadow-[0_15px_30px_rgba(0,0,0,0.6)]">
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(184,107,62,0.08),transparent_70%)] pointer-events-none scale-150" />
-                    
+
                     <FrontBacking profile={item.profile} className="relative z-10">
-                      <MaterialPanel 
-                        variant={item.variant} 
+                      <MaterialPanel
+                        variant={item.variant}
                         profile={item.profile}
                         className="w-full h-full rounded-sm"
                       />
@@ -842,20 +760,20 @@ export const CatalogPage: React.FC = () => {
               ))}
             </div>
           </div>
-          
+
           <div className="lg:col-span-6">
             <Reveal delay={200}>
               <div className="bg-surface p-12 md:p-16 relative overflow-hidden flex flex-col justify-center rounded-sm border border-line-dark shadow-2xl">
                 <div className="absolute inset-0 bg-rings text-ivory opacity-5 pointer-events-none" aria-hidden="true" />
                 <div className="absolute inset-0 bg-grain mix-blend-overlay opacity-10 pointer-events-none" aria-hidden="true" />
-                
+
                 <div className="relative z-10">
                   <h3 className="font-serif text-3xl text-ivory mb-6">Potrzebujesz wyceny konkretnych wzorów?</h3>
                   <p className="mb-10 text-ivory/70 font-light leading-relaxed">
                     Skopiuj numery wzorów z katalogu, dodaj wymiary i prześlij zapytanie do naszego zespołu za pomocą formularza.
                   </p>
-                  <a 
-                    href="#kontakt" 
+                  <a
+                    href="#kontakt"
                     onClick={handleContactClick}
                     className="inline-block bg-[linear-gradient(135deg,var(--color-copper),var(--color-gold))] text-night px-8 py-4 text-[15px] font-medium hover:brightness-110 transition-all rounded-sm shadow-[0_0_20px_rgba(184,107,62,0.15)] hover:shadow-[0_0_30px_rgba(184,107,62,0.25)] outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
                   >
