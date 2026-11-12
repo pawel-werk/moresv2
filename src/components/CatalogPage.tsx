@@ -117,10 +117,17 @@ const TopHandleDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
   const TOP_SCREEN = 140; // pozycja górnej krawędzi na ekranie (px z 400)
   const ROUND = 1.2;      // zaokrąglenie narożników (0 = ostre)
 
+<<<<<<< HEAD
   // Proporcje wycięcia względem jego szerokości (zwykle nie trzeba ruszać)
   const NOTCH_DEPTH = 1.14;  // głębokość łuku (RY = RX * to)
   const NOTCH_LIFT = 0.67;   // prosty odcinek przed łukiem (S = RX * to)
   // ==============================================
+=======
+  // ===== RÓŻNICA WYSOKOŚCI ŚCIANEK ZGODNIE ZE ZDJĘCIEM =====
+  const TOP_L = 120; // Lewa ścianka WYŻSZA (mniejsza wartość Y)
+  const TOP_R = 240; // Prawa ścianka NIŻSZA (większa wartość Y)
+  // =========================================================
+>>>>>>> parent of 18c16ce (a)
 
   // --- Geometria (wyliczana) ---
   const L = 40;
