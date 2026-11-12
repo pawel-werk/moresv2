@@ -522,6 +522,30 @@ const HalfRoundDetail: React.FC<{ variant: MaterialVariant }> = ({ variant }) =>
   );
 };
 
+const FrontBacking: React.FC<{ profile: string; className?: string; children: React.ReactNode }> = ({ profile, className = '', children }) => {
+  const isGlass = profile === 'glass-frame' || profile === 'mullion-frame';
+  const isLattice = profile === 'lattice-frame';
+
+  if (isLattice) {
+    return (
+      <div className={`w-full h-full rounded-sm overflow-hidden relative bg-[#2A2522] ${className}`}>
+        <div className="absolute inset-0 shadow-[inset_0_2px_8px_rgba(0,0,0,0.8)] pointer-events-none z-0" />
+        <div className="relative z-10 w-full h-full">
+          {children}
+        </div>
+      </div>
+    );
+  }
+
+  const background = isGlass ? 'linear-gradient(135deg, #DCEBF7, #BFD8EC)' : '#F7F4EF';
+
+  return (
+    <div className={`w-full h-full rounded-sm overflow-hidden ${className}`} style={{ background }}>
+      {children}
+    </div>
+  );
+};
+
 export const CatalogPage: React.FC = () => {
   const [selectedFront, setSelectedFront] = useState<CatalogItem | null>(null);
   const [activeVariant, setActiveVariant] = useState<MaterialVariant>('lithos');
