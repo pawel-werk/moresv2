@@ -4,10 +4,10 @@ import { companyData } from '../data/content';
 import { scrollToSection } from '../utils/scrollToSection';
 
 const machines = [
-  { name: "Centrum obróbcze", image: "https://pgcnc.pl/cache/images/public/images/shop/940_940_auto/894545_bananaproai_com-202654132.webp" },
-  { name: "Okleiniarka", image: "https://i.postimg.cc/VL096sC2/scm.jpg" },
-  { name: "Prasa", image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&q=80&w=800" },
-  { name: "Formatyzacja", image: "https://www.auto-tap.pl/images/oferta/thumbs/frezowanie.jpg" },
+  { name: "Centrum obróbcze", image: "https://i.postimg.cc/NMxMXxxc/cnc.jpg" },
+  { name: "Okleiniarka", image: "https://i.postimg.cc/y6vxYvdt/okeiniarka.jpg" },
+  { name: "Prasa", image: "https://i.postimg.cc/qBjqMjRL/prasa.jpg" },
+  { name: "Formatyzacja", image: "https://i.postimg.cc/h4pvPpjL/formatyzacja.jpg" },
   { name: "Lakiernia", image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&q=80&w=800" },
   { name: "Montownia", image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=800" }
 ];
@@ -112,7 +112,7 @@ export const CncPage: React.FC = () => {
           <Reveal delay={300} className="relative h-[400px] md:h-[500px] lg:h-[600px] group cursor-pointer">
             <div className="absolute inset-0 bg-surface rounded-sm overflow-hidden flex items-center justify-center shadow-2xl border border-line-dark">
               <img 
-                src="https://pgcnc.pl/cache/images/public/images/shop/940_940_auto/894545_bananaproai_com-202654132.webp" 
+                src="https://i.postimg.cc/NMxMXxxc/cnc.jpg" 
                 alt="Maszyna PG CNC 2030 ATC" 
                 className="w-full h-full object-cover grayscale opacity-50 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105 group-hover:grayscale-0 group-hover:opacity-100" 
               />
