@@ -112,7 +112,7 @@ export const CncPage: React.FC = () => {
           <Reveal delay={300} className="relative h-[400px] md:h-[500px] lg:h-[600px] group cursor-pointer">
             <div className="absolute inset-0 bg-surface rounded-sm overflow-hidden flex items-center justify-center shadow-2xl border border-line-dark">
               <img 
-                src="https://postimg.cc/HcVdDXKZ" 
+                src="https://i.postimg.cc/NMxMXxxc/cnc.jpg" 
                 alt="Maszyna PG CNC 2030 ATC" 
                 className="w-full h-full object-cover grayscale opacity-50 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105 group-hover:grayscale-0 group-hover:opacity-100" 
               />
