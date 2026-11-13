@@ -35,6 +35,18 @@ export const Navbar: React.FC = () => {
     { name: 'Kontakt', href: '#kontakt' },
   ];
 
+  // Obsługa kliknięcia w logo
+  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const currentHash = window.location.hash;
+    // Jeśli jesteśmy już na stronie głównej, przewijamy płynnie do góry
+    if (currentHash === '' || currentHash === '#' || currentHash === '#/') {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    // Jeśli jesteśmy w podstronie, pozwalamy na domyślną zmianę URL (co cofnie nas do głównej)
+    setIsOpen(false);
+  };
+
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href.startsWith('#/')) {
       setIsOpen(false);
@@ -56,6 +68,7 @@ export const Navbar: React.FC = () => {
         
         <a 
           href="#/" 
+          onClick={handleLogoClick}
           className="inline-block group outline-none focus-visible:ring-2 focus-visible:ring-copper rounded-sm"
           aria-label="Strona główna"
         >
@@ -109,7 +122,7 @@ export const Navbar: React.FC = () => {
             <XIcon className="w-8 h-8" aria-hidden="true" />
           </button>
           <div className="flex flex-col gap-6 mt-12 font-sans">
-            <a href="#/" onClick={() => setIsOpen(false)} className="text-2xl text-ivory font-light hover:text-copper transition-colors">Strona główna</a>
+            <a href="#/" onClick={handleLogoClick} className="text-2xl text-ivory font-light hover:text-copper transition-colors">Strona główna</a>
             {links.map((link) => (
               <a 
                 key={link.name} 
