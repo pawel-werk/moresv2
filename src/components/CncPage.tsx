@@ -4,7 +4,7 @@ import { companyData } from '../data/content';
 import { scrollToSection } from '../utils/scrollToSection';
 
 const machines = [
-  { name: "Centrum obróbcze", image: "https://i.postimg.cc/NMxMXxxc/cnc.jpg" },
+  { name: "Centrum obróbcze", image: "https://i.postimg.cc/15sdMrcb/cnc2.jpg" },
   { name: "Okleiniarka", image: "https://i.postimg.cc/y6vxYvdt/okeiniarka.jpg" },
   { name: "Prasa", image: "https://i.postimg.cc/qBjqMjRL/prasa.jpg" },
   { name: "Formatyzacja", image: "https://i.postimg.cc/h4pvPpjL/formatyzacja.jpg" },
