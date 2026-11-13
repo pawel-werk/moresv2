@@ -109,8 +109,8 @@ export const CncPage: React.FC = () => {
             </Reveal>
           </div>
           
-          {/* Horyzontalne proporcje (16:9) dla pełnego zdjęcia w hero */}
-          <Reveal delay={300} className="relative w-full aspect-[4/3] md:aspect-[16/9] group cursor-pointer">
+          {/* Nieco wyższe proporcje (16:10) i obniżona kapsuła (negative bottom) */}
+          <Reveal delay={300} className="relative w-full aspect-[4/3] lg:aspect-[16/10] group cursor-pointer mt-8 lg:mt-0">
             <div className="absolute inset-0 bg-surface rounded-sm overflow-hidden flex items-center justify-center shadow-2xl border border-line-dark">
               <img 
                 src="https://i.postimg.cc/NMxMXxxc/cnc.jpg" 
@@ -121,7 +121,7 @@ export const CncPage: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-night/80 via-transparent to-transparent pointer-events-none group-hover:opacity-40 transition-opacity duration-700" />
             </div>
             
-            <div className="absolute bottom-4 -left-4 md:-left-8 lg:-left-12 bg-surface-2/95 backdrop-blur-sm p-6 shadow-xl border border-line-dark z-10 max-w-sm transition-transform duration-700 group-hover:-translate-y-2">
+            <div className="absolute -bottom-12 lg:-bottom-16 -left-4 md:-left-8 lg:-left-12 bg-surface-2/95 backdrop-blur-sm p-6 shadow-xl border border-line-dark z-10 max-w-sm transition-transform duration-700 group-hover:-translate-y-2">
               <span className="text-[10px] uppercase tracking-widest font-bold text-copper mb-2 block">PG CNC 2030 ATC</span>
               <p className="text-sm font-medium text-ivory/90 leading-relaxed">
                 Wielkoformatowe centra CNC, pole robocze do 3000 x 2000 mm, tolerancja obróbki ±0.1 mm, frezowanie 3D, nesting, wiercenie i rowkowanie.
@@ -131,7 +131,7 @@ export const CncPage: React.FC = () => {
         </div>
 
         {/* DLA KOGO PRACUJEMY */}
-        <div className="mb-24 md:mb-32">
+        <div className="mb-24 md:mb-32 mt-16 lg:mt-24">
           <Reveal>
             <h2 className="font-serif text-3xl md:text-4xl text-ivory mb-12">Dla kogo pracujemy?</h2>
           </Reveal>
