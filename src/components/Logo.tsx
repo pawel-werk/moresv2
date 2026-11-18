@@ -8,8 +8,8 @@ interface LogoProps {
 export const Logo: React.FC<LogoProps> = ({ className = "h-8", variant = 'dark' }) => {
   // Zaktualizowano wariant light na nowy link
   const logoSrc = variant === 'light' 
-    ? "https://i.postimg.cc/nzJc1X8T/mores-logo-v3-white.png" 
-    : "https://i.postimg.cc/1tQ5K8xJ/mores-logo-v3.png";
+    ? "https://i.postimg.cc/nzJc1X8T/mores-logo-v3-white.png?v=2" 
+    : "https://i.postimg.cc/1tQ5K8xJ/mores-logo-v3.png?v=2";
 
   return (
     <img 
