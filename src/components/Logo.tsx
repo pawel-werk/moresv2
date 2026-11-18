@@ -14,7 +14,7 @@ export const Logo: React.FC<LogoProps> = ({ className = "", variant = 'dark' }) 
     <img 
       src={logoSrc} 
       alt="mores logo" 
-      style={{ height: '70px', width: 'auto', objectFit: 'contain' }}
+      style={{ height: '58px', width: 'auto', objectFit: 'contain' }}
       className={`max-h-full block ${className}`}
       loading="eager"
       onError={(e) => {
