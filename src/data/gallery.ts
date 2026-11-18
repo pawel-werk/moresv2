@@ -16,57 +16,57 @@ export const galleryData: GalleryItem[] = [
   {
     id: '1',
     category: 'fronty',
-    title: 'Ponadczasowe drewno',
-    subtitle: 'Dom pod miastem',
-    description: 'Kuchnia / Frezowania', // Zmiana ryflowania na frezowania
-    longDesc: 'Projekt nowoczesnej kuchni łączącej frezowane fronty z ciepłym, naturalnym drewnem. Precyzyjne frezowania dodają głębi i tekstury, tworząc przytulne, a zarazem niezwykle eleganckie wnętrze, w którym rzemiosło gra główne skrzypce.',
-    image: 'https://i.postimg.cc/6pJTtTbK/DSC-5246.jpg',
+    title: 'Minimalizm w drewnie',
+    subtitle: 'Nowoczesna kuchnia',
+    description: 'Kuchnia / Gładkie',
+    longDesc: 'Zabudowa kuchenna łącząca minimalistyczne, gładkie fronty z głęboką strukturą drewna orzechowego. Całość tworzy ciepłą, nowoczesną przestrzeń, przełamaną białymi akcentami dolnych szafek i blatu.',
+    image: '/realizacje/kuchnia.jpg',
     details: [
-      { label: 'Fronty', value: 'Frezowane / Gładkie' }, // Zmiana
-      { label: 'Wykończenie', value: 'Lakier matowy' },
-      { label: 'Detale', value: 'Frezowanie symetryczne' }
+      { label: 'Fronty', value: 'Płaskie fornir / Lakier mat' },
+      { label: 'Wykończenie', value: 'Orzech amerykański / Biel' },
+      { label: 'Detale', value: 'Pionowe uchwyty listwowe' }
     ]
   },
   {
     id: '2',
-    category: 'fronty',
-    title: 'Ciemna Elegancja',
-    subtitle: 'Apartament pokazowy',
+    category: 'nietypowe',
+    title: 'Półwysep z lamelami',
+    subtitle: 'Otwarta przestrzeń',
     description: 'Kuchnia / Lamele',
-    longDesc: 'Ekskluzywna zabudowa kuchenna oparta na głębokiej czerni i strukturze drobnych lameli. Połączenie ciemnego, szczotkowanego drewna z monumentalną, kamienną wyspą podkreśla luksusowy i bezkompromisowy charakter otwartej przestrzeni.',
-    image: 'https://i.postimg.cc/433YFqFj/DSC-5394.jpg',
+    longDesc: 'Nietypowa zabudowa kuchenna, której głównym elementem jest zaokrąglony półwysep połączony ze stołem jadalnianym. Fronty wysokie wykończone pionowymi podziałami nadają lekkości, a zaokrąglone krawędzie mebli wprowadzają organiczny charakter.',
+    image: '/realizacje/kuchnia2.jpg',
     details: [
-      { label: 'Fronty', value: 'Płaskie' },
-      { label: 'Wykończenie', value: 'Anty finger / Ultramat' },
-      { label: 'Detale', value: 'Zintegrowane podcięcia' }
+      { label: 'Zabudowa', value: 'Gięte elementy fornirowane' },
+      { label: 'Wyspa', value: 'Zintegrowana ze stołem' },
+      { label: 'Detale', value: 'Brak widocznych uchwytów' }
     ]
   },
   {
     id: '3',
-    category: 'lakierowanie',
-    title: 'Biały minimalizm',
-    subtitle: 'Loft industrialny',
-    description: 'Zabudowa / Gładki mat',
-    longDesc: 'Jasna, minimalistyczna kuchnia w klasycznej bieli. Gładkie, matowe powierzchnie idealnie wpisują się w nowoczesną architekturę, stanowiąc czyste i świeże tło dla reszty wyposażenia.',
-    image: 'https://i.postimg.cc/FzvmwJsq/DSC-5540.jpg',
+    category: 'nietypowe',
+    title: 'Podświetlany regał',
+    subtitle: 'Strefa dzienna',
+    description: 'Regał / Podświetlenie',
+    longDesc: 'Eksponujący regał z podświetlanymi plecami, stworzony z myślą o ekspozycji trunków. Ciemna, matowa obudowa i gładkie fronty szafek dolnych stanowią doskonałą ramę dla podświetlonego kamienia (lub imitacji).',
+    image: '/realizacje/regal.jpg',
     details: [
-      { label: 'Fronty', value: 'Płaskie' },
-      { label: 'Wykończenie', value: 'Lakier błyszczący' },
-      { label: 'Detale', value: 'Bezuchwytowy system Tip-On' }
+      { label: 'Fronty', value: 'Gładkie, lakierowane' },
+      { label: 'Elementy', value: 'Półki otwarte' },
+      { label: 'Detale', value: 'Podświetlenie LED pleców' }
     ]
   },
   {
     id: '4',
     category: 'fronty',
-    title: 'Jasna Klasyka',
-    subtitle: 'Rezydencja Konstancin',
-    description: 'Kuchnia',
-    longDesc: 'Ponadczasowa, jasna kuchnia z frontami ramiakowymi inspirowanymi stylem shaker. Klasyczna elegancja przełamanej bieli połączona z mosiężnymi uchwytami i grubymi, drewnianymi blatami tworzy wyjątkowo jasną, prestiżową strefę.',
-    image: 'https://i.postimg.cc/MH6Ny0GB/DSC-6492.jpg',
+    title: 'Frezowany zagłówek',
+    subtitle: 'Sypialnia główna',
+    description: 'Sypialnia / Frezowania',
+    longDesc: 'Zabudowa ściany w sypialni łącząca tapicerowane panele z precyzyjnie frezowanymi elementami drewnianymi. Złożone frezowania tworzą unikalną, trójwymiarową teksturę, dodając wnętrzu przytulności i nowoczesnego charakteru.',
+    image: '/realizacje/sypialnia.jpg',
     details: [
-      { label: 'Fronty', value: 'Ramowe / frezowane' },
-      { label: 'Wykończenie', value: 'Lakier półmatowy' },
-      { label: 'Detale', value: 'Klasyczne proporcje ramiaka' }
+      { label: 'Elementy', value: 'Frezowane panele ścienne' },
+      { label: 'Wykończenie', value: 'Naturalne drewno' },
+      { label: 'Detale', value: 'Frezowanie 3D' }
     ]
   }
 ];
