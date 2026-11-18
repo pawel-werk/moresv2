@@ -132,7 +132,7 @@ export const Contact: React.FC<ContactProps> = ({ hideFileDownload = false }) =>
                 {!hideFileDownload && (
                   <div className="bg-night/50 border border-copper/30 p-4 rounded-sm flex flex-col gap-3">
                     <p className="text-ivory/80 text-[13px] font-light">
-                      Aby przyśpieszyć wycenę, zachęcamy do pobrania formularza w pliku Excel. Wypełnij go i dołącz jako załącznik do wysyłanej wiadomości e-mail (na adres <span className="text-copper font-medium">info@mores.pl</span>).
+                      Aby przyśpieszyć wycenę, zachęcamy do pobrania formularza w pliku Excel. Wypełnij go, dołącz jako załącznik do wiadomości e-mail i wyślij go do nas (na adres <span className="text-copper font-medium">info@mores.pl</span>).
                     </p>
                     <a 
                       href="/formularz_zamowienia.xlsx" 
