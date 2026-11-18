@@ -5,8 +5,7 @@ interface LogoProps {
   variant?: 'dark' | 'light';
 }
 
-export const Logo: React.FC<LogoProps> = ({ className = "h-10", variant = 'dark' }) => {
-  // Zaktualizowano wariant light na nowy link
+export const Logo: React.FC<LogoProps> = ({ className = "", variant = 'dark' }) => {
   const logoSrc = variant === 'light' 
     ? "https://i.postimg.cc/nzJc1X8T/mores-logo-v3-white.png?v=2" 
     : "https://i.postimg.cc/1tQ5K8xJ/mores-logo-v3.png?v=2";
@@ -15,7 +14,8 @@ export const Logo: React.FC<LogoProps> = ({ className = "h-10", variant = 'dark'
     <img 
       src={logoSrc} 
       alt="mores logo" 
-      className={`w-auto object-contain max-h-full ${className}`}
+      style={{ height: '40px', width: 'auto', objectFit: 'contain' }}
+      className={`max-h-full ${className}`}
       loading="eager"
       onError={(e) => {
         e.currentTarget.style.display = 'none';
