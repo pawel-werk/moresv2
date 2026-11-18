@@ -16,7 +16,7 @@ export const galleryData: GalleryItem[] = [
   {
     id: '1',
     category: 'fronty',
-    title: 'Minimalizm w drewnie',
+    title: 'Naturalna harmonia',
     subtitle: 'Nowoczesna kuchnia',
     description: 'Kuchnia / Gładkie',
     longDesc: 'Zabudowa kuchenna łącząca minimalistyczne, gładkie fronty z głęboką strukturą drewna orzechowego. Całość tworzy ciepłą, nowoczesną przestrzeń, przełamaną białymi akcentami dolnych szafek i blatu.',
@@ -30,7 +30,7 @@ export const galleryData: GalleryItem[] = [
   {
     id: '2',
     category: 'nietypowe',
-    title: 'Półwysep z lamelami',
+    title: 'Finezja formy',
     subtitle: 'Otwarta przestrzeń',
     description: 'Kuchnia / Lamele',
     longDesc: 'Nietypowa zabudowa kuchenna, której głównym elementem jest zaokrąglony półwysep połączony ze stołem jadalnianym. Fronty wysokie wykończone pionowymi podziałami nadają lekkości, a zaokrąglone krawędzie mebli wprowadzają organiczny charakter.',
@@ -44,7 +44,7 @@ export const galleryData: GalleryItem[] = [
   {
     id: '3',
     category: 'nietypowe',
-    title: 'Podświetlany regał',
+    title: 'Ekspresja kamienia',
     subtitle: 'Strefa dzienna',
     description: 'Regał / Podświetlenie',
     longDesc: 'Eksponujący regał z podświetlanymi plecami, stworzony z myślą o ekspozycji trunków. Ciemna, matowa obudowa i gładkie fronty szafek dolnych stanowią doskonałą ramę dla podświetlonego kamienia (lub imitacji).',
@@ -58,7 +58,7 @@ export const galleryData: GalleryItem[] = [
   {
     id: '4',
     category: 'fronty',
-    title: 'Frezowany zagłówek',
+    title: 'Relief w drewnie',
     subtitle: 'Sypialnia główna',
     description: 'Sypialnia / Frezowania',
     longDesc: 'Zabudowa ściany w sypialni łącząca tapicerowane panele z precyzyjnie frezowanymi elementami drewnianymi. Złożone frezowania tworzą unikalną, trójwymiarową teksturę, dodając wnętrzu przytulności i nowoczesnego charakteru.',
