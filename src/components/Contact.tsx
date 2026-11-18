@@ -3,7 +3,11 @@ import { Reveal } from './Reveal';
 import { ArrowRight } from './Icons';
 import { companyData } from '../data/content';
 
-export const Contact: React.FC = () => {
+interface ContactProps {
+  hideFileDownload?: boolean;
+}
+
+export const Contact: React.FC<ContactProps> = ({ hideFileDownload = false }) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
@@ -12,7 +16,13 @@ export const Contact: React.FC = () => {
     const msg = fd.get('message') as string;
     
     const subject = encodeURIComponent('Zapytanie ze strony internetowej');
-    const body = encodeURIComponent(`Imię/Firma: ${name}\nTelefon: ${phone}\n\n${msg}`);
+    
+    // Dodatkowy dopisek w treści maila, jeśli formularz udostępnia pobieranie pliku
+    const extraMsg = !hideFileDownload 
+      ? '\n\n[Jeśli posiadasz wypełniony formularz z pliku Excel, pamiętaj o dodaniu go jako załącznik do tej wiadomości]' 
+      : '';
+      
+    const body = encodeURIComponent(`Imię/Firma: ${name}\nTelefon: ${phone}\n\n${msg}${extraMsg}`);
     
     window.location.href = `mailto:${companyData.email}?subject=${subject}&body=${body}`;
   };
@@ -94,7 +104,6 @@ export const Contact: React.FC = () => {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-[10px] uppercase tracking-widest text-muted-dark font-bold">Ładowanie mapy...</span>
                 </div>
-                {/* Mapa w ciemnym stylu - bazujemy na filtrach CSS */}
                 <iframe 
                   title="Mapa dojazdu"
                   className="absolute inset-0 w-full h-full z-10 transition-all duration-1000 grayscale opacity-60 hover:opacity-80"
@@ -110,13 +119,33 @@ export const Contact: React.FC = () => {
           {/* Prawa kolumna: Formularz */}
           <Reveal delay={500} className="h-full">
             <div className="flex flex-col h-full bg-surface p-8 md:p-12 lg:p-16 shadow-2xl border border-line-dark rounded-sm">
+              
               <div className="mb-12 border-b border-line-dark pb-8">
                 <h3 className="font-serif text-3xl text-ivory mb-4">
                   Zapytaj o wycenę
                 </h3>
-                <p className="text-ivory/70 font-light leading-relaxed">
+                <p className="text-ivory/70 font-light leading-relaxed mb-6">
                   Podaj wymiary, wykończenie oraz szacowaną ilość sztuk.
                 </p>
+
+                {/* Sekcja do pobierania pliku Excel */}
+                {!hideFileDownload && (
+                  <div className="bg-night/50 border border-copper/30 p-4 rounded-sm flex flex-col gap-3">
+                    <p className="text-ivory/80 text-[13px] font-light">
+                      Aby przyśpieszyć wycenę, zachęcamy do pobrania formularza w pliku Excel. Wypełnij go i dołącz jako załącznik do wysyłanej wiadomości e-mail (na adres <span className="text-copper font-medium">info@mores.pl</span>).
+                    </p>
+                    <a 
+                      href="/formularz_zamowienia.xlsx" 
+                      download="formularz.xlsx"
+                      className="inline-flex items-center gap-2 text-[13px] font-medium text-copper hover:text-gold transition-colors w-fit"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                      Pobierz plik Excel (Formularz zamówienia)
+                    </a>
+                  </div>
+                )}
               </div>
               
               <form onSubmit={handleSubmit} className="flex flex-col flex-1">

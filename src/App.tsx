@@ -38,9 +38,11 @@ function App() {
         {renderPage()}
       </main>
       
-      {/* Globalna sekcja kontaktu (renderowana na dole każdej strony), 
-          dzięki czemu anchor link #kontakt płynnie przewija stronę z dowolnego miejsca */}
-      <Contact />
+      {/* 
+        Globalna sekcja kontaktu.
+        Jeśli aktualny path to 'cnc', ukrywamy możliwość pobierania excela 
+      */}
+      <Contact hideFileDownload={path === 'cnc'} />
       
       <Footer />
     </div>
