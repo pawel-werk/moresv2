@@ -7,14 +7,14 @@ interface LogoProps {
 
 export const Logo: React.FC<LogoProps> = ({ className = "", variant = 'dark' }) => {
   const logoSrc = variant === 'light' 
-    ? "https://i.postimg.cc/nzJc1X8T/mores-logo-v3-white.png?v=2" 
-    : "https://i.postimg.cc/1tQ5K8xJ/mores-logo-v3.png?v=2";
+    ? "https://i.postimg.cc/G3gpXHht/logo-light.png" 
+    : "https://i.postimg.cc/jq3jMLdD/logo.png";
 
   return (
     <img 
       src={logoSrc} 
       alt="mores logo" 
-      style={{ height: '58px', width: 'auto', objectFit: 'contain' }}
+      style={{ height: '70px', width: 'auto', objectFit: 'contain' }}
       className={`max-h-full block ${className}`}
       loading="eager"
       onError={(e) => {
