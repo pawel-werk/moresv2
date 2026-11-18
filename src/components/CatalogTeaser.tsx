@@ -1,160 +1,75 @@
-import React, { useState, useEffect } from 'react';
-import { XIcon } from './Icons';
+import React from 'react';
 import { Reveal } from './Reveal';
-import { galleryData, GalleryItem } from '../data/gallery';
-import { scrollToSection } from '../utils/scrollToSection';
+import { Logo } from './Logo';
 
-export const GalleryTeaser: React.FC = () => {
-  // Pobieramy 4 pierwsze realizacje z głównej bazy jako "Teaser" na stronę główną
-  const teaserProjects = galleryData.slice(0, 4);
-  const [activeProject, setActiveProject] = useState<GalleryItem | null>(null);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && activeProject) setActiveProject(null);
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    if (activeProject) document.body.style.overflow = 'hidden';
-    else document.body.style.overflow = '';
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = '';
-    };
-  }, [activeProject]);
-
+export const CatalogTeaser: React.FC = () => {
   return (
-    <section id="realizacje" className="py-16 md:py-24 bg-surface-2 relative hairline-dark-t">
-      
-      {/* Modal detalu realizacji */}
-      {activeProject && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-8 bg-night/90 backdrop-blur-sm transition-opacity duration-300">
-          <div className="relative w-full max-w-[1400px] w-[96vw] bg-surface rounded-sm shadow-2xl flex flex-col lg:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-300 max-h-[95dvh] lg:h-[85vh] border border-line-dark">
-            
-            <button 
-              onClick={() => setActiveProject(null)} 
-              className="absolute top-4 right-4 lg:top-8 lg:right-8 p-2 text-ivory hover:text-copper transition-colors z-50 bg-surface-2 backdrop-blur-md rounded-full border border-line-dark outline-none focus-visible:ring-2 focus-visible:ring-copper"
-              aria-label="Zamknij"
-            >
-              <XIcon className="w-6 h-6 lg:w-8 lg:h-8" aria-hidden="true" />
-            </button>
-
-            {/* Zdjęcie na pełną wysokość */}
-            <div className="w-full lg:w-[60%] h-[40vh] lg:h-full relative shrink-0 bg-night flex items-center justify-center overflow-hidden">
-              {activeProject.image && (
-                <img 
-                  src={activeProject.image} 
-                  alt={activeProject.title} 
-                  className="w-full h-full object-cover"
-                />
-              )}
-            </div>
-
-            {/* Opis */}
-            <div className="w-full lg:w-[40%] p-6 sm:p-10 lg:p-16 flex flex-col overflow-y-auto text-left items-start">
-              <span className="text-[11px] uppercase tracking-widest font-semibold text-gold mb-4 block">
-                {activeProject.description}
-              </span>
-              <h3 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-ivory mb-2">
-                {activeProject.title}
-              </h3>
-              {activeProject.subtitle && (
-                <p className="text-muted-dark text-sm lg:text-base font-light mb-8 lg:mb-12">
-                  {activeProject.subtitle}
-                </p>
-              )}
-              
-              <p className="text-ivory/70 font-light leading-relaxed text-sm sm:text-base lg:text-lg mb-10">
-                {activeProject.longDesc}
-              </p>
-
-              <div className="mt-auto border-t border-line-dark pt-8 w-full">
-                <div className="space-y-4 mb-10">
-                  {activeProject.details?.map((detail, idx) => (
-                    <div key={idx} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-4 pb-4 border-b border-line-dark last:border-0">
-                      <span className="text-[10px] uppercase tracking-widest font-bold text-muted-dark">
-                        {detail.label}
-                      </span>
-                      <span className="text-ivory text-sm font-medium">
-                        {detail.value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                
-                {/* Wymuszenie wyśrodkowania przycisku na 100% szerokości kolumny */}
-                <div className="flex justify-center w-full">
-                  <a 
-                    href="#kontakt" 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setActiveProject(null);
-                      setTimeout(() => scrollToSection('#kontakt'), 150);
-                    }}
-                    className="inline-block bg-[linear-gradient(135deg,var(--color-copper),var(--color-gold))] text-night text-center px-8 py-4 text-[14px] lg:text-[15px] font-medium hover:brightness-110 transition-all rounded-sm w-full shadow-[0_0_20px_rgba(184,107,62,0.15)] hover:shadow-[0_0_30px_rgba(184,107,62,0.25)] outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-                  >
-                    Zapytaj o wycenę
-                  </a>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      )}
-
+    <section id="katalog-teaser" className="py-12 md:py-16 bg-oak text-ink overflow-hidden hairline-b" aria-labelledby="catalog-teaser-title">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <header className="mb-16 md:mb-24">
-          <Reveal>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-8 h-[1px] bg-copper" />
-              <span className="text-[11px] uppercase tracking-widest font-semibold text-gold">
-                Portfolio
-              </span>
-            </div>
-            <h2 className="font-serif text-4xl md:text-5xl text-ivory mb-6">Nasze realizacje</h2>
-            <p className="text-ivory/70 text-lg font-light leading-relaxed max-w-2xl">
-              Wybrane projekty, w których nasze fronty i elementy stolarskie stały się częścią wyjątkowych wnętrz.
-            </p>
-          </Reveal>
-        </header>
-
-        <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-          {teaserProjects.map((project, idx) => (
-            <Reveal key={project.id} delay={idx * 100} variant="slide-up">
-              <div 
-                className="group cursor-pointer block outline-none focus-visible:ring-2 focus-visible:ring-copper rounded-sm"
-                onClick={() => setActiveProject(project)}
-              >
-                <div className="relative aspect-[4/3] overflow-hidden rounded-sm mb-6 bg-night">
-                  {project.image && (
-                    <img 
-                      src={project.image} 
-                      alt={project.title}
-                      className="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
-                    />
-                  )}
-                  {/* Ciemny gradient od dołu poprawiający kontrast tekstu i łagodzący obraz w ciemnym motywie */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-night/80 via-night/10 to-transparent opacity-60 group-hover:opacity-30 transition-opacity duration-500" />
-                </div>
+        <div className="grid lg:grid-cols-12 gap-16 items-center">
+          
+          <div className="lg:col-span-5 order-2 lg:order-1">
+            <Reveal>
+              <h2 id="catalog-teaser-title" className="font-serif text-4xl md:text-5xl text-ink leading-tight mb-6">
+                Katalog kolekcji frontów
+              </h2>
+              <p className="text-ink/70 text-lg font-light leading-relaxed mb-12 max-w-md">
+                Zapoznaj się z naszymi standardowymi wzorami, rodzajami frezowań i wykończeniami. Pobierz materiały techniczne przygotowane z myślą o profesjonalistach.
+              </p>
+            </Reveal>
+            
+            <Reveal delay={100}>
+              <div className="flex flex-wrap items-center gap-8">
+                <a href="#/katalog" className="bg-ink text-paper px-8 py-4 text-[15px] font-medium hover:bg-graphite transition-colors inline-flex items-center gap-3 rounded-sm">
+                  Zobacz online 
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white" aria-hidden="true">
+                    <path d="M15 5l7 7-7 7M3 12h19"></path>
+                  </svg>
+                </a>
                 
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 px-2">
-                  <div>
-                    <span className="text-[10px] uppercase tracking-widest font-bold text-copper mb-2 block">
-                      {project.description}
-                    </span>
-                    <h3 className="font-serif text-2xl md:text-3xl text-ivory group-hover:text-copper transition-colors">
-                      {project.title}
-                    </h3>
-                  </div>
-                  {project.subtitle && (
-                    <span className="text-muted-dark text-sm font-light mb-1">
-                      {project.subtitle}
-                    </span>
-                  )}
-                </div>
+                <a 
+                  href="/katalog.pdf" 
+                  download="Mores_Katalog_Frontow_2026.pdf" 
+                  className="text-[15px] font-medium text-ink hover:text-brand transition-colors relative group inline-flex items-center gap-2"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
+                    <path d="M12 3v14M8 13l4 4 4-4"></path>
+                    <path d="M4 21h16" stroke="var(--color-brand)"></path>
+                  </svg>
+                  Pobierz PDF
+                  <span className="absolute left-0 -bottom-1.5 w-full h-px bg-brand scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></span>
+                </a>
               </div>
             </Reveal>
-          ))}
+          </div>
+          
+          <div className="lg:col-span-7 order-1 lg:order-2 flex justify-center lg:justify-end">
+            <Reveal delay={200} className="p-4 sm:p-8">
+              <div className="relative w-64 sm:w-80 aspect-[1/1.414] group cursor-pointer perspective-1000">
+                <div className="absolute -inset-4 bg-brand/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-full pointer-events-none"></div>
+                <a href="#/katalog" className="block w-full h-full bg-paper rounded-r-md rounded-l-sm border-l-[16px] border-brand shadow-2xl relative overflow-hidden transition-all duration-[600ms] ease-out group-hover:-translate-y-2 group-hover:scale-[1.02] group-hover:-rotate-1">
+                  <div className="absolute inset-0 bg-noise opacity-[0.03] pointer-events-none"></div>
+                  <div className="flex flex-col justify-between h-full p-8 md:p-10">
+                    <div className="relative z-10">
+                      <Logo className="h-5 opacity-80" variant="dark" />
+                      <div className="w-12 h-px bg-ink/10 mt-8"></div>
+                    </div>
+                    <div className="relative z-10">
+                      <h3 className="font-serif text-3xl md:text-4xl text-ink leading-[1.1] mb-3">
+                        Katalog<br/>frontów
+                      </h3>
+                      <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-ink/40">
+                        Edycja / 2026
+                      </p>
+                    </div>
+                  </div>
+                  <div className="absolute left-0 top-0 bottom-0 w-px bg-black/15 pointer-events-none"></div>
+                  <div className="absolute left-1.5 top-0 bottom-0 w-px bg-white/40 pointer-events-none"></div>
+                </a>
+              </div>
+            </Reveal>
+          </div>
+          
         </div>
       </div>
     </section>
