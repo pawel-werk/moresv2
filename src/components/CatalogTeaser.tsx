@@ -1,96 +1,160 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { XIcon } from './Icons';
 import { Reveal } from './Reveal';
-import { DownloadIcon, ArrowRight } from './Icons';
-import { Logo } from './Logo';
+import { galleryData, GalleryItem } from '../data/gallery';
+import { scrollToSection } from '../utils/scrollToSection';
 
-export const CatalogTeaser: React.FC = () => {
+export const GalleryTeaser: React.FC = () => {
+  // Pobieramy 4 pierwsze realizacje z głównej bazy jako "Teaser" na stronę główną
+  const teaserProjects = galleryData.slice(0, 4);
+  const [activeProject, setActiveProject] = useState<GalleryItem | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && activeProject) setActiveProject(null);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    if (activeProject) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = '';
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [activeProject]);
+
   return (
-    <section id="katalog-teaser" className="py-16 md:py-24 bg-surface relative hairline-dark-b" aria-labelledby="catalog-teaser-title">
+    <section id="realizacje" className="py-16 md:py-24 bg-surface-2 relative hairline-dark-t">
       
-      {/* Subtelne tło podbijające premium charakter */}
-      <div className="absolute inset-0 bg-grain mix-blend-overlay opacity-5 pointer-events-none" aria-hidden="true" />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid lg:grid-cols-12 gap-16 items-center">
-          
-          {/* Kolumna lewa: Typografia i przyciski */}
-          <div className="lg:col-span-6 order-2 lg:order-1">
-            <Reveal>
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-8 h-[1px] bg-copper" />
-                <span className="text-[11px] uppercase tracking-widest font-semibold text-gold">
-                  Narzędzia pracy
-                </span>
-              </div>
-              <h2 id="catalog-teaser-title" className="font-serif text-4xl md:text-5xl text-ivory leading-tight mb-6">
-                Katalog kolekcji frontów
-              </h2>
-              <p className="text-ivory/70 text-lg font-light leading-relaxed mb-12 max-w-md">
-                Zapoznaj się z naszymi standardowymi wzorami, rodzajami frezowań i wykończeniami. Pobierz materiały techniczne przygotowane z myślą o profesjonalistach.
-              </p>
-            </Reveal>
+      {/* Modal detalu realizacji */}
+      {activeProject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-8 bg-night/90 backdrop-blur-sm transition-opacity duration-300">
+          <div className="relative w-full max-w-[1400px] w-[96vw] bg-surface rounded-sm shadow-2xl flex flex-col lg:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-300 max-h-[95dvh] lg:h-[85vh] border border-line-dark">
             
-            <Reveal delay={100}>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                <a 
-                  href="#/katalog" 
-                  className="bg-[linear-gradient(135deg,var(--color-copper),var(--color-gold))] text-night px-8 py-4 text-[15px] font-medium hover:brightness-110 transition-all rounded-sm inline-flex items-center gap-3 outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-2 focus-visible:ring-offset-surface shadow-[0_0_20px_rgba(184,107,62,0.15)] hover:shadow-[0_0_30px_rgba(184,107,62,0.25)]"
-                >
-                  Zobacz online <ArrowRight className="w-4 h-4 text-night" aria-hidden="true" />
-                </a>
-                
-                <a 
-                  href="/katalog/mores-katalog.pdf" 
-                  download 
-                  className="border border-ivory/20 text-ivory hover:border-copper hover:text-copper rounded-sm px-8 py-4 text-[15px] transition-colors inline-flex items-center gap-3 outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-                >
-                  <DownloadIcon className="w-4 h-4" aria-hidden="true" />
-                  Pobierz PDF
-                </a>
-              </div>
-            </Reveal>
-          </div>
+            <button 
+              onClick={() => setActiveProject(null)} 
+              className="absolute top-4 right-4 lg:top-8 lg:right-8 p-2 text-ivory hover:text-copper transition-colors z-50 bg-surface-2 backdrop-blur-md rounded-full border border-line-dark outline-none focus-visible:ring-2 focus-visible:ring-copper"
+              aria-label="Zamknij"
+            >
+              <XIcon className="w-6 h-6 lg:w-8 lg:h-8" aria-hidden="true" />
+            </button>
 
-          {/* Kolumna prawa: Lewitująca okładka katalogu */}
-          <div className="lg:col-span-6 order-1 lg:order-2 flex justify-center lg:justify-end">
-            <Reveal delay={200} className="w-full flex justify-center lg:justify-end p-4 sm:p-8">
-              <div className="relative w-64 sm:w-80 aspect-[1/1.414] group cursor-pointer perspective-1200">
-                
-                {/* Poświata za książką (rozmyty miedziany blask) */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-copper/10 blur-[60px] rounded-full pointer-events-none transition-opacity duration-700 group-hover:bg-copper/20" />
-                
-                {/* Obiekt książki 3D */}
-                <a 
-                  href="#/katalog"
-                  className="block w-full h-full bg-night rounded-r-md rounded-l-sm border-l-[16px] border-copper shadow-[20px_20px_40px_rgba(0,0,0,0.5)] relative transition-transform duration-[600ms] ease-out group-hover:-translate-y-4 group-hover:scale-[1.03] group-hover:rotate-y-[-5deg] group-hover:rotate-x-[2deg] outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-8 focus-visible:ring-offset-surface"
-                  style={{ transformStyle: 'preserve-3d' }}
-                >
-                  {/* Wnętrze okładki */}
-                  <div className="flex flex-col justify-between h-full p-8 md:p-10 relative z-10">
-                    <div className="relative">
-                      <Logo className="h-5 opacity-90" variant="light" />
-                      <div className="w-12 h-px bg-ivory/20 mt-8" />
+            {/* Zdjęcie na pełną wysokość */}
+            <div className="w-full lg:w-[60%] h-[40vh] lg:h-full relative shrink-0 bg-night flex items-center justify-center overflow-hidden">
+              {activeProject.image && (
+                <img 
+                  src={activeProject.image} 
+                  alt={activeProject.title} 
+                  className="w-full h-full object-cover"
+                />
+              )}
+            </div>
+
+            {/* Opis */}
+            <div className="w-full lg:w-[40%] p-6 sm:p-10 lg:p-16 flex flex-col overflow-y-auto text-left items-start">
+              <span className="text-[11px] uppercase tracking-widest font-semibold text-gold mb-4 block">
+                {activeProject.description}
+              </span>
+              <h3 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-ivory mb-2">
+                {activeProject.title}
+              </h3>
+              {activeProject.subtitle && (
+                <p className="text-muted-dark text-sm lg:text-base font-light mb-8 lg:mb-12">
+                  {activeProject.subtitle}
+                </p>
+              )}
+              
+              <p className="text-ivory/70 font-light leading-relaxed text-sm sm:text-base lg:text-lg mb-10">
+                {activeProject.longDesc}
+              </p>
+
+              <div className="mt-auto border-t border-line-dark pt-8 w-full">
+                <div className="space-y-4 mb-10">
+                  {activeProject.details?.map((detail, idx) => (
+                    <div key={idx} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-4 pb-4 border-b border-line-dark last:border-0">
+                      <span className="text-[10px] uppercase tracking-widest font-bold text-muted-dark">
+                        {detail.label}
+                      </span>
+                      <span className="text-ivory text-sm font-medium">
+                        {detail.value}
+                      </span>
                     </div>
-                    
-                    <div className="relative">
-                      <h3 className="font-serif text-3xl md:text-4xl text-ivory leading-[1.1] mb-3">
-                        Katalog<br/>frontów
-                      </h3>
-                      <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-dark">
-                        Edycja / 2026
-                      </p>
-                    </div>
+                  ))}
+                </div>
+                
+                {/* Wymuszenie wyśrodkowania przycisku na 100% szerokości kolumny */}
+                <div className="flex justify-center w-full">
+                  <a 
+                    href="#kontakt" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setActiveProject(null);
+                      setTimeout(() => scrollToSection('#kontakt'), 150);
+                    }}
+                    className="inline-block bg-[linear-gradient(135deg,var(--color-copper),var(--color-gold))] text-night text-center px-8 py-4 text-[14px] lg:text-[15px] font-medium hover:brightness-110 transition-all rounded-sm w-full shadow-[0_0_20px_rgba(184,107,62,0.15)] hover:shadow-[0_0_30px_rgba(184,107,62,0.25)] outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+                  >
+                    Zapytaj o wycenę
+                  </a>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <header className="mb-16 md:mb-24">
+          <Reveal>
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-8 h-[1px] bg-copper" />
+              <span className="text-[11px] uppercase tracking-widest font-semibold text-gold">
+                Portfolio
+              </span>
+            </div>
+            <h2 className="font-serif text-4xl md:text-5xl text-ivory mb-6">Nasze realizacje</h2>
+            <p className="text-ivory/70 text-lg font-light leading-relaxed max-w-2xl">
+              Wybrane projekty, w których nasze fronty i elementy stolarskie stały się częścią wyjątkowych wnętrz.
+            </p>
+          </Reveal>
+        </header>
+
+        <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+          {teaserProjects.map((project, idx) => (
+            <Reveal key={project.id} delay={idx * 100} variant="slide-up">
+              <div 
+                className="group cursor-pointer block outline-none focus-visible:ring-2 focus-visible:ring-copper rounded-sm"
+                onClick={() => setActiveProject(project)}
+              >
+                <div className="relative aspect-[4/3] overflow-hidden rounded-sm mb-6 bg-night">
+                  {project.image && (
+                    <img 
+                      src={project.image} 
+                      alt={project.title}
+                      className="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
+                    />
+                  )}
+                  {/* Ciemny gradient od dołu poprawiający kontrast tekstu i łagodzący obraz w ciemnym motywie */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-night/80 via-night/10 to-transparent opacity-60 group-hover:opacity-30 transition-opacity duration-500" />
+                </div>
+                
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 px-2">
+                  <div>
+                    <span className="text-[10px] uppercase tracking-widest font-bold text-copper mb-2 block">
+                      {project.description}
+                    </span>
+                    <h3 className="font-serif text-2xl md:text-3xl text-ivory group-hover:text-copper transition-colors">
+                      {project.title}
+                    </h3>
                   </div>
-                  
-                  {/* Żłobienie przy grzbiecie (iluzja oprawy) */}
-                  <div className="absolute left-0 top-0 bottom-0 w-px bg-black/60 pointer-events-none z-20" />
-                  <div className="absolute left-1.5 top-0 bottom-0 w-px bg-white/10 pointer-events-none z-20" />
-                </a>
-                
+                  {project.subtitle && (
+                    <span className="text-muted-dark text-sm font-light mb-1">
+                      {project.subtitle}
+                    </span>
+                  )}
+                </div>
               </div>
             </Reveal>
-          </div>
-
+          ))}
         </div>
       </div>
     </section>
