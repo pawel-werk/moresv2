@@ -827,4 +827,3 @@ export const CatalogPage: React.FC = () => {
     </div>
   );
 };
-```[cite: 1, 2]
