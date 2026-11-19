@@ -4,12 +4,12 @@ import { companyData } from '../data/content';
 import { scrollToSection } from '../utils/scrollToSection';
 
 const machines = [
-  { name: "Centrum obróbcze", image: "https://i.postimg.cc/15sdMrcb/cnc2.jpg" },
-  { name: "Okleiniarka", image: "https://i.postimg.cc/y6vxYvdt/okeiniarka.jpg" },
-  { name: "Prasa", image: "https://i.postimg.cc/qBjqMjRL/prasa.jpg" },
-  { name: "Formatyzacja", image: "https://i.postimg.cc/h4pvPpjL/formatyzacja.jpg" },
-  { name: "Lakiernia", image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&q=80&w=800" },
-  { name: "Montownia", image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=800" }
+  { name: "Centrum obróbcze", image: "/park-maszynowy/cnc2.webp" },
+  { name: "Okleiniarka", image: "/park-maszynowy/okeiniarka.webp" },
+  { name: "Prasa", image: "/park-maszynowy/prasa.webp" },
+  { name: "Formatyzacja", image: "/park-maszynowy/formatyzacja.webp" },
+  { name: "Lakiernia", image: "/park-maszynowy/lakiernia.webp" },
+  { name: "Montownia", image: "/park-maszynowy/montownia.webp" }
 ];
 
 const productionFeatures = [
@@ -113,7 +113,7 @@ export const CncPage: React.FC = () => {
           <Reveal delay={300} className="relative w-full aspect-[4/3] lg:aspect-[16/10] group cursor-pointer mt-8 lg:mt-0">
             <div className="absolute inset-0 bg-surface rounded-sm overflow-hidden flex items-center justify-center shadow-2xl border border-line-dark">
               <img 
-                src="https://i.postimg.cc/NMxMXxxc/cnc.jpg" 
+                src="/park-maszynowy/cnc1.webp" 
                 alt="Maszyna PG CNC 2030 ATC" 
                 className="w-full h-full object-cover grayscale opacity-50 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105 group-hover:grayscale-0 group-hover:opacity-100" 
               />
@@ -215,6 +215,8 @@ export const CncPage: React.FC = () => {
                     <img 
                       src={machine.image} 
                       alt={machine.name} 
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-night/80 via-transparent to-transparent pointer-events-none group-hover:opacity-20 transition-opacity duration-700" />

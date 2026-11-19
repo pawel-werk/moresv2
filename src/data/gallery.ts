@@ -20,7 +20,7 @@ export const galleryData: GalleryItem[] = [
     subtitle: 'Nowoczesna kuchnia',
     description: 'Kuchnia / Gładkie',
     longDesc: 'Zabudowa kuchenna łącząca minimalistyczne, gładkie fronty z głęboką strukturą drewna orzechowego. Całość tworzy ciepłą, nowoczesną przestrzeń, przełamaną białymi akcentami dolnych szafek i blatu.',
-    image: '/realizacje/kuchnia.jpg',
+    image: '/realizacje/kuchnia.webp',
     details: [
       { label: 'Fronty', value: 'Płaskie fornir / Lakier mat' },
       { label: 'Wykończenie', value: 'Orzech amerykański / Biel' },
@@ -34,7 +34,7 @@ export const galleryData: GalleryItem[] = [
     subtitle: 'Otwarta przestrzeń',
     description: 'Kuchnia / Lamele',
     longDesc: 'Nietypowa zabudowa kuchenna, której głównym elementem jest zaokrąglony półwysep połączony ze stołem jadalnianym. Fronty wysokie wykończone pionowymi podziałami nadają lekkości, a zaokrąglone krawędzie mebli wprowadzają organiczny charakter.',
-    image: '/realizacje/kuchnia2.jpg',
+    image: '/realizacje/kuchnia2.webp',
     details: [
       { label: 'Zabudowa', value: 'Gięte elementy fornirowane' },
       { label: 'Wyspa', value: 'Zintegrowana ze stołem' },
@@ -48,7 +48,7 @@ export const galleryData: GalleryItem[] = [
     subtitle: 'Strefa dzienna',
     description: 'Regał / Podświetlenie',
     longDesc: 'Eksponujący regał z podświetlanymi plecami, stworzony z myślą o ekspozycji trunków. Ciemna, matowa obudowa i gładkie fronty szafek dolnych stanowią doskonałą ramę dla podświetlonego kamienia (lub imitacji).',
-    image: '/realizacje/regal.jpg',
+    image: '/realizacje/regal.webp',
     details: [
       { label: 'Fronty', value: 'Gładkie, lakierowane' },
       { label: 'Elementy', value: 'Półki otwarte' },
@@ -62,7 +62,7 @@ export const galleryData: GalleryItem[] = [
     subtitle: 'Sypialnia główna',
     description: 'Sypialnia / Frezowania',
     longDesc: 'Zabudowa ściany w sypialni łącząca tapicerowane panele z precyzyjnie frezowanymi elementami drewnianymi. Złożone frezowania tworzą unikalną, trójwymiarową teksturę, dodając wnętrzu przytulności i nowoczesnego charakteru.',
-    image: '/realizacje/sypialnia.jpg',
+    image: '/realizacje/sypialnia.webp',
     details: [
       { label: 'Elementy', value: 'Frezowane panele ścienne' },
       { label: 'Wykończenie', value: 'Naturalne drewno' },
