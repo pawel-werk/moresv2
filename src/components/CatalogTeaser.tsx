@@ -13,7 +13,7 @@ export const CatalogTeaser: React.FC = () => {
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-8 h-[1px] bg-copper" />
                 <span className="text-[11px] uppercase tracking-widest font-semibold text-gold">
-                  Narzędzia pracy
+                  Wzory i wykończenia
                 </span>
               </div>
               <h2 id="catalog-teaser-title" className="font-serif text-4xl md:text-5xl text-ivory leading-tight mb-6">
